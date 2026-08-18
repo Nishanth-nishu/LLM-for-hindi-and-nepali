@@ -142,21 +142,25 @@ def train_sentencepiece(
         )
         sys.exit(1)
 
-    spm.SentencePieceTrainer.train(
-        input=str(corpus_path),
-        model_prefix=model_prefix,
-        vocab_size=vocab_size,
-        model_type=model_type,
-        character_coverage=character_coverage,
-        pad_id=pad_id,
-        unk_id=unk_id,
-        bos_id=bos_id,
-        eos_id=eos_id,
-        normalization_rule_name="nmt_nfkc",
-        remove_extra_whitespaces=True,
-        input_sentence_size=5_000_000,  # max training sentences
-        shuffle_input_sentence=True,
-    )
+    try:
+        spm.SentencePieceTrainer.train(
+            input=str(corpus_path),
+            model_prefix=model_prefix,
+            vocab_size=vocab_size,
+            model_type=model_type,
+            character_coverage=character_coverage,
+            pad_id=pad_id,
+            unk_id=unk_id,
+            bos_id=bos_id,
+            eos_id=eos_id,
+            normalization_rule_name="nmt_nfkc",
+            remove_extra_whitespaces=True,
+            input_sentence_size=5_000_000,  # max training sentences
+            shuffle_input_sentence=True,
+        )
+    except RuntimeError as e:
+        print(f"[train_tokenizer] WARNING: Skipping vocab_size={vocab_size}: {e}", file=sys.stderr)
+        return None
 
 
 # ---------------------------------------------------------------------------
@@ -311,7 +315,7 @@ def run_sweep(
 
     # Write training corpus to a temp file
     corpus_path = output_dir / "train_corpus.txt"
-    print(f"[train_tokenizer] Writing SentencePiece training corpus ??? {corpus_path}")
+    print(f"[train_tokenizer] Writing SentencePiece training corpus -> {corpus_path}")
     write_text_file_for_spm(train_texts, corpus_path)
 
     results = []
@@ -322,16 +326,21 @@ def run_sweep(
 
         model_prefix = str(output_dir / f"spm_{lang}_{model_type}_v{vocab_size}")
 
-        train_sentencepiece(
+        res = train_sentencepiece(
             corpus_path=corpus_path,
             model_prefix=model_prefix,
             vocab_size=vocab_size,
             model_type=model_type,
         )
 
+        model_file = Path(f"{model_prefix}.model")
+        if not model_file.exists():
+            print(f"  [train_tokenizer] Skipped evaluation for vocab_size={vocab_size} (model not generated).")
+            continue
+
         # Load and evaluate
         sp = spm.SentencePieceProcessor()
-        sp.load(f"{model_prefix}.model")
+        sp.load(str(model_file))
 
         print(f"  Evaluating on {len(val_texts)} validation documents???")
         # Use a subset for speed (up to 5000 docs)

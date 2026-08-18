@@ -97,6 +97,9 @@ pip install datasets sentencepiece datasketch fasttext langdetect \
 sudo apt-get install tesseract-ocr tesseract-ocr-hin tesseract-ocr-nep poppler-utils
 # fastText language ID model:
 wget https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.bin
+
+# Only needed for Step 3b (LLM quality repair of manual data, Yi model):
+pip install transformers accelerate bitsandbytes torch
 ```
 
 ### Step 1 ??? Source Reconnaissance (do this FIRST, before bulk download)
@@ -143,6 +146,44 @@ python common/preprocessing/scrape_ingest.py --lang hindi \
 python common/preprocessing/transcription_ingest.py --lang hindi \
     --input-dir project/hindi/data/raw/manual/transcription/ --repo-root project/
 ```
+
+### Step 3b ??? LLM Quality Repair for Manual Data (Yi model)
+
+Manually-collected text (OCR especially) is much noisier than the downloaded
+corpora. Before it enters the shared cleaning pipeline, run it through
+`llm_quality_repair.py`, which uses a Yi model (`01-ai/Yi-1.5-*-Chat`) to fix
+OCR/scrape damage ??? broken characters, mid-word line splits, running
+headers/footers ??? without paraphrasing or inventing content, and to drop
+documents that are unsalvageable. This is a **generative repair pass on
+manual data only**; it never touches the downloaded corpora, which are
+already clean machine text.
+
+```bash
+# Smoke test on a handful of docs first:
+python common/preprocessing/llm_quality_repair.py --lang hindi \
+    --input  project/hindi/data/raw/manual/ocr/hi_ocr_raw.jsonl \
+    --output project/hindi/data/raw/manual/ocr/hi_ocr_llm_repaired.jsonl \
+    --repo-root project/ --model 01-ai/Yi-1.5-6B-Chat --use-4bit --dry-run 20
+
+# Full run (drop --dry-run once the smoke test looks right):
+python common/preprocessing/llm_quality_repair.py --lang hindi \
+    --input  project/hindi/data/raw/manual/ocr/hi_ocr_raw.jsonl \
+    --output project/hindi/data/raw/manual/ocr/hi_ocr_llm_repaired.jsonl \
+    --repo-root project/ --model 01-ai/Yi-1.5-6B-Chat --use-4bit
+```
+
+Repeat for the scrape and transcription outputs, and for Nepali. Use the
+larger `01-ai/Yi-1.5-9B-Chat` (no `--use-4bit`, needs more VRAM) if you have
+a bigger GPU than a free-tier Colab T4; the 6B + 4-bit combination is what
+fits a free T4 (~15GB VRAM).
+
+The script is resumable (re-running with the same `--output` skips
+already-processed doc_ids) and writes an audit trail ??? every
+(original, repaired) pair and every rejection ??? to
+`<lang>/data/raw/manual/llm_repair_audit.jsonl`, plus a random sample to
+`report/llm_quality_repair_audit_sample_<lang>.json` for the Phase-1 report.
+Feed `*_llm_repaired.jsonl` (not the raw ingest output) into Step 5's
+`lang_id_filter.py` for manual sources.
 
 ### Step 4 ??? Freeze Test Holdout (BEFORE any cleaning)
 
@@ -260,6 +301,24 @@ Scripts warn when running with null (fallback) thresholds.
 The 20% manual fraction is evaluated on the **final tokenized training corpus**
 (not raw byte counts). `compute_stats.py` reports a PASS/FAIL against this
 requirement. If FAIL, the output states exactly how many more manual tokens are needed.
+
+### Target split (both languages)
+
+| | Target tokens (post-cleaning) | Source |
+|---|---|---|
+| Manual   | 100,000,000 (20%) | OCR + scrape + transcription, repaired via `llm_quality_repair.py` |
+| Downloaded | 400,000,000 (80%) | Wikipedia, IndicCorpV2, OSCAR, (Hindi: CC100 if enabled) |
+| **Total** | **500,000,000** | |
+
+These targets live in `manual_target_tokens` / `downloaded_target_tokens` /
+`token_target` under `manual_collection:` in each language's
+`configs/data_config.yaml`, and `manifest_utils.manual_downloaded_summary()`
+checks both the absolute targets and the 20% ratio ??? `compute_stats.py`
+prints a PASS/FAIL line for each. For **Nepali**, the 400M downloaded target
+is aspirational (see the note in `nepali/configs/data_config.yaml`): if
+public Nepali corpora don't reach it, do not backfill with invented manual
+data ??? report the exact shortfall in the Phase 1 report instead, per the
+assignment's instructions for the low-resource language.
 
 ---
 

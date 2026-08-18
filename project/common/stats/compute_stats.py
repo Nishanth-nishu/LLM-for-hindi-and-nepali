@@ -302,6 +302,22 @@ def main() -> None:
             f"{int(breakdown['total_chars'] * 0.20 - breakdown['manual_chars'])} chars.",
             file=sys.stderr,
         )
+    if not breakdown["manual_target_met"]:
+        print(
+            f"[compute_stats] Manual tokens: {breakdown['manual_tokens_est']:,} / "
+            f"{breakdown['manual_target_tokens']:,} target "
+            f"({breakdown['manual_tokens_remaining']:,} more needed).",
+            file=sys.stderr,
+        )
+    if not breakdown["downloaded_target_met"]:
+        print(
+            f"[compute_stats] Downloaded tokens: {breakdown['downloaded_tokens_est']:,} / "
+            f"{breakdown['downloaded_target_tokens']:,} target "
+            f"({breakdown['downloaded_tokens_remaining']:,} more needed)."
+            + (" Expected for low-resource Nepali ??? document the shortfall in the report."
+               if lang == "nepali" else ""),
+            file=sys.stderr,
+        )
 
     # 5. Tokenizer stats
     print("[compute_stats] Computing tokenizer stats???")
@@ -337,13 +353,19 @@ def main() -> None:
         json.dump({"filter_table": filter_table, "source_table": src_table}, f,
                   ensure_ascii=False, indent=2)
 
-    print(f"\n[compute_stats] Stats saved ??? {out_path}")
+    print(f"\n[compute_stats] Stats saved -> {out_path}")
     tr = split_stats.get("train", {})
     print(
         f"  Train docs    : {tr.get('n_docs', 0):,}\n"
         f"  Train tokens  : {tr.get('total_tokens', 0):,}\n"
         f"  Manual pct    : {breakdown.get('manual_pct', 0):.1f}%  "
         f"({'PASS' if breakdown.get('compliant') else 'FAIL ???20% required'})\n"
+        f"  Manual tokens : {breakdown.get('manual_tokens_est', 0):,} / "
+        f"{breakdown.get('manual_target_tokens', 0):,} "
+        f"({'PASS' if breakdown.get('manual_target_met') else 'FAIL'})\n"
+        f"  Downloaded tok: {breakdown.get('downloaded_tokens_est', 0):,} / "
+        f"{breakdown.get('downloaded_target_tokens', 0):,} "
+        f"({'PASS' if breakdown.get('downloaded_target_met') else 'FAIL'})\n"
         f"  Vocab size    : {tokenizer_stats.get('vocab_size', 'N/A')}\n"
         f"  Fertility     : {tokenizer_stats.get('fertility', 'N/A')}\n"
         f"  UNK rate      : {tokenizer_stats.get('unk_rate_pct', 'N/A')}%"

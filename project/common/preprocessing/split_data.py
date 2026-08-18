@@ -172,7 +172,7 @@ def main() -> None:
     test_dst = splits_dir / "test.jsonl"
     if test_src.exists():
         shutil.copy(test_src, test_dst)
-        print(f"[split_data] Copied frozen test ??? {test_dst}")
+        print(f"[split_data] Copied frozen test -> {test_dst}")
     else:
         print(f"[split_data] WARNING: test_holdout/test.jsonl not found.", file=sys.stderr)
 

@@ -350,7 +350,7 @@ def main() -> None:
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(report_md)
 
-    print(f"[generate_report] Phase 1 report written ??? {out_path}")
+    print(f"[generate_report] Phase 1 report written -> {out_path}")
     print("  Fill in all <!-- TODO --> sections before submission.")
 
 

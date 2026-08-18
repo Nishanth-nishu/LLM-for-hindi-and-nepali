@@ -74,7 +74,7 @@ MANIFEST_COLUMNS: list[str] = [
 
 VALID_SOURCE_TYPES       = {"wikipedia", "hf_corpus", "scrape", "ocr", "transcription"}
 VALID_COLLECTION_METHODS = {"manual", "downloaded"}
-VALID_STATUSES           = {"retained", "dropped"}
+VALID_STATUSES           = {"retained", "dropped", "needs_manual_review"}
 VALID_SPLITS             = {"train", "val", "test", None, ""}
 
 LANG_EXPECTED: dict[str, str] = {
@@ -432,7 +432,15 @@ def stage_filter_table(lang: str, repo_root: str = ".") -> list[dict]:
 
 def manual_downloaded_summary(lang: str, repo_root: str = ".") -> dict:
     """
-    Summarise manual vs. downloaded char/token counts across retained documents.
+    Summarise manual vs. downloaded char/token counts across retained documents,
+    and check both the percentage requirement (>=20% manual) and the assignment's
+    absolute token targets (manual_target_tokens / downloaded_target_tokens /
+    token_target from <lang>/configs/data_config.yaml, default 100M/400M/500M).
+
+    Token counts here use the same crude char/4.5 estimate as raw_token_estimate
+    elsewhere in the manifest (planning-grade, not the final SentencePiece count ???
+    compute_stats.py's tokenizer stats give the exact figure once a tokenizer
+    exists).
 
     Parameters
     ----------
@@ -449,12 +457,59 @@ def manual_downloaded_summary(lang: str, repo_root: str = ".") -> dict:
                           if r.get("collection_method") == "manual")
     downloaded_chars = total_chars - manual_chars
     manual_pct = manual_chars / total_chars * 100 if total_chars else 0.0
+
+    manual_tokens_est     = round(manual_chars / 4.5)
+    downloaded_tokens_est = round(downloaded_chars / 4.5)
+    total_tokens_est      = round(total_chars / 4.5)
+
+    targets = _load_token_targets(lang, repo_root)
+
     return {
         "total_chars":      total_chars,
         "manual_chars":     manual_chars,
         "downloaded_chars": downloaded_chars,
         "manual_pct":       round(manual_pct, 2),
         "compliant":        manual_pct >= 20.0,
+        "manual_tokens_est":     manual_tokens_est,
+        "downloaded_tokens_est": downloaded_tokens_est,
+        "total_tokens_est":      total_tokens_est,
+        "manual_target_tokens":     targets["manual_target_tokens"],
+        "downloaded_target_tokens": targets["downloaded_target_tokens"],
+        "token_target":             targets["token_target"],
+        "manual_target_met":     manual_tokens_est >= targets["manual_target_tokens"],
+        "downloaded_target_met": downloaded_tokens_est >= targets["downloaded_target_tokens"],
+        "manual_tokens_remaining":     max(0, targets["manual_target_tokens"] - manual_tokens_est),
+        "downloaded_tokens_remaining": max(0, targets["downloaded_target_tokens"] - downloaded_tokens_est),
+    }
+
+
+def _load_token_targets(lang: str, repo_root: str = ".") -> dict:
+    """
+    Read manual_target_tokens / downloaded_target_tokens / token_target from
+    <lang>/configs/data_config.yaml, falling back to the assignment defaults
+    (100M manual / 400M downloaded / 500M total) if the config or fields are
+    missing (e.g. an older config not yet updated).
+    """
+    defaults = {
+        "manual_target_tokens": 100_000_000,
+        "downloaded_target_tokens": 400_000_000,
+        "token_target": 500_000_000,
+    }
+    cfg_path = Path(repo_root) / lang / "configs" / "data_config.yaml"
+    if not cfg_path.exists():
+        return defaults
+    try:
+        import yaml
+        with open(cfg_path, "r", encoding="utf-8") as f:
+            cfg = yaml.safe_load(f) or {}
+    except Exception:
+        return defaults
+
+    mc = cfg.get("manual_collection", {}) or {}
+    return {
+        "manual_target_tokens": int(mc.get("manual_target_tokens", defaults["manual_target_tokens"])),
+        "downloaded_target_tokens": int(mc.get("downloaded_target_tokens", defaults["downloaded_target_tokens"])),
+        "token_target": int(cfg.get("token_target", defaults["token_target"])),
     }
 
 

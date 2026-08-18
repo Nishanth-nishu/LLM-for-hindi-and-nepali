@@ -275,7 +275,7 @@ def main() -> None:
     print(f"\n[test_holdout] Holdout composition:")
     print(f"  By source_type:        {source_types}")
     print(f"  By collection_method:  {coll_methods}")
-    print(f"\n  Test JSONL ??? {test_jsonl_path}")
+    print(f"\n  Test JSONL -> {test_jsonl_path}")
     print(f"  Remaining docs for pipeline: {len(remaining_docs):,}")
 
 

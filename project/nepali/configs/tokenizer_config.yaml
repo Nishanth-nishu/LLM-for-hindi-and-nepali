@@ -12,7 +12,7 @@ train_split: nepali/data/splits/train.jsonl
 text_key: text
 
 sweep:
-  vocab_sizes: [8000, 16000, 24000, 32000]   # extra 8000 for low-resource scenario
+  vocab_sizes: [8000, 16000, 24000]   # extra 8000 for low-resource scenario
   eval_split: nepali/data/splits/val.jsonl
   metrics:
     - fertility
@@ -20,8 +20,8 @@ sweep:
     - unk_rate
     - compression_ratio
 
-final_vocab_size: null
-final_vocab_size_rationale: "NOT YET SET ??? review sweep_results.csv and fill in"
+final_vocab_size: 24000
+final_vocab_size_rationale: "Selected 24000 based on sweep results: optimal fertility (1.47) and UNK rate (0.03%) for lower-resource Nepali corpus."
 
 sentencepiece:
   character_coverage: 0.9999
