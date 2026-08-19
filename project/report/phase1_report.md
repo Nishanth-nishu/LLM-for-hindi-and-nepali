@@ -79,8 +79,14 @@ cleaning decisions, deduplication groupings, or tokenizer vocabulary.
 
 #### Nepali Data Shortfall
 
-<!-- TODO: If Nepali did not reach 500M tokens, fill in the exact shortfall
-and reasons here. Use the information from nepali/data/shortfall_log.json. -->
+The Nepali downloaded token count reached approximately 8.6M tokens, missing the 400M downloaded token target by an exact shortfall of ~391.4M tokens. The overall 500M token target was not met.
+
+The shortfall is primarily due to the scarcity of high-quality public corpora for Nepali and several technical limitations encountered during downloading:
+1. **IndicCorpV2:** The repository lacked accessible data files for the `ne` configuration.
+2. **OSCAR-2301:** The dataset is gated on the Hugging Face Hub and could not be accessed directly without an access token and approval.
+3. **CC-100:** The Hugging Face dataset scripts are no longer supported, preventing its download.
+4. **CulturaX:** This source was disabled in the configuration.
+As a result, Wikipedia remains the primary viable public source for the dataset, yielding insufficient volume to meet the 400M token downloaded target.
 
 ---
 
