@@ -7,10 +7,10 @@ sentencepiece>=0.2
 trafilatura>=1.12
 protego>=0.3
 
-# Downloaded corpora ??? streamed from GCS (the default path)
+# Downloaded corpora — streamed from GCS (the default path)
 google-cloud-storage>=2.16
 
-# Downloaded corpora ??? HuggingFace (only if a source is not yet in the bucket)
+# Downloaded corpora — HuggingFace (only if a source is not yet in the bucket)
 datasets>=2.19
 huggingface-hub>=0.23
 
@@ -22,7 +22,7 @@ numpy>=1.24
 # Plots for the report (title/axis labels/legend are graded)
 matplotlib>=3.7
 
-# OCR (optional ??? also needs: apt-get install tesseract-ocr tesseract-ocr-hin poppler-utils)
+# OCR (optional — also needs: apt-get install tesseract-ocr tesseract-ocr-hin poppler-utils)
 # pytesseract>=0.3.10
 # pdf2image>=1.17
 # Pillow>=10.0

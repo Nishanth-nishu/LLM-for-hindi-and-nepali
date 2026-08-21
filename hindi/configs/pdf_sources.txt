@@ -1,0 +1,21 @@
+# Hindi PDF sources for MANUAL collection (OCR / text extraction).
+#
+# Hindi reaches its manual target by scraping alone, so this is optional here --
+# it is included because document text DIVERSIFIES the manual side. A corpus
+# that is 100% news scrape teaches the tokenizer news register; statutes,
+# reports and books widen it at no cost to the ratio.
+#
+# See nepali/configs/pdf_sources.txt for the full rationale and usage.
+#
+#   python -m pipeline.collect.pdf_harvest --lang hindi \
+#       --out-dir ~/hindi_pdfs --depth 3 \
+#       --user-agent "corpus-research/1.0 (+your.real@email)"
+
+# --- government publications, originally drafted in Hindi ---
+https://rajbhasha.gov.in
+https://www.india.gov.in/hi
+https://pib.gov.in
+
+# --- add your own below ---
+# Consider: NCERT textbooks, Sahitya Akademi publications, state government
+# gazettes, and archive.org collections of out-of-copyright Hindi books.

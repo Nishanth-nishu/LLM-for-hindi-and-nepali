@@ -1,5 +1,5 @@
 """
-train_tokenizer.py  (v2 ??? replaces the v1 sweep script)
+train_tokenizer.py  (v2 — replaces the v1 sweep script)
 =======================================================
 Step 7 of the Phase 1 pipeline: train a from-scratch SentencePiece tokenizer
 per language, with a vocabulary sweep whose selection criterion is not
@@ -26,7 +26,7 @@ v2 replaces it with three things that actually discriminate:
 
 3. A SCALING-LAW REFERENCE POINT.  Tao et al. (2024), "Scaling Laws with
    Vocabulary", find the compute-optimal vocabulary scales as
-   N_v ??? N_nv^0.83 (sub-linear in non-vocabulary parameters). We compute the
+   N_v ∝ N_nv^0.83 (sub-linear in non-vocabulary parameters). We compute the
    predicted optimum for the Phase 2 model size and report the ratio between it
    and the swept choice, so the number in the report has a published anchor
    instead of only an in-house heuristic.
@@ -64,7 +64,7 @@ OTHER FIXES
   applies its own Unicode normalisation. Two different normalisers in sequence
   means the text the tokenizer sees is not the text you stored, and inference
   must replicate both to match. v2 defaults to `identity` and asserts the input
-  is already NFC ??? one normaliser, in one place, in the pipeline.
+  is already NFC — one normaliser, in one place, in the pipeline.
 - v1 evaluated on `val_texts[:5000]`, i.e. the FIRST 5000 documents, which are
   whatever the split writer happened to emit first (usually one source). v2
   takes a seeded random sample across the whole held-out split.
@@ -85,7 +85,7 @@ REFERENCES
   Performance of Multilingual Language Models." ACL. (fertility as the standard
   intrinsic metric: tokens per word)
 - Tao et al. (2024), "Scaling Laws with Vocabulary: Larger Models Deserve
-  Larger Vocabularies." (N_v ??? N_nv^0.83)
+  Larger Vocabularies." (N_v ∝ N_nv^0.83)
 - Petrov et al. (2023), "Language Model Tokenizers Introduce Unfairness Between
   Languages." NeurIPS.
 
@@ -163,7 +163,7 @@ def stream_jsonl_to_text(
     Stream a JSONL split into the one-sentence-per-line plain text file that
     SentencePiece trains on. Never holds the corpus in memory.
 
-    Returns counts, and ??? because this is the cheapest place to check it ???
+    Returns counts, and — because this is the cheapest place to check it —
     whether the corpus is actually in NFC. A tokenizer trained on mixed
     NFC/NFD Devanagari silently learns two spellings of the same word and
     wastes vocabulary on both.
@@ -174,7 +174,7 @@ def stream_jsonl_to_text(
     written in the order documents survived cleaning, which is manual-first
     (see iter_language_docs), then downloaded by source priority. Truncating at
     N therefore hands SentencePiece a corpus that is all manual plus whichever
-    downloaded source happened to come next ??? and the tokenizer learns the
+    downloaded source happened to come next — and the tokenizer learns the
     vocabulary of a corpus that does not exist.
 
     Instead this makes a counting pass, derives a keep probability, and selects
@@ -258,7 +258,7 @@ def sample_eval_texts(
     """
     Reservoir-sample n documents from a held-out split.
 
-    v1 took `val_texts[:5000]` ??? the first 5000 lines, which in a split written
+    v1 took `val_texts[:5000]` — the first 5000 lines, which in a split written
     source-by-source is effectively one source. That biases every metric.
 
     Also buckets by provenance ("manual" / "downloaded") when the field exists,

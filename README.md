@@ -1,4 +1,4 @@
-# Phase 1 ??? Data Collection and Tokenizer Construction
+# Phase 1 — Data Collection and Tokenizer Construction
 
 Two fully independent monolingual pipelines: **Hindi** (Model H, higher-resource)
 and **Nepali** (Model L, from the allowed lower-resource list). Separate corpora,
@@ -44,19 +44,19 @@ python run_phase1.py --lang hindi --stage count,report
 
 | Stage | What it does | Output |
 |---|---|---|
-| `gcs-ingest` | stream Sangraha + Wikipedia from GCS ??? **downloaded** documents | `<lang>/data/raw/downloaded_*.jsonl` |
+| `gcs-ingest` | stream Sangraha + Wikipedia from GCS → **downloaded** documents | `<lang>/data/raw/downloaded_*.jsonl` |
 | `ingest-existing` | fold local zips/jsonl you already downloaded into the pipeline | `<lang>/data/raw/downloaded_imported.jsonl` |
-| `discover` | seed domains ??? article URLs via sitemaps | `<lang>/data/raw/article_urls.txt` |
-| `plan` | can you reach ???20% manual? run **before** a long collection | printed budget |
-| `scrape` | article URLs ??? **manual** documents | `<lang>/data/raw/manual_scrape.jsonl` |
-| `ocr` | PDFs/images ??? **manual** documents (optional) | `<lang>/data/raw/manual_ocr.jsonl` |
+| `discover` | seed domains → article URLs via sitemaps | `<lang>/data/raw/article_urls.txt` |
+| `plan` | can you reach ≥20% manual? run **before** a long collection | printed budget |
+| `scrape` | article URLs → **manual** documents | `<lang>/data/raw/manual_scrape.jsonl` |
+| `ocr` | PDFs/images → **manual** documents (optional) | `<lang>/data/raw/manual_ocr.jsonl` |
 | `download` | HuggingFace corpora (only if not already in the bucket) | `<lang>/data/raw/downloaded_*.jsonl` |
 | `build` | normalise, filter, dedup, **budget trim**, stratified split | `<lang>/data/splits/*.jsonl` |
 | `tokenizer` | train from scratch + vocabulary sweep + statistics | `<lang>/tokenizer/` |
 | `count` | authoritative token count + manual fraction | `<lang>/data/stats/token_accounting.json` |
 | `report` | per-language dataset + tokenizer report | `report/<lang>_dataset_report.md` |
 
-### Corpora already in Cloud Storage ??? the ???80%
+### Corpora already in Cloud Storage — the ≤80%
 
 The downloaded side streams straight out of `gs://lma-01-hi-ne-corpus/raw/`.
 Nothing is re-fetched from HuggingFace, and nothing is copied to local disk
@@ -69,31 +69,31 @@ python run_phase1.py --lang hindi --stage gcs-ingest
 ```
 
 Sources and budgets live in `<lang>/configs/data_config.yaml`, which is the
-single source of truth ??? CLI flags override it, they do not shadow it. Only
+single source of truth — CLI flags override it, they do not shadow it. Only
 Sangraha (verified and unverified) and Wikipedia are used; `excluded_sources:`
 in the same file records what is deliberately left out and why.
 
 It labels everything `downloaded`, because that is what it is. Sangraha and
-Wikipedia are public corpora ??? the brief's ???80%. They do not become manual by
+Wikipedia are public corpora — the brief's ≤80%. They do not become manual by
 being renamed or moved.
 
 **See [`docs/GCP_RUNBOOK.md`](docs/GCP_RUNBOOK.md)** for machine sizing, the
 `gcloud` commands, expected wall-clock per stage, and the failure modes worth
 knowing before a long run.
 
-### The ???20% manual requirement, as arithmetic
+### The ≥20% manual requirement, as arithmetic
 
-Manual data is **collected, never downloaded** ??? that is what makes it manual.
+Manual data is **collected, never downloaded** — that is what makes it manual.
 `scrape_collect.py` and `ocr_collect.py` produce it; `download_public.py`
-produces the other ???80%.
+produces the other ≤80%.
 
 With M = manual tokens and D = downloaded tokens, the brief requires
-`M / (M + D) ??? 0.20`, which rearranges to **`D ??? 4M`** ??? so your
-**total corpus is capped at 5?? your manual tokens**. There are two ways to
+`M / (M + D) ≥ 0.20`, which rearranges to **`D ≤ 4M`** — so your
+**total corpus is capped at 5× your manual tokens**. There are two ways to
 satisfy it, and most people only think of the first:
 
-1. collect more manual data ??? slow, bounded by how much Devanagari web exists;
-2. **download less** ??? instant, entirely in your control.
+1. collect more manual data — slow, bounded by how much Devanagari web exists;
+2. **download less** — instant, entirely in your control.
 
 Run `python -m pipeline.collect.plan_budget --lang <lang>` before committing to
 a long run. A 175M-token corpus that meets the ratio beats a 500M-token one that
@@ -102,12 +102,12 @@ language provided you report the exact count and justify it.
 
 ### Two inputs only you can supply
 
-1. **`<lang>/configs/seed_domains.txt`** ??? the domains you scrape yourself.
+1. **`<lang>/configs/seed_domains.txt`** — the domains you scrape yourself.
    Throughput is set by the *number of domains*, not by concurrency: each domain
-   yields at most ~1.3 pages/s under the 1.5 s politeness delay. 40 domains ??? 53
-   pages/s; 10 domains ??? 13 pages/s. If you are short of manual tokens, add
+   yields at most ~1.3 pages/s under the 1.5 s politeness delay. 40 domains ≈ 53
+   pages/s; 10 domains ≈ 13 pages/s. If you are short of manual tokens, add
    domains.
-2. **PDFs for OCR** (optional) ??? pass with `--ocr-input-dir`.
+2. **PDFs for OCR** (optional) — pass with `--ocr-input-dir`.
 
 ### Before any real run
 
@@ -140,11 +140,11 @@ pipeline/                     shared code (artifacts stay per-language)
     count_corpus_tokens.py    token accounting + manual fraction
   quality/
     yi_quality_score.py       LLM quality scoring + distillation (optional)
-hindi/                        Model H ??? self-contained
+hindi/                        Model H — self-contained
   configs/                    data_config, tokenizer_config, seed_domains
   data/{raw,interim,splits,stats,quality}
   tokenizer/{vocab,analysis}
-nepali/                       Model L ??? same structure, nothing shared
+nepali/                       Model L — same structure, nothing shared
 report/                       per-phase reports, figures, tables
 tests/make_fixture.py         synthetic data to exercise the pipeline offline
 ```
@@ -165,11 +165,11 @@ tests/make_fixture.py         synthetic data to exercise the pipeline offline
 
 ## Language selection
 
-- **Model H ??? Hindi.** The largest public-text footprint of any non-English
+- **Model H — Hindi.** The largest public-text footprint of any non-English
   Indian language: multiple national dailies with deep sitemap-exposed archives,
   government publication in Hindi by statute, and substantial coverage in public
   Indic corpora (Sangraha, IndicCorp).
-- **Model L ??? Nepali.** On the permitted list. The Nepali web is roughly an
+- **Model L — Nepali.** On the permitted list. The Nepali web is roughly an
   order of magnitude smaller than the Hindi web, which is the resource
   constraint this project is meant to expose.
 

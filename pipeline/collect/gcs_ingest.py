@@ -1,5 +1,5 @@
 """
-gcs_ingest.py ??? stream the downloaded side straight out of Cloud Storage
+gcs_ingest.py — stream the downloaded side straight out of Cloud Storage
 ========================================================================
 Reads the corpora you already downloaded and parked in GCS, converts them to
 manifest records, and stops when the token budget is met.
@@ -112,7 +112,7 @@ SOURCES = [
 
 TEXT_KEYS = ("text", "content", "raw_content", "body", "article", "sentence")
 
-DEV_RE = re.compile(r"[???-???]")
+DEV_RE = re.compile(r"[ऀ-ॿ]")
 LETTER_RE = re.compile(r"[^\W\d_]", re.UNICODE)
 
 
@@ -463,7 +463,7 @@ def main() -> int:
         total = sum(s["_size"] or 0 for s in sources)
         print(f"  total bytes available: {total / 1e9:.2f} GB")
         print(f"  budget would read roughly {min(char_budget, total) / 1e9:.2f} GB")
-        print("  (dry run ??? nothing written)")
+        print("  (dry run — nothing written)")
         return 0
 
     # ---- ingest in priority order -----------------------------------------
@@ -479,7 +479,7 @@ def main() -> int:
         if s["key"] in missing:
             continue
         if chars_total >= char_budget:
-            print(f"  [{s['key']}] skipped ??? budget already met by "
+            print(f"  [{s['key']}] skipped — budget already met by "
                   f"higher-priority sources", flush=True)
             per_source[s["key"]] = {"documents": 0, "characters": 0,
                                     "skipped": "budget_met"}
@@ -580,13 +580,18 @@ def main() -> int:
                             extra={"public_corpus": s["hf_repo"],
                                    "window": wi if nwin > 1 else None},
                         )
-                        if writer.write(doc):
+                        wrote_this_doc = writer.write(doc)
+                        if wrote_this_doc:
                             kept += 1
                             chars += len(text)
                             win_chars += len(text)
                             chars_total += len(text)
 
-                        if kept and kept % 20000 == 0:
+                        # Gate on `wrote_this_doc`, not on `kept` alone: a
+                        # duplicate arriving right after a multiple of 20000
+                        # leaves `kept` unchanged, so the condition would still
+                        # hold and the same line would print twice.
+                        if wrote_this_doc and kept % 20000 == 0:
                             rate = kept / max(1e-6, time.monotonic() - t0)
                             print(f"      {kept:,} docs, {chars / 1e6:.0f}M chars "
                                   f"({rate:.0f} docs/s), budget "

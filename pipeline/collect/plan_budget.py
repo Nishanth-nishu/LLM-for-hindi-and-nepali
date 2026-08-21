@@ -1,5 +1,5 @@
 """
-plan_budget.py ??? can you actually reach the >=20% manual requirement?
+plan_budget.py — can you actually reach the >=20% manual requirement?
 ======================================================================
 Answers the only question that matters before you start a long collection run:
 given the domains you have, how many manual tokens can you realistically get,

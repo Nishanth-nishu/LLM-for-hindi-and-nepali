@@ -1,5 +1,5 @@
 """
-run_phase1.py ??? end-to-end Phase 1 pipeline
+run_phase1.py — end-to-end Phase 1 pipeline
 ============================================
 One command per language, from empty repo to the seven Phase 1 deliverables.
 
@@ -16,12 +16,16 @@ STAGE ORDER, AND WHY IT IS THIS ORDER
     discover   seed domains -> article URLs         (manual collection prep)
     plan       can you reach >=20% manual? run BEFORE a long collection
     scrape     article URLs -> manual documents     (the >=20%)
-    ocr        PDFs -> manual documents             (optional, slow)
+    pdf-harvest  seed pages -> a directory of PDFs  (feeds ocr)
+    ocr        PDFs -> manual documents             (text layer, else OCR)
     download   HuggingFace corpora -> documents     (only if not already in GCS)
     build      normalise, filter, dedup, BUDGET TRIM, split
     tokenizer  train from scratch on train split only
     count      authoritative token count + manual fraction
     report     per-language statistics and figures
+    verify     the pre-submission gate: leakage, provenance, the >=20% ratio,
+               and "do not share documents across corpora" -- which spans BOTH
+               languages, so run it once at the end rather than per-language
 
 `gcs-ingest` and `download` are two routes to the same place. If the corpora
 are already sitting in gs://lma-01-hi-ne-corpus/raw/ you want the first: it
@@ -41,9 +45,13 @@ the two-pass protocol in pipeline/tokenizer/count_corpus_tokens.py.
 
 WHAT THIS DOES NOT DO
 ---------------------
-It does not decide your seed domains or supply your PDFs. Those are the two
+It does not decide your seed domains or your PDF sources. Those are the two
 inputs only you can provide, and they are what determine whether you reach the
-manual target. See <lang>/configs/seed_domains.txt.
+manual target. See <lang>/configs/seed_domains.txt and pdf_sources.txt.
+
+For a low-resource language, PDFs are usually the better lever: scraping is
+capped by other people's Crawl-delay at a few pages/s regardless of effort,
+while one statute PDF carries more text than fifty news articles.
 """
 
 from __future__ import annotations
@@ -56,11 +64,14 @@ import time
 from pathlib import Path
 
 STAGES = ["gcs-ingest", "ingest-existing", "discover", "plan", "scrape", "ocr",
-          "download", "build", "tokenizer", "count", "report"]
+          "pdf-harvest", "download", "build", "tokenizer", "count",
+          "report", "verify"]
 
-# `download` re-fetches from HuggingFace, which is pointless once the data is in
-# the bucket -- and it is. `all` therefore means everything except that.
-DEFAULT_STAGES = [s for s in STAGES if s not in ("download", "ingest-existing")]
+# `download` re-fetches from HuggingFace (pointless once the bucket is
+# populated) and `pdf-harvest` needs an --out-dir the user chooses, so neither
+# belongs in `all`.
+DEFAULT_STAGES = [s for s in STAGES
+                  if s not in ("download", "ingest-existing", "pdf-harvest")]
 
 
 def load_targets(root: Path, lang: str) -> dict:
@@ -116,7 +127,7 @@ def stage_report(lang: str, root: Path) -> int:
     vocabsel = load(root / lang / "tokenizer" / "analysis" / "vocab_selection.json")
     download = load(root / lang / "data" / "stats" / "download_summary.json")
 
-    L = [f"# {lang.title()} ??? Phase 1 dataset and tokenizer report", ""]
+    L = [f"# {lang.title()} — Phase 1 dataset and tokenizer report", ""]
 
     if corpus:
         L += ["## Corpus construction", "",
@@ -152,7 +163,7 @@ def stage_report(lang: str, root: Path) -> int:
               f"| Manual | {m['manual_tokens']:,} | **{m['manual_fraction_of_tokens']:.2%}** |",
               f"| Downloaded | {m['downloaded_tokens']:,} | "
               f"{1 - m['manual_fraction_of_tokens']:.2%} |", "",
-              f"Requirement ???{m['requirement']:.0%} ??? "
+              f"Requirement ≥{m['requirement']:.0%} — "
               f"**{'MET' if m['requirement_met'] else 'NOT MET'}**", "",
               f"(By document count the manual share is "
               f"{m['manual_fraction_of_documents']:.2%}; the brief specifies tokens.)", ""]
@@ -163,11 +174,11 @@ def stage_report(lang: str, root: Path) -> int:
               f"Bucket root: `{gcs['bucket_root']}`", "",
               "| Source | HF origin | Documents | Characters |", "|---|---|--:|--:|"]
         for k, v in gcs["sources"].items():
-            L.append(f"| {k} | {v.get('hf_repo', '???')} | "
+            L.append(f"| {k} | {v.get('hf_repo', '—')} | "
                      f"{v.get('documents', 0):,} | {v.get('characters', 0):,} |")
         L += ["", "Deliberately excluded:", ""]
         for k, why in (gcs.get("excluded_deliberately") or {}).items():
-            L.append(f"- `{k}` ??? {why}")
+            L.append(f"- `{k}` — {why}")
         L.append("")
 
     if corpus and corpus.get("budget"):
@@ -190,19 +201,19 @@ def stage_report(lang: str, root: Path) -> int:
               f"characters, **{b.get('estimated_manual_token_fraction', 0):.2%}** "
               f"of tokens (estimated).", "",
               f"The trim aimed at {b.get('effective_fraction_targeted', 0):.1%} "
-              f"rather than {b['min_manual_fraction']:.0%} ??? a "
+              f"rather than {b['min_manual_fraction']:.0%} — a "
               f"{b.get('margin', 0):.1%} margin, because the trim measures "
               f"characters while the requirement grades tokens and the two are "
               f"not exactly proportional across provenance classes.", "",
               f"The downloaded budget was set by the "
               f"**{b['downloaded_budget_binding_constraint']}** constraint"
-              + (f" ??? manual came in "
+              + (f" — manual came in "
                  f"{b['manual_shortfall_chars']:,} characters short of its "
                  f"target, so downloaded was capped at "
-                 f"{b['ratio_cap_chars']:,} to hold the ???"
+                 f"{b['ratio_cap_chars']:,} to hold the ≥"
                  f"{b['min_manual_fraction']:.0%} ratio."
                  if b["downloaded_budget_binding_constraint"] == "ratio"
-                 else " ??? the ratio was satisfied with room to spare."), ""]
+                 else " — the ratio was satisfied with room to spare."), ""]
 
     if download and download.get("sources"):
         L += ["### Downloaded sources", "", "| Source | Status | Documents | Characters |",
@@ -220,12 +231,12 @@ def stage_report(lang: str, root: Path) -> int:
               f"{vocabsel['scaling_law_reference_vocab']:,} "
               f"(ratio {vocabsel['ratio_to_scaling_law_reference']}x)", "",
               "### Vocabulary sweep", "",
-              "| Vocab | Algo | Fertility | ?? vs prev | chars/tok | byte-fallback | Emb. share | Chosen |",
+              "| Vocab | Algo | Fertility | Δ vs prev | chars/tok | byte-fallback | Emb. share | Chosen |",
               "|--:|---|--:|--:|--:|--:|--:|:-:|"]
         for c in vocabsel["candidates"]:
             g = c["relative_fertility_gain_vs_prev"]
             L.append(f"| {c['vocab_size']:,} | {c['model_type']} | {c['fertility']} | "
-                     f"{(f'{g:.2%}' if g != '' else '???')} | {c['chars_per_token']} | "
+                     f"{(f'{g:.2%}' if g != '' else '—')} | {c['chars_per_token']} | "
                      f"{c['byte_fallback_rate']:.2e} | {c['embedding_share']:.1%} | "
                      f"{'**yes**' if c['selected'] else ''} |")
         L.append("")
@@ -299,6 +310,12 @@ def main() -> int:
     ap.add_argument("--download-sources", nargs="+",
                     default=["sangraha", "wikipedia"])
     ap.add_argument("--ocr-input-dir", default=None)
+    ap.add_argument("--pdf-out-dir", default=None,
+                    help="where pdf-harvest downloads to; also becomes the "
+                         "ocr input if --ocr-input-dir is not given")
+    ap.add_argument("--pdf-depth", type=int, default=2)
+    ap.add_argument("--user-agent", default=None,
+                    help="put a real contact address in it")
     ap.add_argument("--existing-dir", default=None,
                     help="directory of already-downloaded zips/jsonl to import")
     ap.add_argument("--vocab-sizes", nargs="+", type=int, default=None)
@@ -398,6 +415,20 @@ def main() -> int:
         if rc:
             failures.append("scrape")
 
+    if "pdf-harvest" in stages:
+        if not args.pdf_out_dir:
+            print("\n[skip] pdf-harvest: no --pdf-out-dir given")
+        else:
+            cmd = [py, "-m", "pipeline.collect.pdf_harvest", "--lang", lang,
+                   "--repo-root", str(root), "--out-dir", args.pdf_out_dir,
+                   "--depth", str(args.pdf_depth)]
+            cmd += opt("--user-agent", args.user_agent)
+            rc = run(cmd, cwd=root, dry=args.dry_run)
+            if rc:
+                failures.append("pdf-harvest")
+            elif not args.ocr_input_dir:
+                args.ocr_input_dir = args.pdf_out_dir   # feed ocr automatically
+
     if "ocr" in stages:
         if not args.ocr_input_dir:
             print("\n[skip] ocr: no --ocr-input-dir given. OCR is optional; "
@@ -460,6 +491,25 @@ def main() -> int:
 
     if "report" in stages and not args.dry_run:
         stage_report(lang, root)
+
+    if "verify" in stages:
+        # Cross-language checks need both corpora built, so this is a no-op
+        # until the second language exists. Running it early is still useful:
+        # the within-language leakage and provenance checks apply immediately.
+        other = "nepali" if lang == "hindi" else "hindi"
+        langs = [lang]
+        if (root / other / "data" / "splits" / "train.jsonl").exists():
+            langs.append(other)
+        else:
+            print(f"\n[note] verify: {other} splits not found, so the "
+                  f"cross-corpus checks (C1/C7) are skipped. Re-run "
+                  f"`--stage verify` once both languages are built.")
+        rc = run([py, "-m", "pipeline.process.verify_corpora",
+                  "--repo-root", str(root), "--languages", *langs,
+                  "--min-manual-fraction", str(min_manual)],
+                 cwd=root, dry=args.dry_run)
+        if rc:
+            failures.append("verify")
 
     print(f"\n=== done: {lang} ===")
     if failures:

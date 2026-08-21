@@ -1,5 +1,5 @@
 """
-download_public.py ??? the <=80% downloaded portion
+download_public.py — the <=80% downloaded portion
 ==================================================
 Your `download_hi_ne_corpora_gcp.py`, reworked to (a) fit the Phase 1 repo
 layout, (b) emit manifest records so the downloaded tokens are counted and

@@ -1,5 +1,5 @@
 """
-seed_discovery.py ??? turn seed domains into article URLs
+seed_discovery.py — turn seed domains into article URLs
 ========================================================
 The missing step between "I have 40 news sites" and "I have 200,000 article
 URLs to scrape".

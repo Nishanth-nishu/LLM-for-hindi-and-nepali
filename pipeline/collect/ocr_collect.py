@@ -1,5 +1,5 @@
 """
-ocr_collect.py ??? manual collection from PDFs and scanned images
+ocr_collect.py — manual collection from PDFs and scanned images
 ================================================================
 The second qualifying manual route in the brief ("OCR from books/PDFs").
 
@@ -28,7 +28,7 @@ NEPALI TESSERACT
 ----------------
 Tesseract ships no Nepali (`nep`) traineddata. `hin` covers the Devanagari
 script and is the standard fallback, but it carries a Hindi language model, so
-Nepali-specific orthography (?????????, ???, ???) is where errors concentrate. This is a
+Nepali-specific orthography (हरू, छ, ँ) is where errors concentrate. This is a
 real limitation and belongs in the report -- the script records
 `ocr_lang_fallback: true` in every affected record so you can quantify it later.
 
@@ -62,7 +62,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from pipeline.manifest import Document, ShardWriter  # noqa: E402
 
 TESS_LANG = {"hindi": "hin", "nepali": "hin"}   # no `nep` pack exists
-DEVANAGARI = re.compile(r"[???-???]")
+DEVANAGARI = re.compile(r"[ऀ-ॿ]")
 
 IMAGE_EXT = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp"}
 
@@ -87,7 +87,7 @@ def clean_ocr_text(text: str) -> str:
         dev = len(DEVANAGARI.findall(stripped)) / len(stripped)
         if dev < 0.5:                                    # page numbers, headers, noise
             continue
-        if len(set(stripped)) <= 2:                      # "??????????????????" style artefacts
+        if len(set(stripped)) <= 2:                      # "।।।।।।" style artefacts
             continue
         out.append(s)
     return "\n".join(out).strip()
@@ -112,10 +112,68 @@ def page_quality_ok(text: str, *, min_chars: int, min_dev: float = 0.75) -> tupl
     return True, "ok"
 
 
+def extract_text_layer(path: Path, max_pages: int | None) -> list[str]:
+    """
+    Pull the embedded text layer with `pdftotext`, or return [] if there is none.
+
+    THIS IS TRIED BEFORE OCR, AND IT MATTERS ENORMOUSLY.
+
+    A born-digital PDF -- anything produced by a word processor or typesetter
+    rather than a scanner -- already contains its text. Statutes, gazettes,
+    ministry reports and most government publications are born-digital. For
+    those files:
+
+      * pdftotext returns the EXACT characters, with no recognition step and
+        therefore no recognition errors;
+      * it takes milliseconds per page instead of the several seconds Tesseract
+        needs to rasterise at 300 dpi and run a neural recogniser.
+
+    On a 100-page statute that is the difference between 0.2 seconds and ten
+    minutes, for a result that is not merely faster but strictly more accurate.
+    Devanagari OCR is good, not perfect: it confuses conjuncts and matras, and
+    every such error becomes a spurious token the tokenizer must learn.
+
+    OCR remains essential for genuinely scanned material -- old books, image
+    PDFs -- which is why it stays as the fallback rather than being replaced.
+    """
+    import subprocess
+    cmd = ["pdftotext", "-layout", "-enc", "UTF-8"]
+    if max_pages:
+        cmd += ["-l", str(max_pages)]
+    cmd += [str(path), "-"]
+    try:
+        out = subprocess.run(cmd, capture_output=True, timeout=120)
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return []
+    if out.returncode != 0:
+        return []
+    text = out.stdout.decode("utf-8", errors="replace")
+    # pdftotext separates pages with a form feed.
+    pages = [p for p in text.split("\f")]
+    joined = "".join(pages)
+    # A scanned PDF still "succeeds" here, returning a handful of stray
+    # characters from headers or an OCR layer that was never added. Require
+    # real content before believing it, otherwise a scan silently yields an
+    # almost-empty document and never reaches the OCR path.
+    if len(joined.strip()) < 200:
+        return []
+    dev = sum(1 for c in joined if "\u0900" <= c <= "\u097f")
+    if dev < len(joined.strip()) * 0.25:
+        return []
+    return pages
+
+
 def ocr_one_file(args_tuple) -> tuple[str, list[str], str]:
-    """Worker: OCR one PDF/image. Returns (filename, page_texts, error)."""
+    """Worker: extract one PDF/image. Returns (filename, page_texts, error)."""
     path_str, lang, dpi, psm, max_pages = args_tuple
     path = Path(path_str)
+
+    # Text layer first: faster and more accurate when it exists.
+    if path.suffix.lower() == ".pdf":
+        pages = extract_text_layer(path, max_pages)
+        if pages:
+            return path.name, pages, ""
+
     try:
         import pytesseract
         from PIL import Image
@@ -202,7 +260,7 @@ def main() -> int:
             name, pages, err = fut.result()
             if err:
                 failed += 1
-                print(f"  [{i}/{len(files)}] {name}: FAILED ??? {err}")
+                print(f"  [{i}/{len(files)}] {name}: FAILED — {err}")
                 continue
 
             groups = []

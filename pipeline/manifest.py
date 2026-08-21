@@ -1,5 +1,5 @@
 """
-manifest.py ??? the provenance contract every stage depends on
+manifest.py — the provenance contract every stage depends on
 =============================================================
 One document record format, written by every collector, read by every
 downstream stage. If a collector does not emit these fields, that data cannot
@@ -21,7 +21,7 @@ The brief requires ">=20% of the final training tokens ... from manual
 collection", and asks you to "report the manual vs. downloaded token split".
 That is a two-class question, so it gets a two-valued field. Deriving it later
 from source strings ("was 'ekantipur.com' manual or downloaded?") is exactly the
-kind of thing that goes wrong quietly at 3am ??? the answer depends on whether you
+kind of thing that goes wrong quietly at 3am — the answer depends on whether you
 scraped it yourself or pulled it out of Sangraha, and only the collector knows.
 
 Set it at ingest. Never infer it afterwards.
@@ -56,7 +56,7 @@ def content_hash(text: str) -> str:
     same article scraped twice with different boilerplate still collides.
     """
     t = unicodedata.normalize("NFC", text).lower()
-    t = re.sub(r"[^\w???-???]+", "", t)
+    t = re.sub(r"[^\wऀ-ॿ]+", "", t)
     return hashlib.blake2b(t.encode("utf-8"), digest_size=16).hexdigest()
 
 

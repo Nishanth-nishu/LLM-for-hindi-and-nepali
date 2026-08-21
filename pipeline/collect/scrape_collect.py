@@ -1,5 +1,5 @@
 """
-scrape_collect.py ??? high-throughput manual web collection
+scrape_collect.py — high-throughput manual web collection
 ==========================================================
 Produces the >=20% MANUAL portion of the corpus by scraping and cleaning pages
 yourself, which is exactly what the brief lists as qualifying manual collection.
@@ -73,15 +73,15 @@ from urllib.parse import urlsplit
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from pipeline.manifest import Document, ShardWriter  # noqa: E402
 
-DEVANAGARI = re.compile(r"[???-???]")
+DEVANAGARI = re.compile(r"[ऀ-ॿ]")
 LATIN = re.compile(r"[A-Za-z]")
 
 # Hindi vs Nepali share a script, so a Devanagari check is not a language check.
 # These are high-frequency function words that are near-exclusive to one side.
-NEPALI_MARKERS = {"???", "?????????", "?????????", "????????????", "???????????????", "????????????", "?????????", "?????????", "????????????",
-                  "???????????????", "???????????????", "???????????????", "???????????????", "????????????????????????", "?????????"}
-HINDI_MARKERS = {"??????", "?????????", "??????", "??????", "????????????", "?????????", "?????????", "?????????", "????????????",
-                 "???????????????", "?????????????????????", "????????????", "??????????????????", "????????????", "???????????????"}
+NEPALI_MARKERS = {"छ", "छन्", "छैन", "गर्छ", "गरेको", "भएको", "लाई", "सँग", "हुन्",
+                  "भन्ने", "भन्दा", "गर्ने", "नेपाल", "काठमाडौं", "हरू"}
+HINDI_MARKERS = {"है", "हैं", "था", "थे", "किया", "गया", "रहा", "में", "नहीं",
+                 "लेकिन", "क्योंकि", "भारत", "दिल्ली", "करने", "बताया"}
 
 
 # ---------------------------------------------------------------------------
@@ -214,7 +214,7 @@ def extract_text(html: str, url: str) -> tuple[str, str]:
 def normalize(text: str) -> str:
     """NFC + whitespace collapse. Same normalisation the tokenizer expects."""
     text = unicodedata.normalize("NFC", text)
-    text = text.replace("???", "").replace("???", "")
+    text = text.replace("​", "").replace("﻿", "")
     lines = [" ".join(l.split()) for l in text.splitlines()]
     return "\n".join(l for l in lines if l).strip()
 
@@ -238,8 +238,8 @@ def language_ok(text: str, lang: str, *, min_dev=0.70, max_latin=0.12) -> tuple[
         return False, f"latin_ratio={lat:.2f}"
 
     toks = text.split()
-    hi = sum(1 for t in toks if t.strip("???,.!?\"'()") in HINDI_MARKERS)
-    ne = sum(1 for t in toks if t.strip("???,.!?\"'()") in NEPALI_MARKERS)
+    hi = sum(1 for t in toks if t.strip("।,.!?\"'()") in HINDI_MARKERS)
+    ne = sum(1 for t in toks if t.strip("।,.!?\"'()") in NEPALI_MARKERS)
     if hi + ne < 3:
         return False, "no_language_markers"
     want_hi = lang == "hindi"
@@ -278,6 +278,14 @@ async def run(*, lang: str, repo_root: Path, urls: list[str], user_agent: str,
 
     st = Stats()
     limiter = HostLimiter(per_host=per_host, delay=delay)
+    # Per-host accounting. Aggregate throughput hides the thing that actually
+    # determines it: how many hosts are contributing, and what delay each one
+    # imposes. A run at 3 pages/s across 21 hosts is not "the network is slow",
+    # it is "most hosts are silent, or have declared a 10s Crawl-delay" -- and
+    # those two have completely different fixes.
+    host_fetched: dict[str, int] = {}
+    host_kept: dict[str, int] = {}
+    host_delay: dict[str, float] = {}
     robots = RobotsCache(user_agent)
     parked: set[str] = set()
     fails: dict[str, int] = {}
@@ -287,6 +295,55 @@ async def run(*, lang: str, repo_root: Path, urls: list[str], user_agent: str,
     out_path = repo_root / lang / "data" / "raw" / out_name
     writer = ShardWriter(out_path)
     log(f"  output: {out_path}  ({len(writer.seen):,} already collected)")
+
+    # URL-level resume.
+    #
+    # ShardWriter resumes the OUTPUT: it remembers content hashes, so a document
+    # already collected is not written twice. That is not the same as resuming
+    # the CRAWL. Without a record of which URLs were visited, a restart walks
+    # the list from the top, re-downloads every page it already has, and
+    # discards each one as a duplicate -- paying full network and politeness
+    # cost for zero new documents. On a 345k-URL list that is hours of work to
+    # rediscover what is already on disk.
+    #
+    # So: log every URL that reached a definitive outcome, and skip those.
+    # Definitive means the server answered -- 2xx we kept or rejected, 4xx, or
+    # robots said no. Timeouts, connection errors and 5xx are NOT logged,
+    # because those deserve a retry on the next run.
+    visited_path = repo_root / lang / "data" / "raw" / f".{out_name}.visited"
+    visited: set[str] = set()
+    if visited_path.exists():
+        with open(visited_path, encoding="utf-8") as vf:
+            visited = {l.strip() for l in vf if l.strip()}
+        log(f"  visited log: {len(visited):,} urls already attempted "
+            f"-> skipping them")
+    elif out_path.exists():
+        # No visited log, but documents exist: this output predates URL-level
+        # resume. Bootstrap from the urls recorded on the documents themselves.
+        #
+        # This recovers the pages that were KEPT, not the ones fetched and
+        # rejected, so the first run after upgrading still re-fetches the
+        # rejects. Partial credit is worth having -- on a run that kept 57% of
+        # what it fetched, this skips over half the redundant work -- and every
+        # run after this one is exact.
+        from pipeline.manifest import read_jsonl as _read
+        visited = {r["url"] for r in _read(out_path) if r.get("url")}
+        if visited:
+            log(f"  no visited log; bootstrapped {len(visited):,} urls from "
+                f"documents already collected.")
+            log(f"  (urls that were fetched and REJECTED are not recorded "
+                f"there, so some re-fetching is unavoidable this run only.)")
+            visited_path.write_text("\n".join(sorted(visited)) + "\n",
+                                    encoding="utf-8")
+    visited_f = open(visited_path, "a", encoding="utf-8")
+    visited_buf: list[str] = []
+
+    def mark_visited(u: str) -> None:
+        visited_buf.append(u)
+        if len(visited_buf) >= 200:
+            visited_f.write("\n".join(visited_buf) + "\n")
+            visited_f.flush()
+            visited_buf.clear()
 
     sem = asyncio.Semaphore(concurrency)
     lock = asyncio.Lock()
@@ -301,8 +358,10 @@ async def run(*, lang: str, repo_root: Path, urls: list[str], user_agent: str,
             ok, cd = await robots.allowed(client, url)
             if cd:
                 limiter.set_delay(host, float(cd))
+                host_delay[host] = float(cd)
             if not ok:
                 st.robots_denied += 1
+                mark_visited(url)
                 return
             await limiter.acquire(host)
             try:
@@ -318,11 +377,21 @@ async def run(*, lang: str, repo_root: Path, urls: list[str], user_agent: str,
                 limiter.release(host)
 
             st.fetched += 1
-            if r.status_code >= 400:
+            host_fetched[host] = host_fetched.get(host, 0) + 1
+            if 400 <= r.status_code < 500:
+                # The server answered and the answer will not change. Log it.
+                st.http_error += 1
+                st.bump(f"http_{r.status_code}")
+                mark_visited(url)
+                return
+            if r.status_code >= 500:
+                # Transient. Leave it unlogged so the next run retries.
                 st.http_error += 1
                 st.bump(f"http_{r.status_code}")
                 return
             fails[host] = 0
+
+            mark_visited(url)          # 2xx: whatever happens below is final
 
             ctype = r.headers.get("content-type", "")
             if "html" not in ctype and "xml" not in ctype:
@@ -352,6 +421,7 @@ async def run(*, lang: str, repo_root: Path, urls: list[str], user_agent: str,
                 if writer.write(doc):
                     st.kept += 1
                     st.chars += len(text)
+                    host_kept[host] = host_kept.get(host, 0) + 1
                 else:
                     st.duplicate += 1
                 if st.chars >= target_chars:
@@ -362,12 +432,20 @@ async def run(*, lang: str, repo_root: Path, urls: list[str], user_agent: str,
     headers = {"User-Agent": user_agent,
                "Accept-Language": "hi,ne,en;q=0.5"}
 
+    todo = [u for u in urls if u not in visited] if visited else list(urls)
+    if visited:
+        log(f"  {len(todo):,} of {len(urls):,} urls remain "
+            f"({len(urls) - len(todo):,} skipped as already attempted)")
+    if not todo:
+        log("  nothing left to fetch. Add domains to seed_domains.txt and "
+            "re-run `--stage discover` to extend the URL list.")
+
     try:
         async with httpx.AsyncClient(headers=headers, limits=limits,
                                      follow_redirects=True) as client:
             pending: set[asyncio.Task] = set()
             last_log = time.monotonic()
-            for i, url in enumerate(urls):
+            for i, url in enumerate(todo):
                 if stop.is_set():
                     break
                 if (time.monotonic() - t0) / 3600 >= max_hours:
@@ -381,14 +459,40 @@ async def run(*, lang: str, repo_root: Path, urls: list[str], user_agent: str,
                 if time.monotonic() - last_log >= 30:
                     last_log = time.monotonic()
                     el = time.monotonic() - t0
-                    log(f"  {i + 1:,}/{len(urls):,} urls | kept {st.kept:,} | "
+                    log(f"  {i + 1:,}/{len(todo):,} urls | kept {st.kept:,} | "
                         f"{st.chars / 1e6:.1f}M chars | "
                         f"{st.fetched / max(1e-9, el):.1f} pages/s | "
                         f"{el / 60:.0f} min")
             if pending:
                 await asyncio.gather(*pending, return_exceptions=True)
+        # ---- per-host breakdown: the diagnostic that matters -------------
+        el = max(1e-9, time.monotonic() - t0)
+        all_hosts = {urlsplit(u).netloc for u in urls}
+        log(f"\n  per-host ({len(host_fetched)} of {len(all_hosts)} hosts responded):")
+        log(f"    {'host':<38}{'fetched':>9}{'kept':>8}{'pg/s':>8}  delay")
+        for h in sorted(host_fetched, key=lambda k: -host_fetched[k])[:40]:
+            d = host_delay.get(h)
+            log(f"    {h:<38}{host_fetched[h]:>9,}{host_kept.get(h, 0):>8,}"
+                f"{host_fetched[h] / el:>8.2f}"
+                f"  {f'{d:g}s (robots)' if d else f'{delay:g}s'}")
+        silent = sorted(all_hosts - set(host_fetched))
+        if silent:
+            log(f"    [{len(silent)} host(s) returned nothing: "
+                f"{', '.join(silent[:6])}{' ...' if len(silent) > 6 else ''}]")
+        slow = {h: d for h, d in host_delay.items() if d > delay * 2}
+        if slow:
+            worst = sorted(slow.items(), key=lambda kv: -kv[1])[:4]
+            log(f"\n  {len(slow)} host(s) declared a Crawl-delay above your "
+                f"{delay:g}s default.")
+            log(f"  That is theirs to set and it is honoured, so the only "
+                f"lever left is MORE HOSTS.")
+            log(f"  Worst: {worst}")
     finally:
         writer.close()
+        if visited_buf:
+            visited_f.write("\n".join(visited_buf) + "\n")
+        visited_f.flush()
+        visited_f.close()
 
     return st
 

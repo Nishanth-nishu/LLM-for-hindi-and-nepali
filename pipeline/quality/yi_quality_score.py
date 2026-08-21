@@ -46,7 +46,7 @@ A CONSTRAINT YOU SHOULD CHECK BEFORE USING THIS
 -----------------------------------------------
 The project brief's hard-constraints box says "No pretrained models; no
 pretrained tokenizers; no HuggingFace Transformer models." In context that
-governs the model you BUILD -- ??2.1 is explicit that it is about implementing
+governs the model you BUILD -- §2.1 is explicit that it is about implementing
 the architecture yourself. Using an LLM as a *data filter* is standard practice
 (FineWeb-Edu, DCLM) and is a different activity from using one as your model.
 
@@ -282,7 +282,7 @@ class HeuristicScorer:
             mean_wl = sum(len(w) for w in words) / len(words)
             if not (2.0 <= mean_wl <= 12.0):
                 score -= 1.5
-            sym = sum(1 for w in words if any(c in "#???$%^&*_=+~<>|\\/@" for c in w))
+            sym = sum(1 for w in words if any(c in "#…$%^&*_=+~<>|\\/@" for c in w))
             score -= 2.0 * min(1.0, (sym / len(words)) / 0.10)
             if self.ref_total:
                 lp = self._ngram_lp(text)

@@ -1,0 +1,47 @@
+# Nepali PDF sources for MANUAL collection (OCR / text extraction).
+#
+# WHY THIS FILE EXISTS
+# --------------------
+# Page scraping on the Nepali web runs at roughly 3 pages/s no matter what you
+# do, because throughput is (hosts x 2 / crawl_delay) and the delay is set by
+# other people's robots.txt. Documents break that ceiling: one statute PDF can
+# carry more text than fifty news articles, and 400 PDFs cost 400 requests
+# instead of 400,000.
+#
+# The brief names "OCR from books/PDFs" as manual collection, so these tokens
+# count toward the >=20% exactly as scraped pages do.
+#
+# HOW TO USE
+# ----------
+# One URL per line: a landing page, index, or archive listing. The harvester
+# walks each one up to --depth hops (same host only) and downloads every PDF it
+# finds, honouring robots.txt and Crawl-delay.
+#
+#   python -m pipeline.collect.pdf_harvest --lang nepali \
+#       --out-dir ~/nepali_pdfs --depth 3 \
+#       --user-agent "corpus-research/1.0 (+your.real@email)"
+#
+# VERIFY EACH SOURCE YOURSELF before a large harvest: check the site's terms,
+# and confirm the documents are the long-form prose you want rather than forms
+# and cover sheets. --min-bytes filters the most obvious of the latter.
+#
+# The entries below are the government domains already in seed_domains.txt,
+# listed as starting points rather than as verified deep links -- the harvester
+# discovers the actual document URLs. Add archive/library sources of your own;
+# the more distinct publishers, the better the corpus.
+
+# --- law and gazette: the highest-value Nepali text that exists ---
+# Natively drafted, long-form, no syndication, essentially zero duplication
+# against Sangraha.
+https://www.lawcommission.gov.np
+https://rajpatra.dop.gov.np
+
+# --- ministries: reports, budget documents, policy papers ---
+https://www.opmcm.gov.np
+https://www.mof.gov.np
+https://moe.gov.np
+https://www.nepal.gov.np
+
+# --- add your own below ---
+# Consider: university repositories, the national library, NGO annual reports,
+# and archive.org collections of out-of-copyright Nepali books.

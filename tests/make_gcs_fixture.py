@@ -1,5 +1,5 @@
 """
-make_gcs_fixture.py ??? a fake bucket with the real tree, for offline testing.
+make_gcs_fixture.py — a fake bucket with the real tree, for offline testing.
 
 Builds
 
@@ -58,7 +58,7 @@ def write_source(path: Path, n: int, words, verbs, shared: list[str]):
                 # a document that also exists in the manual set
                 text = random.choice(shared)
             elif r < 0.10 and prev:
-                text = prev + " ?????? ???????????????????????? ??????????????? ?????????"
+                text = prev + " यह अतिरिक्त वाक्य है।"
             elif r < 0.13:
                 text = "abc " * 30                      # junk
             elif r < 0.16:

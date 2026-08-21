@@ -1,5 +1,5 @@
 """
-ingest_existing.py ??? fold already-downloaded corpora into the pipeline
+ingest_existing.py — fold already-downloaded corpora into the pipeline
 ======================================================================
 You already ran a bulk download and have zips / JSONL sitting in Drive. This
 converts them into manifest records so the rest of the pipeline can use them,
@@ -271,7 +271,7 @@ def main() -> int:
     if writer is not None:
         print(f"  wrote {kept:,} unique -> {out_path}")
     else:
-        print("  (dry run ??? nothing written)")
+        print("  (dry run — nothing written)")
 
     # ---- what this means for the requirement -------------------------------
     est_tokens = total_chars / 4.0     # rough Devanagari proxy
