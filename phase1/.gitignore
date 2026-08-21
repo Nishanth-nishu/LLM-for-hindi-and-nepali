@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
+# Large artifacts go to Google Drive, not git (see README)
+*/data/raw/*.jsonl
+*/data/raw/*.jsonl.gz
+*/data/interim/
+*/data/splits/*.jsonl
+*/data/quality/*.jsonl
+*/data/quality/*.joblib
+*/tokenizer/analysis/sweep_models/
+*/data/raw/article_urls.txt
+
+# Keep: tokenizer models, vocabularies, stats JSON, reports, figures
+!*/tokenizer/vocab/*.model
+!*/tokenizer/vocab/*.vocab
+!*/tokenizer/vocab/*.json
+!*/data/stats/*.json

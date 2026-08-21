@@ -1,0 +1,84 @@
+# data_config.yaml ??? nepali (lower-resource (Model L))
+# Read by pipeline/process/build_corpus.py
+
+language: nepali
+tier: lower_resource
+
+targets:
+  # The brief: "~500M training tokens per language after tokenization",
+  # and ">=20% of the final training tokens ... from manual collection".
+  # Split explicitly rather than as a ratio, because the two halves are
+  # produced by different machinery on different timescales and each needs its
+  # own stop condition.
+  total_tokens: 500000000
+  manual_target_tokens: 100000000      # exactly 20% of 500M
+  downloaded_target_tokens: 400000000  # exactly 80% of 500M
+  min_manual_fraction: 0.20
+  # Collect this multiple of each target. Deduplication and the quality gates
+  # remove a large minority, and scraped news overlaps Sangraha heavily --
+  # Sangraha is itself built from crawls of the same publishers. Ingesting
+  # exactly the target lands well under it.
+  overcollect: 1.45
+  # Token budgets are enforced in CHARACTERS during collection, because no
+  # tokenizer exists yet. 4.0 is a rough Devanagari figure; count_corpus_tokens
+  # prints the measured value -- feed it back with --chars-per-token on pass 2.
+  chars_per_token_proxy: 4.0
+  # Aim this far above min_manual_fraction. The trim measures characters; the
+  # requirement grades tokens. Manual text (scraped news, OCR) and Sangraha have
+  # slightly different characters-per-token, so a corpus trimmed to exactly
+  # 20.00% of characters lands either side of 20% of TOKENS -- and half those
+  # runs come out at 19.99%, which fails. 0.5pp makes the error one-sided.
+  # Costs ~2% of corpus size to guarantee the one number that is actually graded.
+  manual_fraction_margin: 0.005
+
+filters:
+  min_chars: 400
+  min_words: 50
+  min_devanagari_ratio: 0.70
+  max_latin_ratio: 0.12
+  min_unique_word_ratio: 0.30
+  max_symbol_ratio: 0.10
+  max_duplicate_line_ratio: 0.30
+  near_dup_threshold: 0.80
+
+# train/val/test. Val and test are deliberately small: at 500M tokens, 1% is
+# still 5M tokens, which is far more than enough for perplexity and for the
+# tokenizer's held-out fertility measurement.
+split_ratios: [0.98, 0.01, 0.01]
+
+# ?????? Downloaded side: streamed from Cloud Storage ???????????????????????????????????????????????????????????????????????????????????????
+# Read by pipeline/collect/gcs_ingest.py. Sources fill the budget in priority
+# order, so it is spent on the best data first and the unverified Sangraha
+# split absorbs whatever is left over.
+gcs:
+  bucket_root: gs://lma-01-hi-ne-corpus/raw
+  lang_code: ne
+  sources:
+    - key: wikipedia
+      path: wikipedia/data.jsonl
+      priority: 1        # edited prose, small enough to take whole
+      hf_repo: wikimedia/wikipedia
+    - key: sangraha_verified
+      path: sangraha/verified/data.jsonl
+      priority: 2        # AI4Bharat's human-verified split
+      hf_repo: ai4bharat/sangraha
+    - key: sangraha_unverified
+      path: sangraha/unverified/data.jsonl
+      priority: 3        # elastic filler
+      hf_repo: ai4bharat/sangraha
+
+# Present in the bucket and deliberately NOT used. Recorded here so the choice
+# is visible in the repo rather than implied by an absence.
+excluded_sources:
+  - path: opus/OpenSubtitles_en-hi.zip
+    reason: >-
+      Subtitle text from a translation pair. Much of the Hindi side is
+      translated rather than originally composed, and subtitle register
+      (fragmentary dialogue, no paragraph structure) is a poor match for a
+      general-purpose monolingual LM. Including it would also contradict the
+      no-machine-translated-data constraint this project set for itself.
+  - path: hi_ne_corpus.zip
+    reason: >-
+      Mixes Hindi and Nepali in one archive. The brief requires two independent
+      corpora with no shared documents; this cannot be ingested without first
+      splitting it by language and re-checking for cross-language collisions.

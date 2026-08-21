@@ -44,42 +44,29 @@ python run_phase1.py --lang hindi --stage count,report
 
 | Stage | What it does | Output |
 |---|---|---|
-| `gcs-ingest` | stream Sangraha + Wikipedia from GCS ??? **downloaded** documents | `<lang>/data/raw/downloaded_*.jsonl` |
-| `ingest-existing` | fold local zips/jsonl you already downloaded into the pipeline | `<lang>/data/raw/downloaded_imported.jsonl` |
+| `ingest-existing` | fold corpora you already downloaded into the pipeline | `<lang>/data/raw/downloaded_imported.jsonl` |
 | `discover` | seed domains ??? article URLs via sitemaps | `<lang>/data/raw/article_urls.txt` |
 | `plan` | can you reach ???20% manual? run **before** a long collection | printed budget |
 | `scrape` | article URLs ??? **manual** documents | `<lang>/data/raw/manual_scrape.jsonl` |
 | `ocr` | PDFs/images ??? **manual** documents (optional) | `<lang>/data/raw/manual_ocr.jsonl` |
-| `download` | HuggingFace corpora (only if not already in the bucket) | `<lang>/data/raw/downloaded_*.jsonl` |
-| `build` | normalise, filter, dedup, **budget trim**, stratified split | `<lang>/data/splits/*.jsonl` |
+| `download` | HuggingFace corpora ??? **downloaded** documents | `<lang>/data/raw/downloaded_*.jsonl` |
+| `build` | normalise, filter, dedup, stratified split | `<lang>/data/splits/*.jsonl` |
 | `tokenizer` | train from scratch + vocabulary sweep + statistics | `<lang>/tokenizer/` |
 | `count` | authoritative token count + manual fraction | `<lang>/data/stats/token_accounting.json` |
 | `report` | per-language dataset + tokenizer report | `report/<lang>_dataset_report.md` |
 
-### Corpora already in Cloud Storage ??? the ???80%
+### Already downloaded corpora? Fold them in ??? as the ???80%
 
-The downloaded side streams straight out of `gs://lma-01-hi-ne-corpus/raw/`.
-Nothing is re-fetched from HuggingFace, and nothing is copied to local disk
-first: `gcs-ingest` reads over HTTP and stops the moment the token budget is
-met, so the bytes transferred are roughly the bytes kept.
+If you already ran a bulk download, don't redo it:
 
 ```bash
-python -m pipeline.collect.gcs_ingest --lang hindi --dry-run   # inspect first
-python run_phase1.py --lang hindi --stage gcs-ingest
+python -m pipeline.collect.ingest_existing --lang hindi --repo-root . \
+    --input-dir /path/to/extracted/zips --dry-run   # inspect first
 ```
 
-Sources and budgets live in `<lang>/configs/data_config.yaml`, which is the
-single source of truth ??? CLI flags override it, they do not shadow it. Only
-Sangraha (verified and unverified) and Wikipedia are used; `excluded_sources:`
-in the same file records what is deliberately left out and why.
-
-It labels everything `downloaded`, because that is what it is. Sangraha and
-Wikipedia are public corpora ??? the brief's ???80%. They do not become manual by
-being renamed or moved.
-
-**See [`docs/GCP_RUNBOOK.md`](docs/GCP_RUNBOOK.md)** for machine sizing, the
-`gcloud` commands, expected wall-clock per stage, and the failure modes worth
-knowing before a long run.
+It labels them `downloaded`, because that is what they are. Sangraha,
+IndicCorp, OSCAR, Wikipedia and mC4 are public corpora ??? the brief's ???80%.
+They do not become manual by being renamed or moved.
 
 ### The ???20% manual requirement, as arithmetic
 
@@ -128,12 +115,9 @@ pipeline/                     shared code (artifacts stay per-language)
     seed_discovery.py         seed domains -> article URLs
     scrape_collect.py         concurrent, robots-respecting manual scraping
     ocr_collect.py            PDF/image OCR -> manual documents
-    gcs_ingest.py             GCS corpora -> downloaded documents (budgeted)
-    ingest_existing.py        local zips/jsonl -> downloaded documents
     download_public.py        HuggingFace corpora -> downloaded documents
-    plan_budget.py            can you reach >=20% manual? arithmetic, not vibes
   process/
-    build_corpus.py           normalise, filter, dedup, budget trim, split
+    build_corpus.py           normalise, filter, dedup, split
   tokenizer/
     train_tokenizer.py        from-scratch SentencePiece + vocabulary sweep
     tokenizer_report.py       token-frequency stats, chars/token, examples

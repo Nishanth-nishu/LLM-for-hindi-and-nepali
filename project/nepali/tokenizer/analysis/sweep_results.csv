@@ -1,3 +1,0 @@
-vocab_size,fertility,unk_rate,model_path
-16000,1.6026,0.000582,C:\Users\HP\Desktop\individual-project-Nishanth-nishu-phase-1\project\nepali\tokenizer\analysis\sweep_models\spm_nepali_unigram_v16000.model
-24000,1.5247,0.000612,C:\Users\HP\Desktop\individual-project-Nishanth-nishu-phase-1\project\nepali\tokenizer\analysis\sweep_models\spm_nepali_unigram_v24000.model

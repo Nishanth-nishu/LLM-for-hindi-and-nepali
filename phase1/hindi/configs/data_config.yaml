@@ -1,0 +1,38 @@
+# data_config.yaml ??? hindi (higher-resource (Model H))
+# Read by pipeline/process/build_corpus.py
+
+language: hindi
+tier: higher_resource
+
+targets:
+  # The brief: "~500M training tokens per language after tokenization",
+  # and ">=20% of the final training tokens ... from manual collection".
+  total_tokens: 500000000
+  min_manual_fraction: 0.20
+  # Character proxies used during COLLECTION only, because token counts do not
+  # exist until the tokenizer does. ~4 chars/token is a rough Devanagari figure;
+  # recalibrate from your own token_accounting.json after the first full run.
+  manual_target_chars: 400000000
+  downloaded_target_chars: 1600000000
+
+filters:
+  min_chars: 400
+  min_words: 50
+  min_devanagari_ratio: 0.70
+  max_latin_ratio: 0.12
+  min_unique_word_ratio: 0.30
+  max_symbol_ratio: 0.10
+  max_duplicate_line_ratio: 0.30
+  near_dup_threshold: 0.80
+
+# train/val/test. Val and test are deliberately small: at 500M tokens, 1% is
+# still 5M tokens, which is far more than enough for perplexity and for the
+# tokenizer's held-out fertility measurement.
+split_ratios: [0.98, 0.01, 0.01]
+
+downloaded_sources:
+  - sangraha
+  - indiccorp
+  - wikipedia
+  # oscar   # gated: accept terms on HF and `huggingface-cli login` first
+  # mc4     # very large; stream with a character budget
