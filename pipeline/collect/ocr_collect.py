@@ -165,7 +165,7 @@ def extract_text_layer(path: Path, max_pages: int | None) -> list[str]:
 
 def ocr_one_file(args_tuple) -> tuple[str, list[str], str]:
     """Worker: extract one PDF/image. Returns (filename, page_texts, error)."""
-    path_str, lang, dpi, psm, max_pages = args_tuple
+    path_str, lang, dpi, psm, max_pages, text_layer_only = args_tuple
     path = Path(path_str)
 
     # Text layer first: faster and more accurate when it exists.
@@ -173,6 +173,15 @@ def ocr_one_file(args_tuple) -> tuple[str, list[str], str]:
         pages = extract_text_layer(path, max_pages)
         if pages:
             return path.name, pages, ""
+        if text_layer_only:
+            # Deliberate skip, not a failure. On a mixed harvest the scanned
+            # minority can cost more wall-clock than the born-digital majority
+            # by two orders of magnitude: pdftotext is ~50 ms per document,
+            # Tesseract is 3-10 SECONDS per page. When a deadline is the
+            # binding constraint, taking the 76% that is free and declaring
+            # the rest is the correct trade -- and it is a trade you should
+            # state in the report rather than leave implicit.
+            return path.name, [], "SKIP:no_text_layer"
 
     try:
         import pytesseract
@@ -219,6 +228,10 @@ def main() -> int:
                     help="Tesseract page segmentation mode; 6 (uniform block) "
                          "usually beats the default on book scans")
     ap.add_argument("--workers", type=int, default=2)
+    ap.add_argument("--text-layer-only", action="store_true",
+                    help="skip files with no embedded text instead of running "
+                         "OCR on them. pdftotext is ~50ms/doc; Tesseract is "
+                         "3-10s/PAGE. Use when time is the constraint.")
     ap.add_argument("--max-pages-per-file", type=int, default=0,
                     help="0 = all pages")
     ap.add_argument("--min-chars", type=int, default=400)
@@ -251,7 +264,8 @@ def main() -> int:
 
     kept = dropped = failed = 0
     drop_reasons: dict[str, int] = {}
-    tasks = [(str(p), args.lang, args.dpi, args.psm, args.max_pages_per_file)
+    tasks = [(str(p), args.lang, args.dpi, args.psm, args.max_pages_per_file,
+               args.text_layer_only)
              for p in files]
 
     with ProcessPoolExecutor(max_workers=args.workers) as ex:

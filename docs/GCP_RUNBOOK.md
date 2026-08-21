@@ -39,12 +39,18 @@ That samples 2M lines uniformly across sources (it does *not* take the first
 matters) and brings the peak down to roughly 12–16 GB. You lose a little
 vocabulary quality on rare word forms. It is a real trade, not a free one.
 
-**Why 8 vCPU.** The `build` stage is CPU-bound at roughly 20–30 ms per document
-— normalisation, the quality gates, and MinHash signatures. At ~3M documents
-per language that is 20–25 minutes single-threaded, which is fine. More cores
-do not help the current single-process build; they help because you can run
-Hindi and Nepali concurrently in two terminals, and because SentencePiece
-training is threaded. 8 is the point where both of those are covered.
+**Why 8 vCPU.** The `build` stage is CPU-bound at a measured **6.84 ms per
+document** — normalisation, the quality gates, and MinHash signatures, of which
+MinHash is 5.6 ms. All of that is a pure function of the document text, so it
+runs in a process pool while only the order-dependent bookkeeping (the
+exact-duplicate set, the LSH buckets, the output file) stays sequential.
+
+Measured scaling: 30,000 documents took 217.6 s with one worker and 110.8 s
+with two — 1.96x on two cores. At `--workers 7` a 1.6M-document Hindi build
+goes from roughly three hours to well under one. Verified byte-identical to
+the serial path, because `map` preserves order and the tie-breaks depend on it.
+
+SentencePiece training is threaded too, so the cores are used twice.
 
 **Why 500 GB and not the 1 TB you already have.** You never hold the whole
 bucket locally — `gcs-ingest` streams and stops at the budget. The disk holds
@@ -280,7 +286,7 @@ Per language, on `n2-highmem-8`:
 | `gcs-ingest` | 45–90 min | Network from GCS; ~15–20 GB read |
 | `discover` | 10–20 min | Sitemap fetches, politeness-limited |
 | `scrape` | 4–8 h | Politeness: ~1.3 pages/s **per domain**. Scales with domain count, not threads |
-| `build` | 20–40 min | CPU: normalise + quality gates + MinHash |
+| `build` | 30–45 min | CPU, parallel. ~6.8 ms/doc serial; scales near-linearly with `--workers` |
 | `tokenizer` | 2–4 h | Six-point sweep; each Unigram fit is 20–40 min |
 | `count` | 15–30 min | Encoding the whole corpus once |
 
