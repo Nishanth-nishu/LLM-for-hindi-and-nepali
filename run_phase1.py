@@ -302,6 +302,10 @@ def main() -> int:
     ap.add_argument("--gcs-hours", type=float, default=6.0)
     # per-stage knobs
     ap.add_argument("--scrape-hours", type=float, default=4.0)
+    ap.add_argument("--url-order", choices=["forward", "tail", "reshuffle"],
+                    default="forward",
+                    help="'tail' on a resumed scrape: the front of the list is "
+                         "dense with urls a previous run already rejected")
     ap.add_argument("--download-hours", type=float, default=3.0)
     ap.add_argument("--manual-target-chars", type=int, default=None,
                     help="scrape stop condition; defaults to "
@@ -410,7 +414,8 @@ def main() -> int:
     if "scrape" in stages:
         rc = run([py, "-m", "pipeline.collect.scrape_collect", "--lang", lang,
                   "--repo-root", str(root), "--max-hours", str(args.scrape_hours),
-                  "--target-chars", str(manual_target_chars)],
+                  "--target-chars", str(manual_target_chars),
+                  "--url-order", args.url_order],
                  cwd=root, dry=args.dry_run)
         if rc:
             failures.append("scrape")

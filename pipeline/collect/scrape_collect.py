@@ -273,7 +273,9 @@ class Stats:
 
 async def run(*, lang: str, repo_root: Path, urls: list[str], user_agent: str,
               concurrency: int, per_host: int, delay: float, max_hours: float,
-              target_chars: int, min_chars: int, out_name: str, log=print) -> Stats:
+              target_chars: int, min_chars: int, out_name: str,
+              order: str = "forward", shuffle_seed: int = 20260820,
+              log=print) -> Stats:
     import httpx
 
     st = Stats()
@@ -436,6 +438,27 @@ async def run(*, lang: str, repo_root: Path, urls: list[str], user_agent: str,
     if visited:
         log(f"  {len(todo):,} of {len(urls):,} urls remain "
             f"({len(urls) - len(todo):,} skipped as already attempted)")
+
+    # ORDER MATTERS ON A RESUME, AND THE DEFAULT ORDER IS THE WRONG ONE.
+    #
+    # The visited log records URLs that reached a definitive outcome. When it
+    # is bootstrapped from an older output file, only the KEPT urls are
+    # recoverable -- the ones fetched and rejected were never written down. The
+    # shuffle order is seeded and therefore stable, so those rejects all sit at
+    # the FRONT of what remains, and a resume spends hours re-fetching pages it
+    # already knows it does not want. Observed: 4,492 fetched, 12 kept.
+    #
+    # `tail` starts from the end of the list, which by construction is the
+    # region no previous run reached, so acceptance returns to normal
+    # immediately. `reshuffle` mixes rejects evenly through fresh urls instead
+    # of front-loading them -- better if you intend to run the list out.
+    if order == "tail":
+        todo.reverse()
+        log(f"  order: tail-first (skips the re-reject region a bootstrapped "
+            f"resume puts at the front)")
+    elif order == "reshuffle":
+        random.Random(shuffle_seed + 1).shuffle(todo)
+        log(f"  order: reshuffled")
     if not todo:
         log("  nothing left to fetch. Add domains to seed_domains.txt and "
             "re-run `--stage discover` to extend the URL list.")
@@ -554,6 +577,11 @@ def main() -> int:
     ap.add_argument("--per-host", type=int, default=2)
     ap.add_argument("--delay", type=float, default=1.5,
                     help="minimum seconds between hits on ONE host")
+    ap.add_argument("--url-order", choices=["forward", "tail", "reshuffle"],
+                    default="forward",
+                    help="resume order. Use 'tail' after a bootstrapped resume: "
+                         "the front of the list is dense with urls a previous "
+                         "run already fetched and rejected.")
     ap.add_argument("--max-hours", type=float, default=4.0)
     ap.add_argument("--target-chars", type=int, default=400_000_000,
                     help="stop at this many characters kept. ~400M chars is a "
@@ -591,7 +619,8 @@ def main() -> int:
         lang=args.lang, repo_root=root, urls=urls, user_agent=args.user_agent,
         concurrency=args.concurrency, per_host=args.per_host, delay=args.delay,
         max_hours=args.max_hours, target_chars=args.target_chars,
-        min_chars=args.min_chars, out_name=args.out_name))
+        min_chars=args.min_chars, out_name=args.out_name,
+        order=args.url_order))
 
     print(f"\n  fetched          {st.fetched:,}")
     print(f"  kept             {st.kept:,}  ({st.chars / 1e6:.1f}M chars)")
