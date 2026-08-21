@@ -49,7 +49,7 @@ import hashlib
 import re
 import sys
 import time
-from collections import Counter
+from collections import Counter, deque
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit, unquote
 
@@ -90,7 +90,22 @@ def safe_name(url: str, out_dir: Path) -> Path:
 async def harvest(seeds: list[str], out_dir: Path, *, depth: int,
                   max_pdfs: int, per_host: int, delay: float,
                   max_hours: float, user_agent: str, min_bytes: int,
-                  log=print) -> dict:
+                  concurrency: int = 12, log=print) -> dict:
+    """
+    Walk the seed pages concurrently and download every PDF found.
+
+    CONCURRENCY IS ACROSS HOSTS, NOT WITHIN ONE
+    -------------------------------------------
+    A naive version of this pulls one URL off the queue, awaits it, and
+    repeats. With a 1.5s politeness delay that is 0.67 pages/s GLOBALLY --
+    slower than the page scraper it is supposed to outrun, and on a six-site
+    depth-3 walk it can spend an hour before the first PDF appears.
+
+    The delay is per HOST. Running `concurrency` workers off a shared queue
+    lets six sites be walked at once while each individual site still sees one
+    request every 1.5s. HostLimiter enforces that; the workers just keep the
+    pipe full.
+    """
     import httpx
     from pipeline.collect.scrape_collect import HostLimiter, RobotsCache
 
@@ -103,95 +118,124 @@ async def harvest(seeds: list[str], out_dir: Path, *, depth: int,
     stats: Counter[str] = Counter()
     downloaded_bytes = 0
     t0 = time.monotonic()
+    last_log = t0
 
     existing = {p.name for p in out_dir.glob("*.pdf")}
     if existing:
         log(f"  {len(existing):,} pdfs already in {out_dir} — will skip those")
 
-    queue: list[tuple[str, int]] = [(s, 0) for s in seeds]
+    queue: deque[tuple[str, int]] = deque((s, 0) for s in seeds)
+    for s in seeds:
+        seen_pages.add(s)
     headers = {"User-Agent": user_agent, "Accept-Language": "ne,hi,en;q=0.5"}
+    done = asyncio.Event()
+
+    def progress(force: bool = False) -> None:
+        nonlocal last_log
+        now = time.monotonic()
+        if not force and now - last_log < 20:
+            return
+        last_log = now
+        log(f"  {len(seen_pdfs):,} pdfs ({downloaded_bytes / 1e6:.0f} MB) | "
+            f"{stats['pages_walked']:,} pages walked | "
+            f"{len(queue):,} queued | {(now - t0) / 60:.0f} min")
+
+    async def process(client, url: str, d: int) -> None:
+        nonlocal downloaded_bytes
+        host = urlsplit(url).netloc
+
+        ok, cd = await robots.allowed(client, url)
+        if cd:
+            limiter.set_delay(host, float(cd))
+        if not ok:
+            stats["robots_denied"] += 1
+            return
+
+        await limiter.acquire(host)
+        try:
+            r = await client.get(url, timeout=40)
+        except Exception:
+            stats["fetch_error"] += 1
+            return
+        finally:
+            limiter.release(host)
+
+        if r.status_code >= 400:
+            stats[f"http_{r.status_code}"] += 1
+            return
+
+        ctype = r.headers.get("content-type", "").lower()
+
+        # ---- a PDF ---------------------------------------------------------
+        if "pdf" in ctype or is_pdf_link(url):
+            dest = safe_name(url, out_dir)
+            if dest.name in existing:
+                stats["already_have"] += 1
+                return
+            body = r.content
+            if len(body) < min_bytes:
+                stats["too_small"] += 1
+                return
+            if not body[:5].startswith(b"%PDF"):
+                # The Content-Type lied, or a PDF link served an error page.
+                # Cheap to check, and OCR on an HTML error page produces
+                # convincing-looking garbage that is hard to spot later.
+                stats["not_a_pdf"] += 1
+                return
+            dest.write_bytes(body)
+            existing.add(dest.name)
+            seen_pdfs.add(url)
+            downloaded_bytes += len(body)
+            stats["downloaded"] += 1
+            if len(seen_pdfs) >= max_pdfs:
+                done.set()
+            progress()
+            return
+
+        # ---- an HTML page: harvest links ------------------------------------
+        if "html" not in ctype:
+            stats["skipped_content_type"] += 1
+            return
+        stats["pages_walked"] += 1
+        progress()
+        if d >= depth:
+            return
+
+        for href in HREF_RE.findall(r.text):
+            nxt = urljoin(str(r.url), href.strip())
+            if not nxt.startswith(("http://", "https://")):
+                continue
+            nxt, _, _ = nxt.partition("#")
+            if nxt in seen_pages:
+                continue
+            if is_pdf_link(nxt):
+                seen_pages.add(nxt)
+                queue.appendleft((nxt, d))     # PDFs jump the queue, cost no depth
+            elif urlsplit(nxt).netloc == host and not DENY_LINK.search(nxt):
+                seen_pages.add(nxt)
+                queue.append((nxt, d + 1))
+
+    async def worker(client) -> None:
+        while not done.is_set():
+            if (time.monotonic() - t0) / 3600 >= max_hours:
+                done.set()
+                return
+            if not queue:
+                await asyncio.sleep(0.4)       # another worker may enqueue more
+                if not queue:
+                    return
+                continue
+            url, d = queue.popleft()
+            try:
+                await process(client, url, d)
+            except Exception as e:
+                stats[f"worker_error:{type(e).__name__}"] += 1
 
     async with httpx.AsyncClient(headers=headers, follow_redirects=True) as client:
-        while queue and len(seen_pdfs) < max_pdfs:
-            if (time.monotonic() - t0) / 3600 >= max_hours:
-                log(f"  [stop] --max-hours {max_hours} reached")
-                break
+        await asyncio.gather(*(worker(client) for _ in range(concurrency)),
+                             return_exceptions=True)
 
-            url, d = queue.pop(0)
-            if url in seen_pages:
-                continue
-            seen_pages.add(url)
-            host = urlsplit(url).netloc
-
-            ok, cd = await robots.allowed(client, url)
-            if cd:
-                limiter.set_delay(host, float(cd))
-            if not ok:
-                stats["robots_denied"] += 1
-                continue
-
-            await limiter.acquire(host)
-            try:
-                r = await client.get(url, timeout=40)
-            except Exception:
-                stats["fetch_error"] += 1
-                continue
-            finally:
-                limiter.release(host)
-
-            if r.status_code >= 400:
-                stats[f"http_{r.status_code}"] += 1
-                continue
-
-            ctype = r.headers.get("content-type", "").lower()
-
-            # ---- a PDF -------------------------------------------------------
-            if "pdf" in ctype or is_pdf_link(url):
-                dest = safe_name(url, out_dir)
-                if dest.name in existing:
-                    stats["already_have"] += 1
-                    continue
-                body = r.content
-                if len(body) < min_bytes:
-                    stats["too_small"] += 1
-                    continue
-                if not body[:5].startswith(b"%PDF"):
-                    # Content-Type lied, or it is an error page served as a PDF
-                    # link. Cheap to check, and OCR on a HTML error page
-                    # produces convincing-looking garbage.
-                    stats["not_a_pdf"] += 1
-                    continue
-                dest.write_bytes(body)
-                seen_pdfs.add(url)
-                downloaded_bytes += len(body)
-                stats["downloaded"] += 1
-                if len(seen_pdfs) % 25 == 0:
-                    log(f"  {len(seen_pdfs):,} pdfs, "
-                        f"{downloaded_bytes / 1e6:.0f} MB, "
-                        f"{len(queue):,} links queued, "
-                        f"{(time.monotonic() - t0) / 60:.0f} min")
-                continue
-
-            # ---- an HTML page: harvest links --------------------------------
-            if "html" not in ctype:
-                stats["skipped_content_type"] += 1
-                continue
-            stats["pages_walked"] += 1
-            if d >= depth:
-                continue
-
-            for href in HREF_RE.findall(r.text):
-                nxt = urljoin(str(r.url), href.strip())
-                if not nxt.startswith(("http://", "https://")):
-                    continue
-                nxt, _, _ = nxt.partition("#")
-                if nxt in seen_pages:
-                    continue
-                if is_pdf_link(nxt):
-                    queue.append((nxt, d))          # PDFs do not cost depth
-                elif urlsplit(nxt).netloc == host and not DENY_LINK.search(nxt):
-                    queue.append((nxt, d + 1))
-
+    progress(force=True)
     return {"pdfs": len(seen_pdfs), "bytes": downloaded_bytes,
             "pages_walked": stats["pages_walked"], "stats": dict(stats),
             "minutes": (time.monotonic() - t0) / 60}
@@ -216,6 +260,9 @@ def main() -> int:
     ap.add_argument("--per-host", type=int, default=2)
     ap.add_argument("--delay", type=float, default=1.5)
     ap.add_argument("--max-hours", type=float, default=3.0)
+    ap.add_argument("--concurrency", type=int, default=12,
+                    help="workers sharing the queue; the per-host delay is "
+                         "still enforced, so this parallelises ACROSS sites")
     ap.add_argument("--min-bytes", type=int, default=20000,
                     help="skip tiny PDFs: cover sheets, single-page forms")
     ap.add_argument("--user-agent", default=None)
@@ -252,7 +299,8 @@ def main() -> int:
     res = asyncio.run(harvest(seeds, out_dir, depth=args.depth,
                               max_pdfs=args.max_pdfs, per_host=args.per_host,
                               delay=args.delay, max_hours=args.max_hours,
-                              user_agent=ua, min_bytes=args.min_bytes))
+                              user_agent=ua, min_bytes=args.min_bytes,
+                              concurrency=args.concurrency))
 
     print(f"\n  {res['pdfs']:,} pdfs ({res['bytes'] / 1e6:.0f} MB) "
           f"from {res['pages_walked']:,} pages in {res['minutes']:.0f} min")
