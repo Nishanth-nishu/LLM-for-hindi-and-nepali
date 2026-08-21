@@ -429,6 +429,10 @@ def apply_budget(records: list[tuple[str, str, str, int]],
 
 
 def main() -> int:
+    try:
+        sys.stdout.reconfigure(line_buffering=True)
+    except (AttributeError, OSError):
+        pass
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[2],
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--lang", required=True, choices=["hindi", "nepali"])

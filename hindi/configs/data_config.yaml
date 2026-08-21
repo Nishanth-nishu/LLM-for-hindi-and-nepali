@@ -52,6 +52,17 @@ split_ratios: [0.98, 0.01, 0.01]
 # split absorbs whatever is left over.
 gcs:
   bucket_root: gs://lma-01-hi-ne-corpus/raw
+  # How to read a blob far larger than the budget. `strided` divides it into
+  # sampling_windows evenly spaced byte ranges and takes an equal share of the
+  # budget from each; `sequential` reads from the start.
+  #
+  # This matters more than it looks. Hindi's verified Sangraha is 173 GB and a
+  # 400M-token budget touches ~2% of it. The first 2% of a file built by
+  # concatenating sources is whichever source was written first, not a sample
+  # of the corpus -- so a prefix read hands the tokenizer one publisher's
+  # vocabulary. Same bytes transferred either way; only the coverage differs.
+  sampling: strided
+  sampling_windows: 200
   lang_code: hi
   sources:
     - key: wikipedia

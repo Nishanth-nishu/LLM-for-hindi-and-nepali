@@ -430,6 +430,10 @@ def load_urls(path: Path, shuffle_seed: int = 20260820) -> list[str]:
 
 
 def main() -> int:
+    try:
+        sys.stdout.reconfigure(line_buffering=True)
+    except (AttributeError, OSError):
+        pass
     ap = argparse.ArgumentParser(
         description="Concurrent, robots-respecting manual web collection.",
         formatter_class=argparse.RawDescriptionHelpFormatter)

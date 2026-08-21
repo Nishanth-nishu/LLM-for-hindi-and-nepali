@@ -145,6 +145,34 @@ Sources fill the budget in priority order ??? Wikipedia, then verified Sangraha,
 then unverified Sangraha as the filler. If the first two cover the budget, the
 unverified split is never read, and that is the correct outcome.
 
+### Why the reader samples windows instead of reading from the top
+
+Hindi's verified Sangraha is **173 GiB**. A 400M-token budget touches about 2%
+of it. The first 2% of a file assembled by concatenating sources is not a
+sample of that file ??? it is whichever source the authors happened to write
+first, and a tokenizer trained on it learns one publisher's vocabulary.
+
+Measured on a fixture of 20,000 documents written as ten ordered source blocks,
+with a budget covering ~8% of the file:
+
+```
+SEQUENTIAL: {0: 1405}
+STRIDED   : {0: 135, 1: 137, 2: 123, 3: 124, 4: 120,
+             5: 129, 6: 123, 7: 127, 8: 123, 9: 80}
+```
+
+Same bytes transferred. One reads a single source; the other reads all ten.
+
+So `gcs_ingest` divides each large blob into `sampling_windows` evenly spaced
+byte ranges (200 by default) and takes an equal share of the budget from each.
+Byte offsets never land on line boundaries, so the fragment at the start of
+each window is discarded ??? 200 lost records out of millions, the entire cost of
+the scheme. Small blobs where the budget would cover most of the file
+(Wikipedia) still read sequentially, and `--sampling sequential` forces a
+prefix if you ever want one.
+
+Configured under `gcs:` in `<lang>/configs/data_config.yaml`.
+
 ---
 
 ## 4. The run
@@ -158,6 +186,19 @@ gcs-ingest  ???  discover  ???  plan  ???  scrape  ???  build  ???  tokenizer  ?
 `plan` sits between discovery and scraping on purpose: it tells you whether the
 domains you have can produce 100M manual tokens *before* you spend four hours
 finding out they cannot.
+
+### Run everything under `tmux`
+
+Not optional. A closed terminal sends SIGHUP and kills the job; a six-hour
+ingest dies having transferred tens of gigabytes.
+
+```bash
+tmux new -s hindi          # detach with Ctrl-b then d, reattach with tmux a -t hindi
+tmux new -s nepali
+```
+
+`gcs_ingest` now traps SIGHUP and SIGTERM so it writes its resume state before
+dying, which limits the damage ??? but it still dies. Use `tmux`.
 
 ### Hindi
 
@@ -277,9 +318,18 @@ or pass `--bucket-root` pointing at a local copy of the tree.
 **403 on the bucket** ??? EUC is off or the account lacks `storage.objectViewer`.
 Check with `gsutil ls gs://lma-01-hi-ne-corpus/raw/hi/`.
 
-**`gcs-ingest` interrupted** ??? just re-run it. It records lines consumed per
-blob in `<lang>/data/stats/gcs_ingest_state.json` and skips forward. Use
-`--no-resume` to force a full re-read.
+**`gcs-ingest` interrupted** ??? just re-run it. It records lines consumed and
+windows completed per blob in `<lang>/data/stats/gcs_ingest_state.json` and
+resumes from there. Use `--no-resume` to force a full re-read.
+
+**A run produced no output and then vanished** ??? two separate things, both
+fixed but worth recognising. Output that never appears is stdout block-buffering
+on a non-TTY (a notebook cell, a pipe, a redirect); every long-running stage now
+line-buffers, and `python -u` forces it for anything that doesn't. A run that
+vanishes with no `gcs_ingest_summary.json` was killed ??? almost always SIGHUP
+from a closed terminal. The presence or absence of that summary file is the
+reliable way to tell a completed run from a killed one; don't judge by the
+output files, which look identical either way.
 
 **Tokenizer OOM-killed** ??? you are on too small a machine. Either move to
 `n2-highmem-8` or add `--max-corpus-lines 2000000`, as described in ??1.

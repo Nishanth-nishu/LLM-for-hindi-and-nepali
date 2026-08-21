@@ -20,16 +20,32 @@ adding it to the `gcs.sources:` list there.
 
 WHY THIS STREAMS INSTEAD OF DOWNLOADING
 ---------------------------------------
-Sangraha unverified is tens of GB per language. `gsutil cp` then read means you
-pay for the whole file before you know whether you needed the last 90% of it --
-and with a 400M-token cap you usually do not. `blob.open("rt")` pulls chunks
-over HTTP and this module stops reading the moment the budget is hit, so the
-bytes you pay to transfer are roughly the bytes you keep.
+Hindi's verified Sangraha is 173 GB. `gsutil cp` then read means you pay for the
+whole file before you know whether you needed the last 98% of it -- and with a
+400M-token cap you do not. This reads over HTTP and stops the moment the budget
+is met, so the bytes you pay to transfer are roughly the bytes you keep.
 
-The cost of streaming is that a restart re-reads from the top. A state file
-(<lang>/data/stats/gcs_ingest_state.json, written after every source and on
-interrupt) records how many lines of each blob were consumed, so a restart
-skips forward without re-parsing JSON. `--no-resume` ignores it.
+WHY IT SAMPLES WINDOWS INSTEAD OF READING FROM THE TOP
+-------------------------------------------------------
+That budget covers about 2% of a 173 GB blob, and the first 2% of a file
+assembled by concatenating sources is not a sample of that file -- it is
+whichever source the authors wrote first. A tokenizer trained on it learns one
+publisher's vocabulary and calls it Hindi.
+
+So instead of a prefix, the reader divides the blob into --windows evenly
+spaced byte ranges (200 by default) and takes an equal share of the budget from
+each. Byte offsets never land on line boundaries, so the fragment at the start
+of each window is discarded -- 200 lost records out of millions, which is the
+entire cost of the scheme. Transfer volume is unchanged; coverage goes from 2%
+of the file to all of it.
+
+Sequential reading is still used when the budget would cover most of the blob
+anyway (Wikipedia), and `--sampling sequential` forces it if you actually want
+a prefix.
+
+A state file (<lang>/data/stats/gcs_ingest_state.json) records lines consumed
+and windows completed, so a restart resumes rather than re-reading.
+`--no-resume` ignores it.
 
 THE BUDGET, AND WHY IT OVERSHOOTS ON PURPOSE
 --------------------------------------------
@@ -111,59 +127,116 @@ def _split_gs(uri: str) -> tuple[str, str]:
 
 
 class Blob:
-    """One remote or local JSONL file, opened lazily as a text stream."""
+    """
+    One remote or local JSONL file. Supports whole-file streaming and reads of
+    arbitrary byte ranges, which is what strided sampling needs.
+
+    The storage Client is cached per instance: constructing one per call adds a
+    credential lookup to every window, and strided sampling makes hundreds of
+    window reads per source.
+    """
 
     def __init__(self, uri: str):
         self.uri = uri
         self.is_gs = uri.startswith("gs://")
+        self._blob = None
 
+    # -- gs:// plumbing ----------------------------------------------------
+    def _gs_blob(self):
+        if self._blob is None:
+            try:
+                from google.cloud import storage
+            except ImportError as e:
+                raise SystemExit(
+                    "google-cloud-storage is not installed. Either\n"
+                    "    pip install google-cloud-storage\n"
+                    "or pass --bucket-root pointing at a local copy.") from e
+            bucket, key = _split_gs(self.uri)
+            self._blob = storage.Client().bucket(bucket).blob(key)
+        return self._blob
+
+    # -- metadata ----------------------------------------------------------
     def exists(self) -> bool:
         if not self.is_gs:
             return Path(self.uri).exists()
         try:
-            from google.cloud import storage
-        except ImportError:
-            return True          # cannot check; let open() produce the real error
-        bucket, key = _split_gs(self.uri)
-        return storage.Client().bucket(bucket).blob(key).exists()
+            return self._gs_blob().exists()
+        except SystemExit:
+            return True          # no library; let the read produce the real error
 
     def size(self) -> int | None:
         if not self.is_gs:
             p = Path(self.uri)
             return p.stat().st_size if p.exists() else None
         try:
-            from google.cloud import storage
-        except ImportError:
+            b = self._gs_blob()
+        except SystemExit:
             return None
-        bucket, key = _split_gs(self.uri)
-        b = storage.Client().bucket(bucket).blob(key)
         b.reload()
         return b.size
 
+    @property
+    def is_compressed(self) -> bool:
+        return self.uri.endswith(".gz")
+
+    # -- whole-file streaming ---------------------------------------------
     def open_text(self):
         if not self.is_gs:
             p = Path(self.uri)
-            if p.name.endswith(".gz"):
+            if self.is_compressed:
                 return gzip.open(p, "rt", encoding="utf-8", errors="replace")
             return open(p, "rt", encoding="utf-8", errors="replace")
 
-        try:
-            from google.cloud import storage
-        except ImportError as e:
-            raise SystemExit(
-                "google-cloud-storage is not installed. Either\n"
-                "    pip install google-cloud-storage\n"
-                "or pass --bucket-root pointing at a local copy.") from e
-
-        bucket, key = _split_gs(self.uri)
-        blob = storage.Client().bucket(bucket).blob(key)
-        if key.endswith(".gz"):
-            raw = blob.open("rb")
-            return io.TextIOWrapper(gzip.GzipFile(fileobj=raw),
+        blob = self._gs_blob()
+        if self.is_compressed:
+            return io.TextIOWrapper(gzip.GzipFile(fileobj=blob.open("rb")),
                                     encoding="utf-8", errors="replace")
         # chunk_size controls how much is buffered per HTTP range request.
         return blob.open("rt", encoding="utf-8", errors="replace",
                          chunk_size=8 * 1024 * 1024)
+
+    # -- byte-range reading, for strided sampling -------------------------
+    def read_range(self, start: int, end: int) -> bytes:
+        """Bytes in [start, end). Empty bytes at or past EOF."""
+        if end <= start:
+            return b""
+        if not self.is_gs:
+            with open(self.uri, "rb") as f:
+                f.seek(start)
+                return f.read(end - start)
+        # GCS ranges are inclusive of `end`.
+        return self._gs_blob().download_as_bytes(start=start, end=end - 1)
+
+    def iter_range_lines(self, start: int, end: int, *,
+                         skip_partial: bool, chunk: int = 16 * 1024 * 1024):
+        """
+        Yield complete text lines from the byte range [start, end).
+
+        A byte offset chosen arithmetically almost never lands on a line
+        boundary, so the first line of a window is a fragment of the record
+        that straddles the offset. `skip_partial` drops it. The final fragment
+        is dropped too -- it belongs to the next window, which will read it.
+
+        Losing one record per window is the entire cost of this scheme: at 200
+        windows that is 200 documents out of millions.
+        """
+        pos = start
+        carry = b""
+        dropped_partial = not skip_partial
+        while pos < end:
+            stop = min(pos + chunk, end)
+            data = self.read_range(pos, stop)
+            if not data:
+                break
+            buf = carry + data
+            parts = buf.split(b"\n")
+            carry = parts.pop()          # incomplete; may complete next chunk
+            for line in parts:
+                if not dropped_partial:
+                    dropped_partial = True
+                    continue
+                yield line.decode("utf-8", errors="replace")
+            pos = stop
 
 
 def load_config(repo_root: Path, lang: str) -> dict:
@@ -254,7 +327,44 @@ def save_state(path: Path, state: dict) -> None:
     path.write_text(json.dumps(state, indent=2), encoding="utf-8")
 
 
+def _install_signal_handlers() -> None:
+    """
+    Turn SIGTERM and SIGHUP into KeyboardInterrupt so the `finally` blocks run.
+
+    This module writes its resume state in a `finally`. By default SIGHUP kills
+    the process outright, skipping it -- which is exactly what happens when you
+    start a six-hour ingest in a terminal and that terminal later closes. The
+    run dies having transferred tens of gigabytes and recorded nothing about
+    where it got to. Raising instead lets the state file be written.
+
+    Run long jobs under `tmux` or `nohup` anyway; this only limits the damage
+    when you forget.
+    """
+    import signal
+
+    def handler(signum, frame):
+        raise KeyboardInterrupt(f"signal {signum}")
+
+    for name in ("SIGTERM", "SIGHUP"):
+        sig = getattr(signal, name, None)
+        if sig is not None:
+            try:
+                signal.signal(sig, handler)
+            except (ValueError, OSError):
+                pass             # not the main thread, or not supported here
+
+
 def main() -> int:
+    # Line-buffer stdout. When stdout is a pipe rather than a terminal -- a
+    # notebook cell, `tee`, a redirect -- Python block-buffers it, so a running
+    # job prints nothing for minutes and looks hung. Progress output is only
+    # useful if it arrives while there is still a decision to make.
+    try:
+        sys.stdout.reconfigure(line_buffering=True)
+    except (AttributeError, OSError):
+        pass
+    _install_signal_handlers()
+
     ap = argparse.ArgumentParser(
         description=__doc__.split("\n")[2],
         formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -274,6 +384,13 @@ def main() -> int:
     ap.add_argument("--chars-per-token", type=float, default=None,
                     help="proxy for token counting before a tokenizer exists; "
                          "replace with the measured value on pass 2")
+    ap.add_argument("--sampling", choices=["strided", "sequential"],
+                    default=None,
+                    help="strided (default) samples windows spread across the "
+                         "whole blob; sequential reads from the start. Use "
+                         "sequential only if you intend a prefix.")
+    ap.add_argument("--windows", type=int, default=None,
+                    help="number of windows for strided sampling (default 200)")
     ap.add_argument("--min-chars", type=int, default=200)
     ap.add_argument("--min-devanagari-ratio", type=float, default=0.60)
     ap.add_argument("--max-hours", type=float, default=6.0)
@@ -301,6 +418,9 @@ def main() -> int:
     overcollect = pick(args.overcollect, targets, "overcollect", 1.45)
     chars_per_token = pick(args.chars_per_token, targets,
                            "chars_per_token_proxy", 4.0)
+    gcs_cfg = cfg.get("gcs") or {}
+    args.sampling = pick(args.sampling, gcs_cfg, "sampling", "strided")
+    args.windows = pick(args.windows, gcs_cfg, "sampling_windows", 200)
 
     sources = resolve_sources(bucket_root, lang, args.sources, cfg)
     if not sources:
@@ -360,89 +480,157 @@ def main() -> int:
             continue
         if chars_total >= char_budget:
             print(f"  [{s['key']}] skipped ??? budget already met by "
-                  f"higher-priority sources")
+                  f"higher-priority sources", flush=True)
             per_source[s["key"]] = {"documents": 0, "characters": 0,
                                     "skipped": "budget_met"}
             continue
 
+        blob = Blob(s["uri"])
         out_path = raw_dir / f"downloaded_{s['key']}.jsonl"
         writer = ShardWriter(out_path)
-        skip_lines = int(state.get(s["key"], {}).get("lines_read", 0)) if not args.no_resume else 0
-        if skip_lines:
-            print(f"  [{s['key']}] resuming: skipping {skip_lines:,} lines "
-                  f"already consumed")
+
+        remaining = char_budget - chars_total
+        size = s.get("_size") or blob.size()
+
+        # ---- decide how to read this blob ---------------------------------
+        # Sequential is right when we will read most of the file anyway.
+        # Striding is right when the budget covers a small fraction of it:
+        # Hindi's verified Sangraha is 173 GB and a 400M-token budget touches
+        # about 2% of it, and the FIRST 2% of a file assembled by concatenating
+        # sources is not a sample of that file -- it is whichever source the
+        # authors happened to write first. Windows spread the same number of
+        # bytes across the whole blob.
+        #
+        # ~4 bytes per kept character: Devanagari is 3 bytes in UTF-8, plus
+        # JSON structure and the records we reject.
+        est_bytes_needed = remaining * 4
+        nwin = 1
+        if (args.sampling == "strided" and size and not blob.is_compressed
+                and size > est_bytes_needed * 1.5):
+            nwin = max(2, args.windows)
+
+        resume = {} if args.no_resume else state.get(s["key"], {})
+        first_window = int(resume.get("windows_done", 0))
+        skip_lines = int(resume.get("lines_read", 0)) if nwin == 1 else 0
+
+        if nwin > 1:
+            print(f"  [{s['key']}] {size / 1e9:.1f} GB, budget covers "
+                  f"~{est_bytes_needed / size:.1%} of it -> sampling "
+                  f"{nwin} windows spread across the whole file", flush=True)
+            if first_window:
+                print(f"      resuming from window {first_window}", flush=True)
+        else:
+            print(f"  [{s['key']}] reading sequentially", flush=True)
+            if skip_lines:
+                print(f"      resuming: skipping {skip_lines:,} lines already "
+                      f"consumed", flush=True)
+
+        win_size = (size // nwin) if (size and nwin > 1) else 0
+        per_win_chars = max(1, remaining // nwin)
 
         n_lines = 0
         kept = chars = 0
+        windows_done = first_window
         t0 = time.monotonic()
+
+        def line_source(wi: int):
+            """Lines for window `wi`, or the whole blob when nwin == 1."""
+            if nwin == 1:
+                return blob.open_text()
+            w_start = wi * win_size
+            w_end = min(size, w_start + win_size)
+            return blob.iter_range_lines(w_start, w_end, skip_partial=wi > 0)
+
         try:
-            with Blob(s["uri"]).open_text() as f:
-                for line in f:
-                    n_lines += 1
-                    if n_lines <= skip_lines:
-                        continue
-                    if not line.strip():
-                        continue
-                    try:
-                        rec = json.loads(line)
-                    except json.JSONDecodeError:
-                        rejects["bad_json"] += 1
-                        continue
-                    if not isinstance(rec, dict):
-                        rejects["not_object"] += 1
-                        continue
+            for wi in range(first_window, nwin):
+                if chars_total >= char_budget or time.monotonic() > deadline:
+                    break
+                win_chars = 0
+                src = line_source(wi)
+                try:
+                    for line in src:
+                        n_lines += 1
+                        if nwin == 1 and n_lines <= skip_lines:
+                            continue
+                        if not line.strip():
+                            continue
+                        try:
+                            rec = json.loads(line)
+                        except json.JSONDecodeError:
+                            rejects["bad_json"] += 1
+                            continue
+                        if not isinstance(rec, dict):
+                            rejects["not_object"] += 1
+                            continue
 
-                    text = extract_text(rec).strip()
-                    why = cheap_reject(text, args.min_chars,
-                                       args.min_devanagari_ratio)
-                    if why:
-                        rejects[why] += 1
-                        continue
+                        text = extract_text(rec).strip()
+                        why = cheap_reject(text, args.min_chars,
+                                           args.min_devanagari_ratio)
+                        if why:
+                            rejects[why] += 1
+                            continue
 
-                    doc = Document(
-                        text=text, language=lang,
-                        provenance_class="downloaded",
-                        source=s["key"],
-                        collection_method="hf_download",
-                        url=rec.get("url") or rec.get("URL"),
-                        title=rec.get("title"),
-                        extra={"public_corpus": s["hf_repo"],
-                               "gcs_uri": s["uri"]},
-                    )
-                    if writer.write(doc):
-                        kept += 1
-                        chars += len(text)
-                        chars_total += len(text)
+                        doc = Document(
+                            text=text, language=lang,
+                            provenance_class="downloaded",
+                            source=s["key"],
+                            collection_method="hf_download",
+                            url=rec.get("url") or rec.get("URL"),
+                            title=rec.get("title"),
+                            extra={"public_corpus": s["hf_repo"],
+                                   "window": wi if nwin > 1 else None},
+                        )
+                        if writer.write(doc):
+                            kept += 1
+                            chars += len(text)
+                            win_chars += len(text)
+                            chars_total += len(text)
 
-                    if kept and kept % 20000 == 0:
-                        rate = kept / max(1e-6, time.monotonic() - t0)
-                        print(f"      {kept:,} docs, {chars / 1e6:.0f}M chars "
-                              f"({rate:.0f} docs/s), budget "
-                              f"{chars_total / char_budget:.0%}", flush=True)
+                        if kept and kept % 20000 == 0:
+                            rate = kept / max(1e-6, time.monotonic() - t0)
+                            print(f"      {kept:,} docs, {chars / 1e6:.0f}M chars "
+                                  f"({rate:.0f} docs/s), budget "
+                                  f"{chars_total / char_budget:.0%}"
+                                  + (f", window {wi + 1}/{nwin}" if nwin > 1 else ""),
+                                  flush=True)
 
-                    if chars_total >= char_budget:
-                        print(f"      budget reached inside {s['key']}")
-                        stopped_early = True
-                        break
-                    if time.monotonic() > deadline:
-                        print(f"      [stop] --max-hours reached")
-                        stopped_early = True
-                        break
+                        if chars_total >= char_budget:
+                            print(f"      budget reached inside {s['key']}",
+                                  flush=True)
+                            stopped_early = True
+                            break
+                        if time.monotonic() > deadline:
+                            print(f"      [stop] --max-hours reached", flush=True)
+                            stopped_early = True
+                            break
+                        if nwin > 1 and win_chars >= per_win_chars:
+                            break            # this window has paid its share
+                finally:
+                    if hasattr(src, "close"):
+                        src.close()
+                windows_done = wi + 1
+                if stopped_early:
+                    break
         except KeyboardInterrupt:
-            print("\n  [interrupted] flushing and recording position")
+            print("\n  [interrupted] flushing and recording position", flush=True)
             stopped_early = True
         finally:
             writer.close()
             state[s["key"]] = {"lines_read": n_lines, "documents": kept,
-                               "characters": chars, "uri": s["uri"]}
+                               "characters": chars, "uri": s["uri"],
+                               "windows": nwin, "windows_done": windows_done}
             save_state(state_path, state)
 
         per_source[s["key"]] = {"documents": kept, "characters": chars,
                                 "duplicates_in_file": writer.duplicates,
                                 "lines_read": n_lines,
+                                "sampling": "strided" if nwin > 1 else "sequential",
+                                "windows": nwin,
+                                "windows_completed": windows_done,
+                                "blob_bytes": size,
                                 "hf_repo": s["hf_repo"], "uri": s["uri"]}
         print(f"  [{s['key']}] {kept:,} documents, {chars / 1e6:.1f}M chars "
-              f"-> {out_path.name}")
+              f"-> {out_path.name}", flush=True)
         if stopped_early and chars_total >= char_budget:
             break
 

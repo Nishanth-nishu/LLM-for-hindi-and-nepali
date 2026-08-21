@@ -698,6 +698,10 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    try:
+        sys.stdout.reconfigure(line_buffering=True)
+    except (AttributeError, OSError):
+        pass
     args = parse_args()
     root = Path(args.repo_root).resolve()
     lang = args.lang
