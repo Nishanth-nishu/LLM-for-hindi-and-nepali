@@ -1,0 +1,18 @@
+{
+  "wikipedia": {
+    "lines_read": 32885,
+    "documents": 23787,
+    "characters": 37090392,
+    "uri": "gs://lma-01-hi-ne-corpus/raw/ne/wikipedia/data.jsonl",
+    "windows": 1,
+    "windows_done": 1
+  },
+  "sangraha_verified": {
+    "lines_read": 1324634,
+    "documents": 1177648,
+    "characters": 2282910101,
+    "uri": "gs://lma-01-hi-ne-corpus/raw/ne/sangraha/verified/data.jsonl",
+    "windows": 200,
+    "windows_done": 200
+  }
+}

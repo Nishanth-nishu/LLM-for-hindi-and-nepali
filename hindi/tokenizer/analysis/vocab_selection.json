@@ -1,0 +1,61 @@
+{
+  "selected_vocab_size": 4000,
+  "selection_reason": "OVERRIDE. The elbow criterion selected 32,000; 4,000 shipped instead. the elbow criterion optimises fertility alone and never stops while fertility keeps improving; at 32000 the embedding matrix is 16.4M of a 25M parameter budget (66%), leaving 8.6M for the transformer. 4000 sits at 1.21x the Tao et al. (2024) scaling-law optimum of 3311 for 15M non-vocab params at d_model=512, spends 8.2% of the budget on embeddings, and has the lowest byte-fallback rate in the sweep. The complete sweep is retained in sweep_results.csv so the trade-off stays inspectable. Original elbow reasoning: largest feasible size (32000); no elbow found within the swept range, so the sweep should be extended upward before treating this as optimal",
+  "scaling_law_reference_vocab": 3311,
+  "ratio_to_scaling_law_reference": 9.6648,
+  "scaling_law_citation": "Tao et al. (2024), Scaling Laws with Vocabulary: Larger Models Deserve Larger Vocabularies. N_v proportional to N_nv^0.83",
+  "candidates": [
+    {
+      "vocab_size": 4000,
+      "model_type": "unigram",
+      "fertility": 1.6553,
+      "relative_fertility_gain_vs_prev": "",
+      "chars_per_token": 3.1281,
+      "bytes_per_token": 7.9575,
+      "unk_rate": 0.0,
+      "byte_fallback_rate": 0.00735829,
+      "embedding_params": 2048000,
+      "embedding_share": 0.0819,
+      "selected": false
+    },
+    {
+      "vocab_size": 8000,
+      "model_type": "unigram",
+      "fertility": 1.4748,
+      "relative_fertility_gain_vs_prev": 0.109,
+      "chars_per_token": 3.5109,
+      "bytes_per_token": 8.9315,
+      "unk_rate": 0.0,
+      "byte_fallback_rate": 0.00825891,
+      "embedding_params": 4096000,
+      "embedding_share": 0.1638,
+      "selected": false
+    },
+    {
+      "vocab_size": 16000,
+      "model_type": "unigram",
+      "fertility": 1.3609,
+      "relative_fertility_gain_vs_prev": 0.0772,
+      "chars_per_token": 3.8047,
+      "bytes_per_token": 9.6789,
+      "unk_rate": 0.0,
+      "byte_fallback_rate": 0.0089501,
+      "embedding_params": 8192000,
+      "embedding_share": 0.3277,
+      "selected": false
+    },
+    {
+      "vocab_size": 32000,
+      "model_type": "unigram",
+      "fertility": 1.2894,
+      "relative_fertility_gain_vs_prev": 0.0525,
+      "chars_per_token": 4.0156,
+      "bytes_per_token": 10.2154,
+      "unk_rate": 0.0,
+      "byte_fallback_rate": 0.00944614,
+      "embedding_params": 16384000,
+      "embedding_share": 0.6554,
+      "selected": true
+    }
+  ]
+}

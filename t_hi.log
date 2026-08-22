@@ -1,0 +1,46 @@
+
+=== tokenizer training: hindi ===
+  config      : /home/jupyter/LLM-for-hindi-and-nepali/hindi/configs/tokenizer_config.yaml
+  model types : ['unigram']
+  vocab sizes : [4000, 8000, 16000, 32000]
+
+[1/4] streaming train split -> SentencePiece input
+  character cap 400,000,000 of 1,746,239,914 available -> sampling 1,016,624 of 4,438,177 lines
+  sampling 1,016,624 of 4,438,177 lines (22.9%), uniformly across sources
+  792,123 docs -> 994,201 lines, 399,743,807 chars
+
+[2/4] sampling held-out evaluation text
+  sampled 5,000 held-out documents; provenance buckets: {'manual': 1576, 'downloaded': 2500}
+
+[3/4] sweep
+
+[hindi] training unigram vocab=4000 ...
+  fertility=1.6553  chars/token=3.128  unk=0.000000%  byte_fallback=0.735829%
+  fertility by provenance: {'manual': 1.6808, 'downloaded': 1.6225}
+
+[hindi] training unigram vocab=8000 ...
+  fertility=1.4748  chars/token=3.511  unk=0.000000%  byte_fallback=0.825891%
+  fertility by provenance: {'manual': 1.4928, 'downloaded': 1.4466}
+
+[hindi] training unigram vocab=16000 ...
+  fertility=1.3609  chars/token=3.805  unk=0.000000%  byte_fallback=0.895010%
+  fertility by provenance: {'manual': 1.3769, 'downloaded': 1.3365}
+
+[hindi] training unigram vocab=32000 ...
+  fertility=1.2894  chars/token=4.016  unk=0.000000%  byte_fallback=0.944614%
+  fertility by provenance: {'manual': 1.3061, 'downloaded': 1.268}
+
+[4/4] selection
+  [WARN] at the configured Phase 2 size, vocab=32000 puts 66% of ALL model parameters into the embedding matrix. The brief specifies ~25M-parameter models; above ~35% you are buying vocabulary with depth. Consider a smaller vocabulary and say so in the report -- this is the trade-off the sweep exists to expose.
+  [select] unigram vocab_size=32000
+           largest feasible size (32000); no elbow found within the swept range, so the sweep should be extended upward before treating this as optimal
+           scaling-law reference (Tao et al. 2024) for 15,000,000 non-vocab params: 3,311 (ratio 9.66x)
+  [override] sweep chose 32,000; forcing 4,000
+             the elbow criterion optimises fertility alone and never stops while fertility keeps improving; at 32000 the embedding matrix is 16.4M of a 25M parameter budget (66%), leaving 8.6M for the transformer. 4000 sits at 1.21x the Tao et al. (2024) scaling-law optimum of 3311 for 15M non-vocab params at d_model=512, spends 8.2% of the budget on embeddings, and has the lowest byte-fallback rate in the sweep
+  wrote /home/jupyter/LLM-for-hindi-and-nepali/hindi/tokenizer/analysis/sweep_results.csv
+  wrote /home/jupyter/LLM-for-hindi-and-nepali/hindi/tokenizer/analysis/vocab_selection.json
+
+  final model : /home/jupyter/LLM-for-hindi-and-nepali/hindi/tokenizer/vocab/hindi_tokenizer.model
+  final vocab : /home/jupyter/LLM-for-hindi-and-nepali/hindi/tokenizer/vocab/hindi_tokenizer.vocab
+  metadata    : /home/jupyter/LLM-for-hindi-and-nepali/hindi/tokenizer/vocab/hindi_tokenizer.json
+  unigram / vocab=4000 / fertility=1.6553 / unk=0.000000% / byte_fallback=0.735829%

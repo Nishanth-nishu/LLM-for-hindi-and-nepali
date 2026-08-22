@@ -1,0 +1,43 @@
+
+=== tokenizer training: nepali ===
+  config      : /home/jupyter/LLM-for-hindi-and-nepali/nepali/configs/tokenizer_config.yaml
+  model types : ['unigram']
+  vocab sizes : [4000, 8000, 16000, 32000]
+
+[1/4] streaming train split -> SentencePiece input
+  sampling 415,000 of 1,771,022 lines (23.4%), uniformly across sources
+  882,729 docs -> 419,496 lines, 402,393,990 chars
+
+[2/4] sampling held-out evaluation text
+  sampled 5,000 held-out documents; provenance buckets: {'manual': 2211, 'downloaded': 2500}
+
+[3/4] sweep
+
+[nepali] training unigram vocab=4000 ...
+  fertility=1.8338  chars/token=3.647  unk=0.000000%  byte_fallback=0.275738%
+  fertility by provenance: {'manual': 1.8039, 'downloaded': 1.8501}
+
+[nepali] training unigram vocab=8000 ...
+  fertility=1.5814  chars/token=4.229  unk=0.000000%  byte_fallback=0.319762%
+  fertility by provenance: {'manual': 1.5566, 'downloaded': 1.5955}
+
+[nepali] training unigram vocab=16000 ...
+  fertility=1.4209  chars/token=4.706  unk=0.000000%  byte_fallback=0.355875%
+  fertility by provenance: {'manual': 1.4002, 'downloaded': 1.4319}
+
+[nepali] training unigram vocab=32000 ...
+  fertility=1.3166  chars/token=5.079  unk=0.000000%  byte_fallback=0.384074%
+  fertility by provenance: {'manual': 1.3012, 'downloaded': 1.3249}
+
+[4/4] selection
+  [WARN] at the configured Phase 2 size, vocab=32000 puts 66% of ALL model parameters into the embedding matrix. The brief specifies ~25M-parameter models; above ~35% you are buying vocabulary with depth. Consider a smaller vocabulary and say so in the report -- this is the trade-off the sweep exists to expose.
+  [select] unigram vocab_size=32000
+           largest feasible size (32000); no elbow found within the swept range, so the sweep should be extended upward before treating this as optimal
+           scaling-law reference (Tao et al. 2024) for 15,000,000 non-vocab params: 3,311 (ratio 9.66x)
+  wrote /home/jupyter/LLM-for-hindi-and-nepali/nepali/tokenizer/analysis/sweep_results.csv
+  wrote /home/jupyter/LLM-for-hindi-and-nepali/nepali/tokenizer/analysis/vocab_selection.json
+
+  final model : /home/jupyter/LLM-for-hindi-and-nepali/nepali/tokenizer/vocab/nepali_tokenizer.model
+  final vocab : /home/jupyter/LLM-for-hindi-and-nepali/nepali/tokenizer/vocab/nepali_tokenizer.vocab
+  metadata    : /home/jupyter/LLM-for-hindi-and-nepali/nepali/tokenizer/vocab/nepali_tokenizer.json
+  unigram / vocab=32000 / fertility=1.3166 / unk=0.000000% / byte_fallback=0.384074%

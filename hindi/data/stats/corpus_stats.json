@@ -1,0 +1,156 @@
+{
+  "language": "hindi",
+  "raw_documents": 1245094,
+  "kept_documents": 1117910,
+  "documents_in_final_corpus": 808253,
+  "budget": {
+    "manual_target_tokens": 115000000,
+    "downloaded_target_tokens": 405000000,
+    "min_manual_fraction": 0.2,
+    "margin": 0.005,
+    "effective_fraction_targeted": 0.205,
+    "chars_per_token": {
+      "manual": 3.742,
+      "downloaded": 3.603
+    },
+    "manual_target_chars": 430330000,
+    "downloaded_target_chars": 1459215000,
+    "available_chars": {
+      "manual": 377033015,
+      "downloaded": 2065263422
+    },
+    "kept_chars": {
+      "manual": 377033015,
+      "downloaded": 1407839179
+    },
+    "estimated_kept_tokens": {
+      "manual": 100757085,
+      "downloaded": 390740821,
+      "total": 491497907
+    },
+    "downloaded_budget_used": 1407839439,
+    "downloaded_budget_binding_constraint": "ratio",
+    "ratio_cap_chars": 1407839439,
+    "manual_char_fraction": 0.2112,
+    "estimated_manual_token_fraction": 0.205,
+    "documents_kept_by_source": {
+      "manual": {
+        "bhaskar.com": 1566,
+        "bihar.punjabkesari.in": 358,
+        "bollywood.punjabkesari.in": 1,
+        "chandigarh.punjabkesari.in": 1,
+        "gadget.punjabkesari.in": 1,
+        "haryana.punjabkesari.in": 404,
+        "himachal.punjabkesari.in": 399,
+        "hindi.downtoearth.org.in": 1959,
+        "hindi.moneycontrol.com": 27658,
+        "hindi.webdunia.com": 2540,
+        "jammukashmir.punjabkesari.in": 8,
+        "mp.punjabkesari.in": 398,
+        "nari.punjabkesari.in": 397,
+        "navbharattimes.indiatimes.com": 1234,
+        "punjab.punjabkesari.in": 379,
+        "rajasthan.punjabkesari.in": 6,
+        "sports.punjabkesari.in": 378,
+        "up.punjabkesari.in": 351,
+        "uttarakhand.punjabkesari.in": 3,
+        "www.abplive.com": 431,
+        "www.amarujala.com": 24404,
+        "www.bbc.co.uk": 13,
+        "www.bbc.com": 772,
+        "www.bhaskar.com": 24183,
+        "www.dainiktribuneonline.com": 1743,
+        "www.haribhoomi.com": 898,
+        "www.hindisamay.com": 5907,
+        "www.hindwi.org": 3371,
+        "www.inextlive.com": 978,
+        "www.jagran.com": 2437,
+        "www.livehindustan.com": 22520,
+        "www.naidunia.com": 269,
+        "www.newsonair.gov.in": 4,
+        "www.patrika.com": 27672,
+        "www.prabhatkhabar.com": 2116,
+        "www.punjabkesari.in": 1434,
+        "www.tv9hindi.com": 2067
+      },
+      "downloaded": {
+        "wikipedia": 67613,
+        "sangraha_verified": 581380
+      }
+    },
+    "documents_dropped_over_budget_by_source": {
+      "manual": {},
+      "downloaded": {
+        "sangraha_verified": 309657
+      }
+    },
+    "manual_shortfall_chars": 53296985,
+    "materiality_threshold_chars": 4303300
+  },
+  "counters": {
+    "boilerplate_lines_removed": 58551,
+    "kept": 1117910,
+    "drop:duplicate_lines": 2318,
+    "drop:repetitive": 10345,
+    "drop:near_duplicate": 12257,
+    "drop:symbol_heavy": 1590,
+    "drop:too_short_chars": 66676,
+    "drop:code_mixed": 29338,
+    "drop:exact_duplicate": 24,
+    "drop:low_devanagari": 2734,
+    "drop:no_language_markers": 1855,
+    "drop:wrong_language": 38,
+    "drop:bad_mean_word_length": 1,
+    "drop:too_few_words": 8,
+    "drop:over_budget": 309657
+  },
+  "splits": {
+    "train": 792123,
+    "val": 8065,
+    "test": 8065
+  },
+  "split_documents_by_class": {
+    "train": {
+      "manual": 156108,
+      "downloaded": 636015
+    },
+    "val": {
+      "manual": 1576,
+      "downloaded": 6489
+    },
+    "test": {
+      "manual": 1576,
+      "downloaded": 6489
+    }
+  },
+  "split_characters_by_class": {
+    "train": {
+      "manual": 369664048,
+      "downloaded": 1380221920
+    },
+    "val": {
+      "manual": 3673302,
+      "downloaded": 13952245
+    },
+    "test": {
+      "manual": 3695665,
+      "downloaded": 13665014
+    }
+  },
+  "config": {
+    "min_chars": 400,
+    "min_words": 50,
+    "min_devanagari_ratio": 0.7,
+    "max_latin_ratio": 0.12,
+    "min_unique_word_ratio": 0.3,
+    "max_symbol_ratio": 0.1,
+    "max_duplicate_line_ratio": 0.3,
+    "near_dup_threshold": 0.8,
+    "split_ratios": [
+      0.98,
+      0.01,
+      0.01
+    ]
+  },
+  "note": "Character fractions are a proxy. The graded manual fraction is in TOKENS -- run pipeline/tokenizer/count_corpus_tokens.py after the tokenizer exists."
+}

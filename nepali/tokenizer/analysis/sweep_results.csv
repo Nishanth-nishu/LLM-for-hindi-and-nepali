@@ -1,0 +1,2 @@
+vocab_size,model_type,fertility,chars_per_token,bytes_per_token,unk_rate,byte_fallback_rate,tokens_per_doc,eval_documents,eval_tokens,embedding_params,embedding_share,fertility_by_provenance,model_path
+4000,unigram,1.8386973776519908,3.6452491307008885,9.77492360648266,0.0,0.0021647160973346465,536.2366,5000,2681183,2048000,0.08192,"{""manual"": 1.8045, ""downloaded"": 1.8383}",/home/jupyter/LLM-for-hindi-and-nepali/nepali/tokenizer/analysis/sweep_models/spm_nepali_unigram_v4000.model

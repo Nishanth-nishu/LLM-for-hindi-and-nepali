@@ -1,0 +1,207 @@
+{
+  "language": "hindi",
+  "tokenizer": {
+    "model_file": "/home/jupyter/LLM-for-hindi-and-nepali/hindi/tokenizer/vocab/hindi_tokenizer.model",
+    "vocab_size": 4000,
+    "note": "Counts are valid only for this tokenizer. Retraining it invalidates every token figure below."
+  },
+  "totals": {
+    "corpus_tokens_all_splits": 571100312,
+    "train_tokens": 559913515,
+    "target_tokens": 500000000,
+    "pct_of_target": 114.22,
+    "shortfall_tokens": 0
+  },
+  "manual_vs_downloaded": {
+    "manual_tokens": 121590216,
+    "downloaded_tokens": 449510096,
+    "unlabelled_tokens": 0,
+    "manual_fraction_of_tokens": 0.2129,
+    "manual_fraction_of_documents": 0.197,
+    "requirement": 0.2,
+    "requirement_met": true
+  },
+  "measured_chars_per_token": {
+    "overall": 3.125,
+    "by_provenance": {
+      "manual": 3.101,
+      "downloaded": 3.132
+    },
+    "use": "Pass this to --chars-per-token on gcs_ingest and build_corpus for a second pass whose budgets are exact."
+  },
+  "per_split": {
+    "train": {
+      "path": "/home/jupyter/LLM-for-hindi-and-nepali/hindi/data/splits/train.jsonl",
+      "total_tokens": 559913515,
+      "total_documents": 792123,
+      "tokens_by_provenance": {
+        "manual": 119216033,
+        "downloaded": 440697482
+      },
+      "documents_by_provenance": {
+        "manual": 156108,
+        "downloaded": 636015
+      },
+      "characters_by_provenance": {
+        "manual": 369664048,
+        "downloaded": 1380221920
+      },
+      "bytes_by_provenance": {
+        "manual": 930193621,
+        "downloaded": 3521500922
+      },
+      "tokens_by_source": {
+        "downloaded:sangraha_verified": 380928338,
+        "downloaded:wikipedia": 59769144,
+        "manual:hindi.moneycontrol.com": 22856524,
+        "manual:www.patrika.com": 19245693,
+        "manual:www.amarujala.com": 17981744,
+        "manual:www.hindisamay.com": 15136640,
+        "manual:www.livehindustan.com": 11385739,
+        "manual:www.bhaskar.com": 10487301,
+        "manual:www.hindwi.org": 3917638,
+        "manual:hindi.downtoearth.org.in": 3328063,
+        "manual:hindi.webdunia.com": 2239770,
+        "manual:www.jagran.com": 1800309,
+        "manual:www.prabhatkhabar.com": 1730109,
+        "manual:www.dainiktribuneonline.com": 1339117,
+        "manual:navbharattimes.indiatimes.com": 1008834,
+        "manual:www.punjabkesari.in": 967673,
+        "manual:www.tv9hindi.com": 930916,
+        "manual:www.bbc.com": 733493,
+        "manual:www.inextlive.com": 690301,
+        "manual:www.haribhoomi.com": 654229,
+        "manual:bhaskar.com": 415343,
+        "manual:www.abplive.com": 372649,
+        "manual:nari.punjabkesari.in": 261017,
+        "manual:haryana.punjabkesari.in": 253006,
+        "manual:mp.punjabkesari.in": 234063,
+        "manual:sports.punjabkesari.in": 224125,
+        "manual:up.punjabkesari.in": 219629,
+        "manual:himachal.punjabkesari.in": 217486,
+        "manual:punjab.punjabkesari.in": 194991,
+        "manual:bihar.punjabkesari.in": 189883,
+        "manual:www.naidunia.com": 148182,
+        "manual:www.bbc.co.uk": 15590,
+        "manual:www.newsonair.gov.in": 14814,
+        "manual:rajasthan.punjabkesari.in": 8002,
+        "manual:jammukashmir.punjabkesari.in": 5906,
+        "manual:uttarakhand.punjabkesari.in": 4021,
+        "manual:chandigarh.punjabkesari.in": 2109,
+        "manual:gadget.punjabkesari.in": 664,
+        "manual:bollywood.punjabkesari.in": 460
+      },
+      "unlabelled_documents": 0
+    },
+    "val": {
+      "path": "/home/jupyter/LLM-for-hindi-and-nepali/hindi/data/splits/val.jsonl",
+      "total_tokens": 5635973,
+      "total_documents": 8065,
+      "tokens_by_provenance": {
+        "manual": 1186739,
+        "downloaded": 4449234
+      },
+      "documents_by_provenance": {
+        "manual": 1576,
+        "downloaded": 6489
+      },
+      "characters_by_provenance": {
+        "manual": 3673302,
+        "downloaded": 13952245
+      },
+      "bytes_by_provenance": {
+        "manual": 9231229,
+        "downloaded": 35591900
+      },
+      "tokens_by_source": {
+        "downloaded:sangraha_verified": 3864534,
+        "downloaded:wikipedia": 584700,
+        "manual:hindi.moneycontrol.com": 234271,
+        "manual:www.patrika.com": 195932,
+        "manual:www.amarujala.com": 179368,
+        "manual:www.hindisamay.com": 134746,
+        "manual:www.livehindustan.com": 117459,
+        "manual:www.bhaskar.com": 109873,
+        "manual:www.hindwi.org": 39404,
+        "manual:hindi.downtoearth.org.in": 34660,
+        "manual:hindi.webdunia.com": 23292,
+        "manual:www.prabhatkhabar.com": 17053,
+        "manual:www.jagran.com": 16259,
+        "manual:www.punjabkesari.in": 11804,
+        "manual:www.dainiktribuneonline.com": 10737,
+        "manual:navbharattimes.indiatimes.com": 9645,
+        "manual:www.tv9hindi.com": 9157,
+        "manual:www.bbc.com": 7379,
+        "manual:www.inextlive.com": 6046,
+        "manual:www.haribhoomi.com": 5613,
+        "manual:bhaskar.com": 3923,
+        "manual:www.abplive.com": 3481,
+        "manual:nari.punjabkesari.in": 3081,
+        "manual:himachal.punjabkesari.in": 2459,
+        "manual:bihar.punjabkesari.in": 2066,
+        "manual:haryana.punjabkesari.in": 1903,
+        "manual:up.punjabkesari.in": 1817,
+        "manual:mp.punjabkesari.in": 1649,
+        "manual:sports.punjabkesari.in": 1567,
+        "manual:punjab.punjabkesari.in": 1318,
+        "manual:www.naidunia.com": 777
+      },
+      "unlabelled_documents": 0
+    },
+    "test": {
+      "path": "/home/jupyter/LLM-for-hindi-and-nepali/hindi/data/splits/test.jsonl",
+      "total_tokens": 5550824,
+      "total_documents": 8065,
+      "tokens_by_provenance": {
+        "manual": 1187444,
+        "downloaded": 4363380
+      },
+      "documents_by_provenance": {
+        "manual": 1576,
+        "downloaded": 6489
+      },
+      "characters_by_provenance": {
+        "manual": 3695665,
+        "downloaded": 13665014
+      },
+      "bytes_by_provenance": {
+        "manual": 9302682,
+        "downloaded": 34858238
+      },
+      "tokens_by_source": {
+        "downloaded:sangraha_verified": 3804215,
+        "downloaded:wikipedia": 559165,
+        "manual:hindi.moneycontrol.com": 219585,
+        "manual:www.patrika.com": 198148,
+        "manual:www.amarujala.com": 178361,
+        "manual:www.hindisamay.com": 146470,
+        "manual:www.livehindustan.com": 117770,
+        "manual:www.bhaskar.com": 106007,
+        "manual:www.hindwi.org": 37423,
+        "manual:hindi.downtoearth.org.in": 37191,
+        "manual:hindi.webdunia.com": 27053,
+        "manual:www.prabhatkhabar.com": 16849,
+        "manual:www.jagran.com": 16517,
+        "manual:www.dainiktribuneonline.com": 15398,
+        "manual:www.punjabkesari.in": 10833,
+        "manual:navbharattimes.indiatimes.com": 9446,
+        "manual:www.tv9hindi.com": 8717,
+        "manual:www.bbc.com": 6567,
+        "manual:www.inextlive.com": 5977,
+        "manual:www.haribhoomi.com": 5689,
+        "manual:haryana.punjabkesari.in": 3934,
+        "manual:bhaskar.com": 3888,
+        "manual:www.abplive.com": 3386,
+        "manual:nari.punjabkesari.in": 2188,
+        "manual:bihar.punjabkesari.in": 1789,
+        "manual:up.punjabkesari.in": 1679,
+        "manual:mp.punjabkesari.in": 1525,
+        "manual:himachal.punjabkesari.in": 1472,
+        "manual:punjab.punjabkesari.in": 1323,
+        "manual:sports.punjabkesari.in": 1131,
+        "manual:www.naidunia.com": 1128
+      },
+      "unlabelled_documents": 0
+    }
+  }
+}

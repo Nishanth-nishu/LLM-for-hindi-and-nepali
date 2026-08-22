@@ -1,0 +1,65 @@
+{
+  "checks": [
+    {
+      "name": "C2 hindi: no doc_id in two splits",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "C3 hindi: no identical text across splits",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "C4 hindi: every document has a provenance class",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "C5 hindi: manual token fraction >= 20%",
+      "passed": true,
+      "detail": "21.29% of 571,100,312 tokens (121,590,216 manual)"
+    },
+    {
+      "name": "C6 hindi: tokenizer trained on train split only",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "C2 nepali: no doc_id in two splits",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "C3 nepali: no identical text across splits",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "C4 nepali: every document has a provenance class",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "C5 nepali: manual token fraction >= 20%",
+      "passed": true,
+      "detail": "100.00% of 36,017,844 tokens (36,017,844 manual)"
+    },
+    {
+      "name": "C6 nepali: tokenizer trained on train split only",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "C1 hindi/nepali: no document shared across corpora",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "C7 hindi/nepali: no identical text across corpora",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "all_passed": true
+}

@@ -1,0 +1,45 @@
+{
+  "language": "nepali",
+  "bucket_root": "gs://lma-01-hi-ne-corpus/raw",
+  "target_tokens": 400000000,
+  "overcollect": 1.45,
+  "chars_per_token_proxy": 4.0,
+  "characters_ingested": 2320000493,
+  "estimated_tokens_ingested": 580000123,
+  "stopped_on_budget": true,
+  "sources": {
+    "wikipedia": {
+      "documents": 23787,
+      "characters": 37090392,
+      "duplicates_in_file": 97,
+      "lines_read": 32885,
+      "sampling": "sequential",
+      "windows": 1,
+      "windows_completed": 1,
+      "blob_bytes": 206613754,
+      "hf_repo": "wikimedia/wikipedia",
+      "uri": "gs://lma-01-hi-ne-corpus/raw/ne/wikipedia/data.jsonl"
+    },
+    "sangraha_verified": {
+      "documents": 1177648,
+      "characters": 2282910101,
+      "duplicates_in_file": 144585,
+      "lines_read": 1324634,
+      "sampling": "strided",
+      "windows": 200,
+      "windows_completed": 200,
+      "blob_bytes": 86254715260,
+      "hf_repo": "ai4bharat/sangraha",
+      "uri": "gs://lma-01-hi-ne-corpus/raw/ne/sangraha/verified/data.jsonl"
+    }
+  },
+  "rejected_at_ingest": {
+    "too_short": 9974,
+    "not_devanagari": 1428
+  },
+  "excluded_deliberately": {
+    "opus/OpenSubtitles_en-hi": "translated subtitle text; wrong register for a monolingual LM",
+    "hi_ne_corpus.zip": "mixes both languages; the brief forbids sharing documents across corpora"
+  },
+  "note": "Token figures here are a character proxy. The authoritative count comes from pipeline/tokenizer/count_corpus_tokens.py after the tokenizer is trained."
+}

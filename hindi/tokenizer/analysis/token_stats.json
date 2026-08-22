@@ -1,0 +1,243 @@
+{
+  "vocabulary": {
+    "vocab_size": 4000,
+    "pieces_observed_on_heldout": 3830,
+    "vocab_utilisation": 0.9575,
+    "unused_pieces": 170,
+    "hapax_pieces_on_heldout": 3
+  },
+  "efficiency": {
+    "fertility_tokens_per_word": 1.6522,
+    "avg_chars_per_token": 3.1276,
+    "avg_bytes_per_token": 7.9557,
+    "compression_ratio_bytes_per_token": 7.9557,
+    "avg_tokens_per_document": 688.26
+  },
+  "unknown_tokens": {
+    "unk_token_id": 1,
+    "unk_count": 0,
+    "unk_rate": 0.0,
+    "documents_containing_unk": 0,
+    "document_unk_rate": 0.0,
+    "byte_fallback_count": 40608,
+    "byte_fallback_rate": 0.00731567,
+    "note": "With byte_fallback enabled the UNK rate is structurally zero: any unseen character decomposes into UTF-8 byte pieces rather than becoming UNK. byte_fallback_rate is the meaningful successor metric -- stranded single bytes are what drive token inflation on Devanagari."
+  },
+  "token_frequency": {
+    "total_tokens_evaluated": 5550824,
+    "coverage_top_100": 0.4467,
+    "coverage_top_1000": 0.8007,
+    "coverage_top_10000": 1.0,
+    "zipf_slope": -1.1397,
+    "most_frequent": [
+      {
+        "piece": "।",
+        "id": 260,
+        "count": 153454,
+        "share": 0.027645
+      },
+      {
+        "piece": "▁के",
+        "id": 261,
+        "count": 132986,
+        "share": 0.023958
+      },
+      {
+        "piece": "▁में",
+        "id": 263,
+        "count": 99641,
+        "share": 0.017951
+      },
+      {
+        "piece": "▁है",
+        "id": 264,
+        "count": 98010,
+        "share": 0.017657
+      },
+      {
+        "piece": ",",
+        "id": 265,
+        "count": 94617,
+        "share": 0.017046
+      },
+      {
+        "piece": "▁",
+        "id": 262,
+        "count": 93601,
+        "share": 0.016863
+      },
+      {
+        "piece": "▁की",
+        "id": 266,
+        "count": 78617,
+        "share": 0.014163
+      },
+      {
+        "piece": "▁से",
+        "id": 267,
+        "count": 61836,
+        "share": 0.01114
+      },
+      {
+        "piece": "▁को",
+        "id": 268,
+        "count": 59777,
+        "share": 0.010769
+      },
+      {
+        "piece": "▁और",
+        "id": 269,
+        "count": 57380,
+        "share": 0.010337
+      },
+      {
+        "piece": "▁का",
+        "id": 270,
+        "count": 50793,
+        "share": 0.009151
+      },
+      {
+        "piece": "ी",
+        "id": 271,
+        "count": 43803,
+        "share": 0.007891
+      },
+      {
+        "piece": "ों",
+        "id": 272,
+        "count": 39826,
+        "share": 0.007175
+      },
+      {
+        "piece": "▁ने",
+        "id": 274,
+        "count": 38027,
+        "share": 0.006851
+      },
+      {
+        "piece": "▁पर",
+        "id": 273,
+        "count": 37908,
+        "share": 0.006829
+      },
+      {
+        "piece": "न",
+        "id": 276,
+        "count": 37717,
+        "share": 0.006795
+      },
+      {
+        "piece": "<0x0A>",
+        "id": 14,
+        "count": 37157,
+        "share": 0.006694
+      },
+      {
+        "piece": "ल",
+        "id": 278,
+        "count": 35762,
+        "share": 0.006443
+      },
+      {
+        "piece": "▁हैं",
+        "id": 275,
+        "count": 35145,
+        "share": 0.006331
+      },
+      {
+        "piece": "र",
+        "id": 280,
+        "count": 33329,
+        "share": 0.006004
+      },
+      {
+        "piece": ".",
+        "id": 277,
+        "count": 33085,
+        "share": 0.00596
+      },
+      {
+        "piece": "▁कि",
+        "id": 279,
+        "count": 31577,
+        "share": 0.005689
+      },
+      {
+        "piece": "ा",
+        "id": 281,
+        "count": 28937,
+        "share": 0.005213
+      },
+      {
+        "piece": "क",
+        "id": 285,
+        "count": 28690,
+        "share": 0.005169
+      },
+      {
+        "piece": "-",
+        "id": 282,
+        "count": 28199,
+        "share": 0.00508
+      },
+      {
+        "piece": "म",
+        "id": 289,
+        "count": 27026,
+        "share": 0.004869
+      },
+      {
+        "piece": "▁भी",
+        "id": 284,
+        "count": 26765,
+        "share": 0.004822
+      },
+      {
+        "piece": "0",
+        "id": 283,
+        "count": 26309,
+        "share": 0.00474
+      },
+      {
+        "piece": "1",
+        "id": 287,
+        "count": 25659,
+        "share": 0.004623
+      },
+      {
+        "piece": "▁एक",
+        "id": 288,
+        "count": 25627,
+        "share": 0.004617
+      }
+    ],
+    "piece_length_histogram_chars": {
+      "0": 93601,
+      "1": 1405721,
+      "2": 1914547,
+      "3": 874057,
+      "4": 580423,
+      "5": 312226,
+      "6": 207639,
+      "7": 89041,
+      "8": 44682,
+      "9": 15687,
+      "10": 6384,
+      "11": 3594,
+      "12": 1800,
+      "13": 1194,
+      "14": 228
+    }
+  },
+  "fertility_by_provenance": {
+    "manual": 1.6682,
+    "downloaded": 1.6479
+  },
+  "meta": {
+    "language": "hindi",
+    "model_file": "/home/jupyter/LLM-for-hindi-and-nepali/hindi/tokenizer/vocab/hindi_tokenizer.model",
+    "evaluated_split": "test",
+    "documents_sampled": 8065,
+    "sample_seed": 20260820
+  }
+}

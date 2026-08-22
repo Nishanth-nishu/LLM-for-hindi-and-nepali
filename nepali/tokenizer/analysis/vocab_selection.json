@@ -1,0 +1,22 @@
+{
+  "selected_vocab_size": 4000,
+  "selection_reason": "OVERRIDE. The elbow criterion selected 4,000; 4,000 shipped instead. see sweep_results_selection.csv for the four-point sweep this choice was made from. The complete sweep is retained in sweep_results.csv so the trade-off stays inspectable. Original elbow reasoning: largest feasible size (4000); no elbow found within the swept range, so the sweep should be extended upward before treating this as optimal",
+  "scaling_law_reference_vocab": 3311,
+  "ratio_to_scaling_law_reference": 1.2081,
+  "scaling_law_citation": "Tao et al. (2024), Scaling Laws with Vocabulary: Larger Models Deserve Larger Vocabularies. N_v proportional to N_nv^0.83",
+  "candidates": [
+    {
+      "vocab_size": 4000,
+      "model_type": "unigram",
+      "fertility": 1.8387,
+      "relative_fertility_gain_vs_prev": "",
+      "chars_per_token": 3.6452,
+      "bytes_per_token": 9.7749,
+      "unk_rate": 0.0,
+      "byte_fallback_rate": 0.00216472,
+      "embedding_params": 2048000,
+      "embedding_share": 0.0819,
+      "selected": true
+    }
+  ]
+}

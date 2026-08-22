@@ -1,0 +1,33 @@
+
+=== tokenizer training: nepali ===
+  config      : /home/jupyter/LLM-for-hindi-and-nepali/nepali/configs/tokenizer_config.yaml
+  model types : ['unigram']
+  vocab sizes : [4000]
+
+[1/4] streaming train split -> SentencePiece input
+  character cap 400,000,000 of 1,820,319,431 available -> sampling 410,501 of 1,868,108 lines
+  sampling 410,501 of 1,868,108 lines (22.0%), uniformly across sources
+  939,563 docs -> 416,489 lines, 401,639,645 chars
+
+[2/4] sampling held-out evaluation text
+  sampled 5,000 held-out documents; provenance buckets: {'manual': 2270, 'downloaded': 2500}
+
+[3/4] sweep
+
+[nepali] training unigram vocab=4000 ...
+  fertility=1.8387  chars/token=3.645  unk=0.000000%  byte_fallback=0.216472%
+  fertility by provenance: {'manual': 1.8045, 'downloaded': 1.8383}
+
+[4/4] selection
+  [select] unigram vocab_size=4000
+           largest feasible size (4000); no elbow found within the swept range, so the sweep should be extended upward before treating this as optimal
+           scaling-law reference (Tao et al. 2024) for 15,000,000 non-vocab params: 3,311 (ratio 1.21x)
+  [override] sweep chose 4,000; forcing 4,000
+             see sweep_results_selection.csv for the four-point sweep this choice was made from
+  wrote /home/jupyter/LLM-for-hindi-and-nepali/nepali/tokenizer/analysis/sweep_results.csv
+  wrote /home/jupyter/LLM-for-hindi-and-nepali/nepali/tokenizer/analysis/vocab_selection.json
+
+  final model : /home/jupyter/LLM-for-hindi-and-nepali/nepali/tokenizer/vocab/nepali_tokenizer.model
+  final vocab : /home/jupyter/LLM-for-hindi-and-nepali/nepali/tokenizer/vocab/nepali_tokenizer.vocab
+  metadata    : /home/jupyter/LLM-for-hindi-and-nepali/nepali/tokenizer/vocab/nepali_tokenizer.json
+  unigram / vocab=4000 / fertility=1.8387 / unk=0.000000% / byte_fallback=0.216472%

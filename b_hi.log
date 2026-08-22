@@ -1,0 +1,62 @@
+  config: /home/jupyter/LLM-for-hindi-and-nepali/hindi/configs/data_config.yaml
+[hindi] building corpus  (4 workers, near-dedup on/96perm)
+  50,000 in, 47,419 kept, 181 docs/s, 5 min
+  100,000 in, 93,831 kept, 174 docs/s, 10 min
+  150,000 in, 141,717 kept, 184 docs/s, 14 min
+  200,000 in, 188,330 kept, 188 docs/s, 18 min
+  250,000 in, 235,034 kept, 191 docs/s, 22 min
+  300,000 in, 281,791 kept, 193 docs/s, 26 min
+  350,000 in, 328,483 kept, 194 docs/s, 30 min
+  400,000 in, 375,124 kept, 195 docs/s, 34 min
+  450,000 in, 421,899 kept, 196 docs/s, 38 min
+  500,000 in, 468,543 kept, 196 docs/s, 42 min
+  550,000 in, 515,339 kept, 197 docs/s, 47 min
+  600,000 in, 562,037 kept, 197 docs/s, 51 min
+  650,000 in, 608,752 kept, 198 docs/s, 55 min
+  700,000 in, 655,473 kept, 198 docs/s, 59 min
+  750,000 in, 702,253 kept, 198 docs/s, 63 min
+  800,000 in, 748,995 kept, 199 docs/s, 67 min
+  850,000 in, 795,617 kept, 199 docs/s, 71 min
+  900,000 in, 842,313 kept, 199 docs/s, 75 min
+  950,000 in, 889,090 kept, 199 docs/s, 79 min
+  1,000,000 in, 935,860 kept, 199 docs/s, 84 min
+  1,050,000 in, 982,369 kept, 201 docs/s, 87 min
+  1,100,000 in, 1,029,102 kept, 206 docs/s, 89 min
+  1,150,000 in, 1,051,274 kept, 210 docs/s, 91 min
+  1,200,000 in, 1,082,005 kept, 216 docs/s, 92 min
+  1,224,711 in, 1,098,499 kept, 219 docs/s, 93 min
+
+  read 1,224,711 raw documents, kept 1,098,499
+    drop:too_short_chars                66,675
+    drop:code_mixed                     29,330
+    drop:near_duplicate                 12,063
+    drop:repetitive                      9,642
+    drop:low_devanagari                  2,734
+    drop:duplicate_lines                 2,264
+    drop:no_language_markers             1,855
+    drop:symbol_heavy                    1,578
+    drop:wrong_language                     38
+    drop:exact_duplicate                    24
+    drop:too_few_words                       8
+    drop:bad_mean_word_length                1
+
+  --- budget trim ---
+    chars/token used: manual 3.74, downloaded 3.39  (measured)
+    targeting >=20.5% manual = requirement 20% + 0.5% margin for char/token drift
+    manual          334,222,144 chars available ->     334,222,144 kept  (~89,364,209 tokens)
+    downloaded    2,065,264,945 chars available ->   1,174,834,104 kept  (~346,558,732 tokens)
+    estimated corpus: 435,922,942 tokens, 20.50% manual
+    downloaded budget set by: ratio
+      the >=20% requirement is binding, not your 400,000,000-token target.
+      manual came up 10,635,790 tokens short, so downloaded was capped at 346,558,764 to hold the ratio.
+      Final corpus will be about 435,922,942 tokens, not 500,000,000.
+      To ship the full target instead, collect more manual data (--stage scrape,ocr) and re-run build.
+    420,911 documents dropped as over budget (least-curated sources first)
+
+  splits (stratified by provenance and source):
+    train    664,070 docs  {'manual': 137084, 'downloaded': 526986}  manual=22.2% of chars
+    val        6,759 docs  {'manual': 1382, 'downloaded': 5377}  manual=21.0% of chars
+    test       6,759 docs  {'manual': 1382, 'downloaded': 5377}  manual=22.7% of chars
+
+  wrote /home/jupyter/LLM-for-hindi-and-nepali/hindi/data/splits/{train,val,test}.jsonl
+  wrote /home/jupyter/LLM-for-hindi-and-nepali/hindi/data/stats/corpus_stats.json
