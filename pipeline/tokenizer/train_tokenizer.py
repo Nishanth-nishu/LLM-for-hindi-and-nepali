@@ -715,6 +715,13 @@ def parse_args() -> argparse.Namespace:
                    help="shorthand for --model-types unigram bpe")
     p.add_argument("--vocab-sizes", nargs="+", type=int, default=None)
     p.add_argument("--eval-sample", type=int, default=5000)
+    p.add_argument("--force-vocab-size", type=int, default=None,
+                   help="ship this swept size instead of the elbow rule's pick. "
+                        "The full sweep is still written to sweep_results.csv; "
+                        "pair with --force-reason so the override is justified "
+                        "in the report rather than silent.")
+    p.add_argument("--force-reason", default=None,
+                   help="one sentence recorded in vocab_selection.json")
     p.add_argument("--max-corpus-chars", type=int, default=400_000_000,
                    help="cap the SentencePiece training text by CHARACTERS "
                         "(default 400M). Lines are a poor proxy when documents "
@@ -806,6 +813,42 @@ def main() -> int:
         n_non_vocab_params=n_non_vocab,
         d_model=d_model,
     )
+
+    # ---- explicit override -------------------------------------------------
+    #
+    # The elbow rule optimises ONE axis: fertility. On Devanagari fertility
+    # keeps improving 7-14% per doubling well past the point where the
+    # vocabulary is a sensible use of the parameter budget, so the rule climbs
+    # to the top of the sweep and honestly reports "no elbow found".
+    #
+    # That is a real finding, not a malfunction -- the criteria genuinely
+    # disagree, and resolving that disagreement is a judgement call about the
+    # Phase 2 architecture, which the sweep cannot make on its own.
+    #
+    # So: keep the whole sweep in the report, override the pick, and record
+    # WHY in the same file the sweep writes. A justified override is
+    # defensible; a silent one is not.
+    if args.force_vocab_size:
+        avail = sorted({m.vocab_size for m in results})
+        if args.force_vocab_size not in avail:
+            print(f"[error] --force-vocab-size {args.force_vocab_size} was not "
+                  f"swept. Available: {avail}", file=sys.stderr)
+            return 1
+        why = args.force_reason or (
+            "selected over the sweep default on parameter-budget grounds: the "
+            "elbow criterion optimises fertility alone and does not stop while "
+            "fertility is still improving")
+        print(f"  [override] sweep chose {selection.vocab_size:,}; "
+              f"forcing {args.force_vocab_size:,}")
+        print(f"             {why}")
+        swept_pick = selection.vocab_size
+        selection.vocab_size = args.force_vocab_size
+        selection.reason = (
+            f"OVERRIDE. The elbow criterion selected {swept_pick:,}; "
+            f"{args.force_vocab_size:,} shipped instead. {why}. The complete "
+            f"sweep is retained in sweep_results.csv so the trade-off stays "
+            f"inspectable. Original elbow reasoning: {selection.reason}"
+        )
     save_results(results, selection, analysis_dir)
 
     # Pick the winning (model_type, vocab_size). When algorithms were compared,
