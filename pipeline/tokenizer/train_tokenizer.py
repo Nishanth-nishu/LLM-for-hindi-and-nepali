@@ -156,6 +156,7 @@ def stream_jsonl_to_text(
     *,
     text_key: str = "text",
     max_lines: int | None = None,
+    max_chars: int | None = None,
     check_nfc: bool = True,
     log=print,
 ) -> dict:
@@ -197,8 +198,31 @@ def stream_jsonl_to_text(
                 if text.strip():
                     yield text
 
+    # A CHARACTER cap, not just a line cap.
+    #
+    # Line counts are a terrible proxy for corpus size when documents are
+    # paragraph-shaped: 1.77M lines of Nepali news averaged 965 chars each,
+    # so a 2M-line cap admitted 1.7 GB of text. SentencePiece Unigram builds a
+    # suffix array over all of it and needs roughly ten times its size in RAM,
+    # which turns a 30-minute fit into an overnight one for no gain --
+    # vocabulary quality saturates a long way below 1 GB.
+    #
+    # Whichever cap binds first wins.
     keep_threshold: int | None = None
     total_lines = 0
+    total_chars_avail = 0
+    if max_chars and not max_lines:
+        for text in iter_docs():
+            for l in text.split("\n"):
+                l = l.strip()
+                if l:
+                    total_lines += 1
+                    total_chars_avail += len(l)
+        if total_chars_avail > max_chars:
+            max_lines = max(1, int(total_lines * max_chars / total_chars_avail))
+            log(f"  character cap {max_chars:,} of {total_chars_avail:,} "
+                f"available -> sampling {max_lines:,} of {total_lines:,} lines")
+            total_lines = 0        # recomputed by the line-cap path below
     if max_lines:
         for text in iter_docs():
             total_lines += sum(1 for l in text.split("\n") if l.strip())
@@ -691,6 +715,10 @@ def parse_args() -> argparse.Namespace:
                    help="shorthand for --model-types unigram bpe")
     p.add_argument("--vocab-sizes", nargs="+", type=int, default=None)
     p.add_argument("--eval-sample", type=int, default=5000)
+    p.add_argument("--max-corpus-chars", type=int, default=400_000_000,
+                   help="cap the SentencePiece training text by CHARACTERS "
+                        "(default 400M). Lines are a poor proxy when documents "
+                        "are paragraph-shaped; this is the cap that matters.")
     p.add_argument("--max-corpus-lines", type=int, default=None,
                    help="cap lines written to the SPM input file (smoke tests)")
     p.add_argument("--seed", type=int, default=20260820)
@@ -743,7 +771,8 @@ def main() -> int:
     print("\n[1/4] streaming train split -> SentencePiece input")
     corpus_path = sweep_dir / "train_corpus.txt"
     stats = stream_jsonl_to_text(train_jsonl, corpus_path, text_key=text_key,
-                                 max_lines=args.max_corpus_lines)
+                                 max_lines=args.max_corpus_lines,
+                                 max_chars=args.max_corpus_chars)
     print(f"  {stats['documents']:,} docs -> {stats['lines']:,} lines, "
           f"{stats['characters']:,} chars")
 

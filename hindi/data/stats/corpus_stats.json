@@ -3,50 +3,8 @@
   "raw_documents": 0,
   "kept_documents": 0,
   "documents_in_final_corpus": 0,
-  "budget": {
-    "manual_target_tokens": 150000,
-    "downloaded_target_tokens": 600000,
-    "min_manual_fraction": 0.2,
-    "margin": 0.005,
-    "effective_fraction_targeted": 0.205,
-    "chars_per_token": {
-      "manual": 4.0,
-      "downloaded": 4.0
-    },
-    "manual_target_chars": 600000,
-    "downloaded_target_chars": 2400000,
-    "available_chars": {
-      "manual": 0,
-      "downloaded": 0
-    },
-    "kept_chars": {
-      "manual": 0,
-      "downloaded": 0
-    },
-    "estimated_kept_tokens": {
-      "manual": 0,
-      "downloaded": 0,
-      "total": 0
-    },
-    "downloaded_budget_used": 0,
-    "downloaded_budget_binding_constraint": "ratio",
-    "ratio_cap_chars": 0,
-    "manual_char_fraction": 0.0,
-    "estimated_manual_token_fraction": 0.0,
-    "documents_kept_by_source": {
-      "manual": {},
-      "downloaded": {}
-    },
-    "documents_dropped_over_budget_by_source": {
-      "manual": {},
-      "downloaded": {}
-    },
-    "manual_shortfall_chars": 600000,
-    "materiality_threshold_chars": 50000
-  },
-  "counters": {
-    "kept": 0
-  },
+  "budget": null,
+  "counters": {},
   "splits": {
     "train": 0,
     "val": 0,
