@@ -299,19 +299,51 @@ def main() -> int:
     if ok and corpus_tokens >= args.target_tokens:
         print("\n  [OK] target met and manual fraction satisfied.")
 
+    # What the build ACTUALLY used, not a hardcoded 4.0. Once a second pass has
+    # run, the budgets were sized with measured values and saying "the proxy was
+    # 4.0" is simply false.
+    used_cpt = {}
+    prev_stats = root / lang / "data" / "stats" / "corpus_stats.json"
+    if prev_stats.exists():
+        try:
+            used_cpt = ((json.loads(prev_stats.read_text(encoding="utf-8"))
+                         .get("budget") or {}).get("chars_per_token") or {})
+        except Exception:
+            used_cpt = {}
+    if used_cpt:
+        used_desc = ", ".join(f"{k} {v}" for k, v in sorted(used_cpt.items()))
+    else:
+        used_desc = "4.0 proxy (no budget record found)"
+
     print(f"\n  --- measured chars/token: {measured_cpt:.3f} "
-          f"(proxy used by the budget stages was 4.0) ---")
+          f"(budget stages used {used_desc}) ---")
     print(f"      by provenance: {cpt_by_class}")
-    if abs(measured_cpt - 4.0) > 0.25:
-        print(f"      The budgets were sized with the wrong ratio, so the corpus "
-              f"missed its target\n      by roughly "
-              f"{abs(measured_cpt - 4.0) / 4.0:.0%}. Re-run with the measured "
-              f"value to correct it:\n"
-              f"        python run_phase1.py --lang {lang} "
-              f"--stage build,tokenizer,count \\\n"
-              f"            --chars-per-token {measured_cpt:.2f}")
-        print(f"      (build re-trims from the same cleaned pool, so this is "
-              f"minutes, not hours.)")
+
+    # Only recommend another pass if this one actually fell short. A corpus that
+    # met its target does not need re-trimming, and re-running would discard a
+    # passing result -- which is exactly the wrong thing to suggest at the end
+    # of a successful run.
+    drifted = any(abs(cpt_by_class.get(k, 0) - float(v)) > 0.05
+                  for k, v in used_cpt.items()) if used_cpt else True
+    if corpus_tokens < args.target_tokens and drifted:
+        m = cpt_by_class.get("manual", measured_cpt)
+        d = cpt_by_class.get("downloaded", measured_cpt)
+        print(f"      The budgets were sized with chars-per-token that the "
+              f"measurement disagrees\n      with, which is where the shortfall "
+              f"comes from. Re-trim with the measured\n      values -- per "
+              f"provenance, since manual and downloaded differ:")
+        print(f"        python -m pipeline.process.build_corpus --lang {lang} "
+              f"--repo-root . --from-clean \\\n"
+              f"            --manual-chars-per-token {m:.3f} "
+              f"--downloaded-chars-per-token {d:.3f} \\\n"
+              f"            --manual-target-tokens <keep> "
+              f"--downloaded-target-tokens <raise>")
+        print(f"      (--from-clean re-trims the same cleaned pool: seconds, "
+              f"not hours. Do NOT\n       re-run the tokenizer stage unless the "
+              f"splits change materially.)")
+    elif corpus_tokens >= args.target_tokens and used_cpt:
+        print(f"      Budget and measurement agree closely enough; no further "
+              f"pass needed.")
 
     print(f"\n  wrote {out}")
     return 0
