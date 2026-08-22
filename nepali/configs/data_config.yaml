@@ -81,13 +81,6 @@ gcs:
 # Present in the bucket and deliberately NOT used. Recorded here so the choice
 # is visible in the repo rather than implied by an absence.
 excluded_sources:
-  - path: opus/OpenSubtitles_en-hi.zip
-    reason: >-
-      Subtitle text from a translation pair. Much of the Hindi side is
-      translated rather than originally composed, and subtitle register
-      (fragmentary dialogue, no paragraph structure) is a poor match for a
-      general-purpose monolingual LM. Including it would also contradict the
-      no-machine-translated-data constraint this project set for itself.
   - path: hi_ne_corpus.zip
     reason: >-
       Mixes Hindi and Nepali in one archive. The brief requires two independent

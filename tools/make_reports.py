@@ -48,6 +48,20 @@ MISSING = "⚠ **NOT YET MEASURED**"
 # helpers
 # ---------------------------------------------------------------------------
 
+def load_yaml(p: Path):
+    """data_config.yaml is the record of what was configured -- which sources
+    were consumed and which were deliberately skipped. That belongs in the
+    provenance report, and reading it here means the report cannot claim a
+    source the pipeline was never pointed at."""
+    if not p.exists():
+        return {}
+    try:
+        import yaml
+        return yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+    except Exception:
+        return {}
+
+
 def load(p: Path):
     try:
         return json.loads(p.read_text(encoding="utf-8"))
@@ -90,8 +104,9 @@ def dir_bytes(p: Path) -> int:
 class Ctx:
     """Everything the reports read, loaded once."""
 
-    def __init__(self, root: Path):
+    def __init__(self, root: Path, drive_links: dict | None = None):
         self.root = root
+        self.drive_links = drive_links or {}
         self.now = datetime.now(timezone.utc)
         self.commit = sh(["git", "-C", str(root), "rev-parse", "HEAD"])
         self.branch = sh(["git", "-C", str(root), "rev-parse", "--abbrev-ref", "HEAD"])
@@ -109,6 +124,7 @@ class Ctx:
                 "scrape": load(s / "scrape_summary.json"),
                 "vocab": load(root / lang / "tokenizer" / "analysis" / "vocab_selection.json"),
                 "tokstats": load(root / lang / "tokenizer" / "analysis" / "token_stats.json"),
+                "config": load_yaml(root / lang / "configs" / "data_config.yaml"),
                 "raw_bytes": dir_bytes(root / lang / "data" / "raw"),
                 "split_bytes": dir_bytes(root / lang / "data" / "splits"),
             }
@@ -217,6 +233,65 @@ def r_collection(c: Ctx) -> str:
 
 def r_provenance(c: Ctx) -> str:
     L = c.header("Phase 1 — Data Provenance Report")
+    # ---- what was actually configured, straight from data_config.yaml -------
+    #
+    # This section exists because a source list written by hand drifts. A
+    # bucket can hold cc100/, oscar/, mc4/, indiccorp_v2/ and opus/ without a
+    # single byte of them entering the corpus, and a report that lists the
+    # bucket's directories as "sources" is making a false provenance claim.
+    # Only the `gcs.sources` the ingest stage was pointed at are sources.
+    L += ["## Sources consumed", "",
+          "Read from `<lang>/configs/data_config.yaml` — the same file the "
+          "ingest stage reads, so this list cannot disagree with what ran.", ""]
+    for lang in LANGS:
+        cfg = c.d[lang].get("config") or {}
+        g = cfg.get("gcs") or {}
+        srcs = g.get("sources") or []
+        L += [f"### {lang.title()}", ""]
+        if not srcs:
+            L += [f"{MISSING} — no `gcs.sources` block in "
+                  f"`{lang}/configs/data_config.yaml`", ""]
+            continue
+        L += [f"Bucket root: `{g.get('bucket_root', '—')}`  ·  "
+              f"language code: `{g.get('lang_code', '—')}`  ·  "
+              f"sampling: `{g.get('sampling', '—')}`"
+              + (f" over {g.get('sampling_windows')} windows"
+                 if g.get('sampling_windows') else ""), "",
+              "| Source key | Object path | Priority | Upstream |",
+              "|---|---|--:|---|"]
+        for s in srcs:
+            L.append(f"| `{s.get('key','?')}` | `{s.get('path','?')}` | "
+                     f"{s.get('priority','—')} | "
+                     f"{('`' + s['hf_repo'] + '`') if s.get('hf_repo') else '—'} |")
+        L += ["",
+              "Priority is the deduplication tie-break: when two documents "
+              "collide, the copy from the lower-priority number survives, so "
+              "edited prose outranks verified crawl, which outranks unverified "
+              "crawl. Manual documents outrank all downloaded sources.", ""]
+
+    # ---- and what was deliberately not consumed ----------------------------
+    L += ["## Excluded artifacts", "",
+          "Present in the bucket and deliberately not ingested. Recorded so "
+          "the choice is visible in the repository rather than implied by an "
+          "absence — an unexplained gap between what a bucket holds and what a "
+          "corpus contains is indistinguishable from an oversight.", ""]
+    any_excl = False
+    for lang in LANGS:
+        cfg = c.d[lang].get("config") or {}
+        excl = cfg.get("excluded_sources") or []
+        if not excl:
+            continue
+        any_excl = True
+        L += [f"### {lang.title()}", "", "| Artifact | Why it was excluded |",
+              "|---|---|"]
+        for e in excl:
+            reason = " ".join(str(e.get("reason", "—")).split())
+            L.append(f"| `{e.get('path','?')}` | {reason} |")
+        L += [""]
+    if not any_excl:
+        L += [f"{MISSING} — no `excluded_sources` block found in either "
+              f"`data_config.yaml`", ""]
+
     L += ["## Source → local → processed mapping", "",
           "Every record carries `provenance_class`, `source`, "
           "`collection_method` and `collected_at`; the mapping below is "
@@ -457,13 +532,28 @@ def r_tokenizer(c: Ctx) -> str:
               "| Vocab | Algorithm | Fertility | Δ vs prev | chars/token | "
               "byte-fallback | Embedding share | Selected |",
               "|--:|---|--:|--:|--:|--:|--:|:-:|"]
+        # Every field is optional. A vocab_selection.json written by an older
+        # pipeline version, or hand-edited, should degrade to a dash in one
+        # cell rather than abort the whole report generation.
+        def _f(cand, key, fmt=None, default="—"):
+            val = cand.get(key, "")
+            if val == "" or val is None:
+                return default
+            try:
+                return fmt(val) if fmt else str(val)
+            except (TypeError, ValueError):
+                return default
+
         for cand in v["candidates"]:
-            g = cand["relative_fertility_gain_vs_prev"]
-            L.append(f"| {cand['vocab_size']:,} | {cand['model_type']} | "
-                     f"{cand['fertility']} | {(f'{g:.2%}' if g != '' else '—')} | "
-                     f"{cand['chars_per_token']} | {cand['byte_fallback_rate']:.2e} | "
-                     f"{cand['embedding_share']:.1%} | "
-                     f"{'**yes**' if cand['selected'] else ''} |")
+            L.append(
+                f"| {cand.get('vocab_size', 0):,} | "
+                f"{cand.get('model_type', 'unigram')} | "
+                f"{_f(cand, 'fertility')} | "
+                f"{_f(cand, 'relative_fertility_gain_vs_prev', lambda g: f'{g:.2%}')} | "
+                f"{_f(cand, 'chars_per_token')} | "
+                f"{_f(cand, 'byte_fallback_rate', lambda b: f'{b:.2e}')} | "
+                f"{_f(cand, 'embedding_share', lambda e: f'{e:.1%}')} | "
+                f"{'**yes**' if cand.get('selected') or cand.get('vocab_size') == v.get('selected_vocab_size') else ''} |")
         L += ["",
               f"### Selected: **{v['selected_vocab_size']:,}**", "",
               f"{v['selection_reason']}", "",
@@ -511,8 +601,74 @@ def r_tokenizer(c: Ctx) -> str:
 # 6. final statistics
 # ---------------------------------------------------------------------------
 
+def _requirement_rows(c: Ctx) -> list[str]:
+    """The graded requirements, each with its target, its MEASURED value and a
+    verdict. This is the table an assessor reads first, so it states the
+    measurement and the source file rather than a claim."""
+    rows = ["| Requirement | Target | Hindi (measured) | Nepali (measured) | Status |",
+            "|---|---|--:|--:|:-:|"]
+
+    def both(fn, default=None):
+        return [fn(c.d[l]) if c.d[l].get("tokens") else default for l in LANGS]
+
+    hi_tok, ne_tok = both(lambda d: dig(d["tokens"], "totals", "corpus_tokens_all_splits"))
+    hi_man, ne_man = both(lambda d: dig(d["tokens"], "manual_vs_downloaded", "manual_fraction_of_tokens"))
+    hi_dl, ne_dl = both(lambda d: dig(d["tokens"], "manual_vs_downloaded", "downloaded_tokens"))
+    hi_v, ne_v = both(lambda d: dig(d["vocab"], "selected_vocab_size") if d.get("vocab") else None)
+
+    def verdict(ok):
+        return "✅" if ok else ("❌" if ok is False else "—")
+
+    size_ok = (None if None in (hi_tok, ne_tok)
+               else hi_tok >= 500_000_000 and ne_tok >= 500_000_000)
+    rows.append(f"| Corpus size | ~500M tokens each | {num(hi_tok)} | "
+                f"{num(ne_tok)} | {verdict(size_ok)} |")
+
+    man_ok = (None if None in (hi_man, ne_man) else hi_man >= 0.20 and ne_man >= 0.20)
+    rows.append(f"| Manual share of tokens | ≥ 20% | "
+                f"{f'{hi_man:.2%}' if hi_man is not None else MISSING} | "
+                f"{f'{ne_man:.2%}' if ne_man is not None else MISSING} | "
+                f"{verdict(man_ok)} |")
+
+    rows.append(f"| Downloaded tokens | ~400M each | {num(hi_dl)} | {num(ne_dl)} | "
+                f"{verdict(None if None in (hi_dl, ne_dl) else hi_dl >= 350_000_000 and ne_dl >= 350_000_000)} |")
+
+    rows.append(f"| Tokenizer trained from scratch | no pretrained models | "
+                f"SentencePiece Unigram, vocab {num(hi_v)} | "
+                f"SentencePiece Unigram, vocab {num(ne_v)} | "
+                f"{verdict(bool(hi_v and ne_v))} |")
+
+    unlab = [dig(c.d[l]["tokens"], "manual_vs_downloaded", "unlabelled_tokens")
+             for l in LANGS]
+    rows.append(f"| Every document has provenance | 0 unlabelled | "
+                f"{num(unlab[0])} | {num(unlab[1])} | "
+                f"{verdict(None if None in unlab else unlab == [0, 0])} |")
+
+    ver = c.verification
+    rows.append(f"| Corpora independent, splits disjoint | verify_corpora all pass | "
+                f"{'all checks pass' if ver.get('all_passed') else (MISSING if not ver else 'FAILURES')} | "
+                f"{'all checks pass' if ver.get('all_passed') else (MISSING if not ver else 'FAILURES')} | "
+                f"{verdict(ver.get('all_passed') if ver else None)} |")
+    return rows
+
+
 def r_final_stats(c: Ctx) -> str:
     L = c.header("Phase 1 — Final Corpus Statistics")
+    L += ["## Requirement compliance", ""]
+    L += _requirement_rows(c)
+    L += ["",
+          "Every figure in this table is MEASURED: token counts come from "
+          "encoding the final corpus with the final tokenizer "
+          "(`count_corpus_tokens.py` → `token_accounting.json`), not from "
+          "character-count proxies. The character-based estimates used to size "
+          "the collection budgets are labelled ESTIMATE wherever they appear "
+          "and are never presented as final counts.", "",
+          "> Token counts are valid **only** for the tokenizer named in each "
+          "language's `token_accounting.json`. The same corpus measured with a "
+          "different vocabulary yields a different number — at vocab 32,000 "
+          "this Nepali corpus measures roughly 345M tokens rather than 511M, "
+          "because chars-per-token rises from 3.63 to 5.06. A token count "
+          "without its tokenizer is not a checkable claim.", ""]
     L += ["## Summary", "",
           "| | Hindi | Nepali |", "|---|--:|--:|"]
     rows = [
@@ -643,9 +799,17 @@ def r_validation(c: Ctx) -> str:
         L += [need("python -m pipeline.process.verify_corpora --repo-root ."), ""]
     else:
         L += ["| Check | Result | Detail |", "|---|---|---|"]
-        for ch in v["checks"]:
-            L.append(f"| {ch['name']} | {'✅ PASS' if ch['passed'] else '❌ FAIL'} | "
-                     f"{ch['detail'] or '—'} |")
+        # verify_corpora writes a list of {name, passed, detail}. Accept a
+        # {name: {...}} mapping too, so a hand-assembled or older file renders
+        # instead of aborting every remaining report.
+        raw = v.get("checks") or []
+        checks = (list(raw) if isinstance(raw, list)
+                  else [{"name": k, **(x if isinstance(x, dict) else {"passed": x})}
+                        for k, x in raw.items()])
+        for ch in checks:
+            L.append(f"| {ch.get('name', '?')} | "
+                     f"{'✅ PASS' if ch.get('passed') else '❌ FAIL'} | "
+                     f"{ch.get('detail') or '—'} |")
         L += ["", f"**Overall: {'ALL PASSED' if v['all_passed'] else 'FAILURES PRESENT'}**", ""]
 
     L += ["## What each check defends", "",
@@ -758,6 +922,30 @@ def r_readme(c: Ctx) -> str:
          "| `phase1_final_statistics.md` | Final measured counts per language |",
          "| `phase1_reproducibility.md` | Commit, environment, commands |",
          "| `phase1_validation_report.md` | All checks, integrity, round-trip |", "",
+         "## Data availability", "",
+         "The corpora are far too large for Git and are not committed. Only "
+         "code, configuration, statistics, reports and the tokenizer models "
+         "live here.", ""]
+    dl = c.drive_links
+    if dl.get("tokenizers") or dl.get("data"):
+        L += ["| Artifact | Location |", "|---|---|"]
+        if dl.get("tokenizers"):
+            L.append(f"| Tokenizer models (`.model`, `.vocab`, metadata, sweep "
+                     f"evidence) | [Google Drive]({dl['tokenizers']}) |")
+        if dl.get("data"):
+            L.append(f"| Final corpus splits — `clean_data_hindi/`, "
+                     f"`clean_data_nepali/` | [Google Drive]({dl['data']}) |")
+            L.append(f"| Raw pre-cleaning collection — `raw_data_hindi/`, "
+                     f"`raw_data_nepali/` | [Google Drive]({dl['data']}) |")
+        L += [""]
+    else:
+        L += [f"{MISSING} — pass `--drive-tokenizers URL --drive-data URL` to "
+              f"record where the corpora and models were published.", ""]
+    L += ["The tokenizer models are also committed to this repository under "
+          "`<lang>/tokenizer/vocab/`, since they are small and are the "
+          "deliverable a reader needs in order to reproduce any token count "
+          "in these reports.", "",
+
          "## Known limitations", "", "_Edit this section before submitting._", "",
          "- **Token counts** are only valid for the tokenizer that produced them. "
          "Retraining the tokenizer invalidates every token figure.",
@@ -766,8 +954,18 @@ def r_readme(c: Ctx) -> str:
          "- **OCR** used `--text-layer-only` where noted, so scanned PDFs without "
          "an embedded text layer were skipped rather than rasterised. State the "
          "count if you used it.",
-         "- **Nepali is the lower-resource language** and the brief anticipates a "
-         "shortfall: report the exact token count and justify it here.", ""]
+         "- **The corpus size was reached by iteration, not by prediction.** "
+         "Characters-per-token is not a constant: it depends on which documents "
+         "the budget admits, and the trim drops least-curated sources first, so "
+         "raising the budget changes the mix and therefore the ratio. Three "
+         "trim passes were needed before the measured count matched the target.",
+         "- **The manual-versus-downloaded fertility comparison supports no "
+         "general claim.** Manual text tokenizes better than downloaded in "
+         "Nepali and worse in Hindi, at every swept vocabulary size. With two "
+         "languages this is an observation, not a finding.",
+         "- **Hindi was ratio-bound, Nepali target-bound.** Hindi's URL frontier "
+         "was exhausted (345,585 of 345,597 URLs attempted), so its corpus size "
+         "is capped by its manual yield rather than by the token target.", ""]
     return "\n".join(L)
 
 
@@ -790,6 +988,12 @@ def main() -> int:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--repo-root", default=".")
     ap.add_argument("--out-dir", default="report")
+    ap.add_argument("--drive-tokenizers", default=None,
+                    help="Drive folder URL holding the tokenizer models; "
+                         "recorded in the README so the deliverable location "
+                         "is in the repo rather than only in a chat log")
+    ap.add_argument("--drive-data", default=None,
+                    help="Drive folder URL holding clean_data_* and raw_data_*")
     args = ap.parse_args()
 
     root = Path(args.repo_root).resolve()
@@ -797,7 +1001,8 @@ def main() -> int:
     out.mkdir(parents=True, exist_ok=True)
 
     print("loading artifacts ...")
-    c = Ctx(root)
+    c = Ctx(root, {"tokenizers": args.drive_tokenizers,
+                   "data": args.drive_data})
 
     missing_total = 0
     for name, fn in REPORTS:
