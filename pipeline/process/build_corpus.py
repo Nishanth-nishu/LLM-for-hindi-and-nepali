@@ -78,6 +78,7 @@ Usage
 from __future__ import annotations
 
 import argparse
+import contextlib
 import hashlib
 import json
 import math
@@ -542,6 +543,11 @@ def main() -> int:
     ap.add_argument("--manual-fraction-margin", type=float, default=None,
                     help="aim this far above --min-manual-fraction, so that "
                          "character-to-token drift cannot land you under it")
+    ap.add_argument("--from-clean", action="store_true",
+                    help="skip normalise/filter/dedup and re-trim from the "
+                         "existing interim/clean.jsonl. Use when only the "
+                         "budget targets changed -- minutes instead of hours. "
+                         "Re-run the full pass if raw data or filters changed.")
     ap.add_argument("--no-budget", action="store_true",
                     help="keep everything that survives dedup, ignore the "
                          "targets (use to measure how much you actually have)")
@@ -600,6 +606,53 @@ def main() -> int:
     n_in = 0
     t_start = time.monotonic()
 
+    # ---- fast path: re-trim from the already-cleaned pool -------------------
+    #
+    # Cleaning and deduplication are deterministic and expensive -- 85 minutes
+    # on 1.4M documents. The BUDGET TRIM that follows is neither: it is a
+    # greedy fill over records already in memory, and it is the part you
+    # actually want to re-run when a token target changes.
+    #
+    # `clean.jsonl` is the output of the expensive half. If it exists and you
+    # only want different budget numbers, read it back and skip straight to the
+    # trim. Minutes instead of hours, and byte-identical to what a full rebuild
+    # would produce, because nothing upstream of the trim depends on the
+    # budget.
+    #
+    # Re-run the full pass whenever the RAW data or the cleaning config
+    # changes -- this path cannot see either.
+    if args.from_clean:
+        if not clean_path.exists():
+            print(f"[error] --from-clean needs {clean_path}, which does not "
+                  f"exist. Run a full build first.", file=sys.stderr)
+            return 1
+        prev = root / lang / "data" / "stats" / "corpus_stats.json"
+        if prev.exists():
+            try:
+                old_stats = json.loads(prev.read_text(encoding="utf-8"))
+                counters.update(old_stats.get("counters") or {})
+                n_in = old_stats.get("raw_documents", 0)
+            except Exception:
+                pass
+        print(f"  --from-clean: reusing {clean_path.name} "
+              f"(skipping normalise/filter/dedup)")
+        with open(clean_path, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    rec = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                kept_records.append((rec["doc_id"],
+                                     rec.get("provenance_class", "UNLABELLED"),
+                                     rec.get("source", "?"),
+                                     len(rec.get("text") or "")))
+        counters["kept"] = len(kept_records)
+        print(f"  {len(kept_records):,} cleaned documents loaded in "
+              f"{time.monotonic() - t_start:.0f}s")
+
     def consume(rec: dict, res: tuple) -> None:
         """Sequential bookkeeping. Order-dependent, so it stays single-threaded."""
         nonlocal n_in
@@ -641,8 +694,14 @@ def main() -> int:
             return False
         return True
 
-    with open(clean_path, "w", encoding="utf-8") as out:
-        if args.workers == 1:
+    # nullcontext when re-trimming: clean.jsonl was just READ, so it must not
+    # be reopened for write.
+    out_cm = (contextlib.nullcontext(None) if args.from_clean
+              else open(clean_path, "w", encoding="utf-8"))
+    with out_cm as out:
+        if args.from_clean:
+            pass                      # kept_records already populated above
+        elif args.workers == 1:
             # Serial path: same code, same worker globals, no process pool.
             # Kept so the parallel result can be diffed against it.
             _init_worker(lang, cfg, cfg["near_dup_threshold"],
