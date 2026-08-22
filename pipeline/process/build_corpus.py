@@ -632,6 +632,13 @@ def main() -> int:
                 old_stats = json.loads(prev.read_text(encoding="utf-8"))
                 counters.update(old_stats.get("counters") or {})
                 n_in = old_stats.get("raw_documents", 0)
+                # The cleaning counters describe the pass that produced
+                # clean.jsonl and are worth carrying forward. `over_budget` is
+                # NOT one of them -- it belongs to the trim, which is exactly
+                # what this run is redoing. Carrying it over would add the old
+                # count to the new one and put a doubled figure in the cleaning
+                # report.
+                counters.pop("drop:over_budget", None)
             except Exception:
                 pass
         print(f"  --from-clean: reusing {clean_path.name} "
