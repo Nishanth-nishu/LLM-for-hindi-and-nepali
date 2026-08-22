@@ -29,10 +29,14 @@ STAGE="${HOME}/drive_upload"
 
 DRY=""
 STAGE_ONLY=0
+WITH_RAW=0
+RAW_ONLY=0
 for arg in "$@"; do
   case "$arg" in
     --dry-run)    DRY="--dry-run" ;;
     --stage-only) STAGE_ONLY=1 ;;
+    --with-raw)   WITH_RAW=1 ;;
+    --raw-only)   WITH_RAW=1; RAW_ONLY=1 ;;
     *) echo "unknown flag: $arg" >&2; exit 2 ;;
   esac
 done
@@ -49,6 +53,30 @@ done
 if command -v pigz >/dev/null 2>&1; then ZIP="pigz -c"; else ZIP="gzip -c"; fi
 echo "[info] compressing with: $ZIP"
 
+# ---- raw preflight --------------------------------------------------------
+# Raw is several times the size of the finished corpus -- it is everything
+# collected BEFORE filtering, deduplication and the budget trim. Print the
+# number before spending an hour on it, because Drive's free tier is 15 GB
+# shared with Gmail and this can exhaust it.
+if [[ $WITH_RAW -eq 1 ]]; then
+  echo
+  echo "=== raw preflight ==="
+  total=0
+  for L in hindi nepali; do
+    if [[ -d "$REPO/$L/data/raw" ]]; then
+      sz=$(find "$REPO/$L/data/raw" -maxdepth 1 -name '*.jsonl' -printf '%s\n' \
+           2>/dev/null | awk '{s+=$1} END {print s+0}')
+      n=$(find "$REPO/$L/data/raw" -maxdepth 1 -name '*.jsonl' | wc -l)
+      echo "  $L: $n raw files, $(numfmt --to=iec "$sz" 2>/dev/null || echo "$sz")B"
+      total=$((total + sz))
+    fi
+  done
+  echo "  uncompressed total: $(numfmt --to=iec "$total" 2>/dev/null || echo "$total")B"
+  echo "  expect roughly $(numfmt --to=iec $((total / 3)) 2>/dev/null || echo $((total/3)))B after gzip"
+  echo "  (Devanagari is 3 bytes/char and compresses ~3-3.5x)"
+fi
+
+if [[ $RAW_ONLY -eq 0 ]]; then
 echo
 echo "=== 1/3  staging tokenizers ==="
 for L in hindi nepali; do
@@ -89,10 +117,43 @@ for L in hindi nepali; do
   done
   [[ -f "$REPO/report/verification.json" ]] && cp "$REPO/report/verification.json" "$dst/"
 done
+fi   # RAW_ONLY
+
+# ---- raw, pre-cleaning ----------------------------------------------------
+# One .gz per source file rather than one concatenated blob: the filenames ARE
+# the provenance. manual_scrape.jsonl and gcs_sangraha_verified.jsonl tell you
+# where a document came from without opening it, and merging them would throw
+# that away.
+if [[ $WITH_RAW -eq 1 ]]; then
+  echo
+  echo "=== staging RAW (pre-cleaning) ==="
+  for L in hindi nepali; do
+    src_dir="$REPO/$L/data/raw"
+    [[ -d "$src_dir" ]] || { echo "[warn] no $src_dir"; continue; }
+    dst="$STAGE/raw_data_$L"
+    mkdir -p "$dst"
+    while IFS= read -r src; do
+      base="$(basename "$src")"
+      if [[ -s "$dst/$base.gz" ]]; then
+        echo "  $L/$base.gz already staged, skipping"
+      else
+        echo "  compressing $L/$base ($(du -h "$src" | cut -f1)) ..."
+        $ZIP "$src" > "$dst/$base.gz"
+      fi
+    done < <(find "$src_dir" -maxdepth 1 -name '*.jsonl' | sort)
+    # The URL frontier is small and is the only record of what the crawler was
+    # ever pointed at, including the pages it fetched and rejected.
+    for extra in article_urls.txt; do
+      [[ -f "$src_dir/$extra" ]] && $ZIP "$src_dir/$extra" > "$dst/$extra.gz"
+    done
+    [[ -f "$REPO/$L/configs/seed_domains.txt" ]] && \
+      cp "$REPO/$L/configs/seed_domains.txt" "$dst/"
+  done
+fi
 
 echo
 echo "  staged sizes:"
-du -sh "$STAGE"/tokenizers "$STAGE"/clean_data_hindi "$STAGE"/clean_data_nepali
+du -sh "$STAGE"/* 2>/dev/null
 
 if [[ $STAGE_ONLY -eq 1 ]]; then
   echo
@@ -111,14 +172,25 @@ echo "=== 3/3  uploading ==="
 # and skips what already matches. Safe to interrupt and restart.
 COMMON=(--progress --transfers 4 --checkers 8 --checksum --drive-chunk-size 64M $DRY)
 
-echo "-> tokenizers"
-rclone copy "$STAGE/tokenizers" "${REMOTE},root_folder_id=${TOKENIZER_FOLDER}:" "${COMMON[@]}"
+if [[ $RAW_ONLY -eq 0 ]]; then
+  echo "-> tokenizers"
+  rclone copy "$STAGE/tokenizers" "${REMOTE},root_folder_id=${TOKENIZER_FOLDER}:" "${COMMON[@]}"
 
-for L in hindi nepali; do
-  echo "-> clean_data_$L"
-  rclone copy "$STAGE/clean_data_$L" \
-    "${REMOTE},root_folder_id=${DATA_FOLDER}:clean_data_$L" "${COMMON[@]}"
-done
+  for L in hindi nepali; do
+    echo "-> clean_data_$L"
+    rclone copy "$STAGE/clean_data_$L" \
+      "${REMOTE},root_folder_id=${DATA_FOLDER}:clean_data_$L" "${COMMON[@]}"
+  done
+fi
+
+if [[ $WITH_RAW -eq 1 ]]; then
+  for L in hindi nepali; do
+    [[ -d "$STAGE/raw_data_$L" ]] || continue
+    echo "-> raw_data_$L"
+    rclone copy "$STAGE/raw_data_$L" \
+      "${REMOTE},root_folder_id=${DATA_FOLDER}:raw_data_$L" "${COMMON[@]}"
+  done
+fi
 
 echo
 echo "[done] verify with:"
