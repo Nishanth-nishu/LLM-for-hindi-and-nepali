@@ -188,8 +188,22 @@ async def amain(args) -> int:
     for r in results:
         all_urls.extend(r)
 
+    # MERGE. Discovery is incremental: a second pass with a higher
+    # --max-sitemaps finds URLs the first pass never reached, but it does not
+    # re-find everything the first pass did (sitemaps roll over, feeds move).
+    # Overwriting would silently shrink the frontier. The scraper dedups
+    # against its own visited log, so carrying old URLs forward costs nothing.
+    prior: list[str] = []
+    if args.merge and out_path.exists():
+        prior = [l.strip() for l in out_path.read_text(encoding="utf-8").splitlines()
+                 if l.strip()]
+        print(f"  merging with {len(prior):,} urls already in {out_path.name}")
+
     seen = set()
-    deduped = [u for u in all_urls if not (u in seen or seen.add(u))]
+    deduped = [u for u in (prior + all_urls) if not (u in seen or seen.add(u))]
+    new_count = len(deduped) - len(prior)
+    if args.merge:
+        print(f"  {new_count:,} urls are new this pass")
     out_path.write_text("\n".join(deduped), encoding="utf-8")
 
     hosts = len({urlsplit(u).netloc for u in deduped})
@@ -219,6 +233,10 @@ def main() -> int:
                     help="default: <lang>/configs/seed_domains.txt")
     ap.add_argument("--max-per-host", type=int, default=30000)
     ap.add_argument("--max-sitemaps", type=int, default=250)
+    ap.add_argument("--merge", action="store_true",
+                    help="union the discovered urls with whatever is already in "
+                         "article_urls.txt instead of replacing the file. Use on "
+                         "any second or later discovery pass.")
     ap.add_argument("--concurrency", type=int, default=12)
     ap.add_argument("--target-tokens", type=int, default=100_000_000,
                     help="manual-token target, for the headroom check")
