@@ -633,10 +633,15 @@ def select_vocab_size(
 # Sweep driver
 # ---------------------------------------------------------------------------
 
+def sweep_model_prefix(out_dir: Path, lang: str, model_type: str, v: int) -> str:
+    return str(out_dir / f"spm_{lang}_{model_type}_v{v}")
+
+
 def run_sweep(*, corpus_path: Path, eval_texts: list[str],
               buckets: dict[str, list[str]], vocab_sizes: list[int],
               model_types: list[str], out_dir: Path, lang: str,
               spm_params: dict, d_model: int, total_params: int | None,
+              reuse: bool = False,
               log=print) -> list[TokenizerMetrics]:
     import sentencepiece as spm
 
@@ -645,10 +650,22 @@ def run_sweep(*, corpus_path: Path, eval_texts: list[str],
 
     for model_type in model_types:
         for v in vocab_sizes:
-            log(f"\n[{lang}] training {model_type} vocab={v} ...")
-            prefix = str(out_dir / f"spm_{lang}_{model_type}_v{v}")
-            model_file = train_sentencepiece(corpus_path, prefix, v, model_type,
-                                             spm_params, log=log)
+            prefix = sweep_model_prefix(out_dir, lang, model_type, v)
+            existing = Path(f"{prefix}.model")
+            # REUSE. SentencePiece training is deterministic given the same
+            # input file and parameters, so a model already sitting in
+            # sweep_models/ from an earlier run of this same sweep is the
+            # identical artefact retraining would produce. Re-evaluating it is
+            # seconds; retraining it is tens of minutes and gigabytes of RAM.
+            # Only ever set by --reuse-models, so the default stays "train".
+            if reuse and existing.exists():
+                log(f"\n[{lang}] reusing {model_type} vocab={v} "
+                    f"({existing.name}, {existing.stat().st_size:,} bytes)")
+                model_file = existing
+            else:
+                log(f"\n[{lang}] training {model_type} vocab={v} ...")
+                model_file = train_sentencepiece(corpus_path, prefix, v, model_type,
+                                                 spm_params, log=log)
             if model_file is None:
                 continue
 
@@ -722,6 +739,12 @@ def parse_args() -> argparse.Namespace:
                         "in the report rather than silent.")
     p.add_argument("--force-reason", default=None,
                    help="one sentence recorded in vocab_selection.json")
+    p.add_argument("--reuse-models", action="store_true",
+                   help="if a sweep model for (model_type, vocab_size) already "
+                        "exists in tokenizer/analysis/sweep_models/, evaluate it "
+                        "instead of retraining. SentencePiece is deterministic, "
+                        "so this reproduces the same sweep table in minutes. Use "
+                        "when re-running only to change --force-vocab-size.")
     p.add_argument("--max-corpus-chars", type=int, default=400_000_000,
                    help="cap the SentencePiece training text by CHARACTERS "
                         "(default 400M). Lines are a poor proxy when documents "
@@ -777,11 +800,34 @@ def main() -> int:
 
     print("\n[1/4] streaming train split -> SentencePiece input")
     corpus_path = sweep_dir / "train_corpus.txt"
-    stats = stream_jsonl_to_text(train_jsonl, corpus_path, text_key=text_key,
-                                 max_lines=args.max_corpus_lines,
-                                 max_chars=args.max_corpus_chars)
-    print(f"  {stats['documents']:,} docs -> {stats['lines']:,} lines, "
-          f"{stats['characters']:,} chars")
+    # If every model this sweep asks for is already on disk and --reuse-models
+    # is set, nothing will read the corpus file, so rebuilding it is pure cost.
+    want = [(mt, v) for mt in model_types for v in vocab_sizes]
+    all_present = all(Path(f"{sweep_model_prefix(sweep_dir, lang, mt, v)}.model").exists()
+                      for mt, v in want)
+    if args.reuse_models and all_present and corpus_path.exists():
+        print(f"  [reuse] all {len(want)} sweep models present; skipping the "
+              f"rebuild of {corpus_path.name} "
+              f"({corpus_path.stat().st_size:,} bytes on disk)")
+        # The metadata still has to describe the text these models were
+        # actually trained on, so measure the file rather than leave the
+        # field empty or, worse, carry a stale number forward.
+        n_lines = n_chars = 0
+        with open(corpus_path, "r", encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                n_lines += 1
+                n_chars += len(line) - 1
+        stats = {"documents": None, "lines": n_lines, "characters": n_chars,
+                 "measured_from": "existing train_corpus.txt (--reuse-models); "
+                                  "document count not recoverable from the "
+                                  "flattened file"}
+        print(f"  measured {n_lines:,} lines, {n_chars:,} chars")
+    else:
+        stats = stream_jsonl_to_text(train_jsonl, corpus_path, text_key=text_key,
+                                     max_lines=args.max_corpus_lines,
+                                     max_chars=args.max_corpus_chars)
+        print(f"  {stats['documents']:,} docs -> {stats['lines']:,} lines, "
+              f"{stats['characters']:,} chars")
 
     print("\n[2/4] sampling held-out evaluation text")
     eval_src = val_jsonl if val_jsonl.exists() else train_jsonl
@@ -799,7 +845,8 @@ def main() -> int:
                         buckets=buckets, vocab_sizes=vocab_sizes,
                         model_types=model_types, out_dir=sweep_dir, lang=lang,
                         spm_params=cfg.get("sentencepiece", {}) or {},
-                        d_model=d_model, total_params=total_params)
+                        d_model=d_model, total_params=total_params,
+                        reuse=args.reuse_models)
     if not results:
         print("[error] every sweep point failed", file=sys.stderr)
         return 1
