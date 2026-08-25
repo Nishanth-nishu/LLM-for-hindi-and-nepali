@@ -1,0 +1,695 @@
+{
+  "language": "hindi",
+  "totals": {
+    "documents": 808253,
+    "characters": 1784872194,
+    "words": 345105437,
+    "tokens": 571100312,
+    "sentences": 19878138,
+    "tokenizer": "hindi_tokenizer.model",
+    "tokenizer_vocab_size": 4000
+  },
+  "document_length": {
+    "characters": {
+      "count": 808253,
+      "total": 1784872194,
+      "mean": 2208.3,
+      "std": 2511.9,
+      "min": 400,
+      "p1": 434.0,
+      "p5": 574.0,
+      "p25": 1085.0,
+      "median": 1626.0,
+      "p75": 2393.0,
+      "p95": 5667.0,
+      "p99": 12878.5,
+      "max": 145303
+    },
+    "words": {
+      "count": 808253,
+      "total": 345105437,
+      "mean": 427.0,
+      "std": 477.6,
+      "min": 51,
+      "p1": 81.0,
+      "p5": 110.0,
+      "p25": 211.0,
+      "median": 318.0,
+      "p75": 465.0,
+      "p95": 1089.0,
+      "p99": 2468.0,
+      "max": 24209
+    },
+    "tokens": {
+      "count": 808253,
+      "total": 571100312,
+      "mean": 706.6,
+      "std": 856.3,
+      "min": 86,
+      "p1": 139.0,
+      "p5": 184.0,
+      "p25": 337.0,
+      "median": 508.0,
+      "p75": 757.0,
+      "p95": 1837.0,
+      "p99": 4288.0,
+      "max": 74900
+    }
+  },
+  "composition_by_provenance": {
+    "manual": {
+      "documents": 159260,
+      "characters": 377033015,
+      "words": 72417774,
+      "share_of_characters": 0.2112,
+      "share_of_documents": 0.197
+    },
+    "downloaded": {
+      "documents": 648993,
+      "characters": 1407839179,
+      "words": 272687663,
+      "share_of_characters": 0.7888,
+      "share_of_documents": 0.803
+    }
+  },
+  "composition_by_source": {
+    "sangraha_verified": {
+      "documents": 581380,
+      "characters": 1229069824,
+      "words": 239808786,
+      "provenance_class": "downloaded",
+      "share_of_characters": 0.6886
+    },
+    "wikipedia": {
+      "documents": 67613,
+      "characters": 178769355,
+      "words": 32878877,
+      "provenance_class": "downloaded",
+      "share_of_characters": 0.1002
+    },
+    "hindi.moneycontrol.com": {
+      "documents": 27658,
+      "characters": 71487922,
+      "words": 13912986,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0401
+    },
+    "www.patrika.com": {
+      "documents": 27672,
+      "characters": 63607727,
+      "words": 12364764,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0356
+    },
+    "www.amarujala.com": {
+      "documents": 24404,
+      "characters": 58185132,
+      "words": 10500914,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0326
+    },
+    "www.hindisamay.com": {
+      "documents": 5907,
+      "characters": 43828101,
+      "words": 8902896,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0246
+    },
+    "www.livehindustan.com": {
+      "documents": 22520,
+      "characters": 38657498,
+      "words": 7229831,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0217
+    },
+    "www.bhaskar.com": {
+      "documents": 24183,
+      "characters": 32759782,
+      "words": 6312973,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0184
+    },
+    "hindi.downtoearth.org.in": {
+      "documents": 1959,
+      "characters": 10891719,
+      "words": 2054780,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0061
+    },
+    "www.hindwi.org": {
+      "documents": 3371,
+      "characters": 10316406,
+      "words": 2066034,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0058
+    },
+    "hindi.webdunia.com": {
+      "documents": 2540,
+      "characters": 6946224,
+      "words": 1339101,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0039
+    },
+    "www.jagran.com": {
+      "documents": 2437,
+      "characters": 5937678,
+      "words": 1140567,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0033
+    },
+    "www.prabhatkhabar.com": {
+      "documents": 2116,
+      "characters": 5842947,
+      "words": 1098135,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0033
+    },
+    "www.dainiktribuneonline.com": {
+      "documents": 1743,
+      "characters": 4470236,
+      "words": 849621,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0025
+    },
+    "navbharattimes.indiatimes.com": {
+      "documents": 1234,
+      "characters": 3270013,
+      "words": 621337,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0018
+    },
+    "www.punjabkesari.in": {
+      "documents": 1434,
+      "characters": 3057632,
+      "words": 590740,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0017
+    },
+    "www.tv9hindi.com": {
+      "documents": 2067,
+      "characters": 2833188,
+      "words": 548567,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0016
+    },
+    "www.inextlive.com": {
+      "documents": 978,
+      "characters": 2272379,
+      "words": 432944,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0013
+    },
+    "www.haribhoomi.com": {
+      "documents": 898,
+      "characters": 2176756,
+      "words": 417842,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0012
+    },
+    "www.bbc.com": {
+      "documents": 772,
+      "characters": 1673203,
+      "words": 305738,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0009
+    },
+    "www.abplive.com": {
+      "documents": 431,
+      "characters": 1196217,
+      "words": 235590,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0007
+    },
+    "bhaskar.com": {
+      "documents": 1566,
+      "characters": 1142918,
+      "words": 227764,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0006
+    },
+    "nari.punjabkesari.in": {
+      "documents": 397,
+      "characters": 837328,
+      "words": 167708,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0005
+    },
+    "haryana.punjabkesari.in": {
+      "documents": 404,
+      "characters": 834111,
+      "words": 161605,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0005
+    },
+    "mp.punjabkesari.in": {
+      "documents": 398,
+      "characters": 790210,
+      "words": 152597,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0004
+    },
+    "up.punjabkesari.in": {
+      "documents": 351,
+      "characters": 725045,
+      "words": 140025,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0004
+    },
+    "himachal.punjabkesari.in": {
+      "documents": 399,
+      "characters": 714560,
+      "words": 136784,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0004
+    },
+    "sports.punjabkesari.in": {
+      "documents": 378,
+      "characters": 693510,
+      "words": 138265,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0004
+    },
+    "bihar.punjabkesari.in": {
+      "documents": 358,
+      "characters": 624137,
+      "words": 122337,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0003
+    },
+    "punjab.punjabkesari.in": {
+      "documents": 379,
+      "characters": 614912,
+      "words": 122697,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0003
+    },
+    "www.naidunia.com": {
+      "documents": 269,
+      "characters": 490132,
+      "words": 93509,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0003
+    },
+    "www.newsonair.gov.in": {
+      "documents": 4,
+      "characters": 49752,
+      "words": 9067,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "www.bbc.co.uk": {
+      "documents": 13,
+      "characters": 41902,
+      "words": 7645,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "rajasthan.punjabkesari.in": {
+      "documents": 6,
+      "characters": 25764,
+      "words": 5141,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "jammukashmir.punjabkesari.in": {
+      "documents": 8,
+      "characters": 17144,
+      "words": 3369,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "uttarakhand.punjabkesari.in": {
+      "documents": 3,
+      "characters": 11568,
+      "words": 2147,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "chandigarh.punjabkesari.in": {
+      "documents": 1,
+      "characters": 5756,
+      "words": 1056,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "gadget.punjabkesari.in": {
+      "documents": 1,
+      "characters": 2032,
+      "words": 403,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "bollywood.punjabkesari.in": {
+      "documents": 1,
+      "characters": 1474,
+      "words": 295,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    }
+  },
+  "documents_by_collection_method": {
+    "hf_download": 648993,
+    "scrape": 159260
+  },
+  "top_manual_domains": [
+    {
+      "host": "hindi.moneycontrol.com",
+      "documents": 27658,
+      "characters": 71487922,
+      "share_of_manual_characters": 0.1896
+    },
+    {
+      "host": "www.patrika.com",
+      "documents": 27672,
+      "characters": 63607727,
+      "share_of_manual_characters": 0.1687
+    },
+    {
+      "host": "www.amarujala.com",
+      "documents": 24404,
+      "characters": 58185132,
+      "share_of_manual_characters": 0.1543
+    },
+    {
+      "host": "www.hindisamay.com",
+      "documents": 5907,
+      "characters": 43828101,
+      "share_of_manual_characters": 0.1162
+    },
+    {
+      "host": "www.livehindustan.com",
+      "documents": 22520,
+      "characters": 38657498,
+      "share_of_manual_characters": 0.1025
+    },
+    {
+      "host": "www.bhaskar.com",
+      "documents": 24183,
+      "characters": 32759782,
+      "share_of_manual_characters": 0.0869
+    },
+    {
+      "host": "hindi.downtoearth.org.in",
+      "documents": 1959,
+      "characters": 10891719,
+      "share_of_manual_characters": 0.0289
+    },
+    {
+      "host": "www.hindwi.org",
+      "documents": 3371,
+      "characters": 10316406,
+      "share_of_manual_characters": 0.0274
+    },
+    {
+      "host": "hindi.webdunia.com",
+      "documents": 2540,
+      "characters": 6946224,
+      "share_of_manual_characters": 0.0184
+    },
+    {
+      "host": "www.jagran.com",
+      "documents": 2437,
+      "characters": 5937678,
+      "share_of_manual_characters": 0.0157
+    },
+    {
+      "host": "www.prabhatkhabar.com",
+      "documents": 2116,
+      "characters": 5842947,
+      "share_of_manual_characters": 0.0155
+    },
+    {
+      "host": "www.dainiktribuneonline.com",
+      "documents": 1743,
+      "characters": 4470236,
+      "share_of_manual_characters": 0.0119
+    },
+    {
+      "host": "navbharattimes.indiatimes.com",
+      "documents": 1234,
+      "characters": 3270013,
+      "share_of_manual_characters": 0.0087
+    },
+    {
+      "host": "www.punjabkesari.in",
+      "documents": 1434,
+      "characters": 3057632,
+      "share_of_manual_characters": 0.0081
+    },
+    {
+      "host": "www.tv9hindi.com",
+      "documents": 2067,
+      "characters": 2833188,
+      "share_of_manual_characters": 0.0075
+    },
+    {
+      "host": "www.inextlive.com",
+      "documents": 978,
+      "characters": 2272379,
+      "share_of_manual_characters": 0.006
+    },
+    {
+      "host": "www.haribhoomi.com",
+      "documents": 898,
+      "characters": 2176756,
+      "share_of_manual_characters": 0.0058
+    },
+    {
+      "host": "www.bbc.com",
+      "documents": 772,
+      "characters": 1673203,
+      "share_of_manual_characters": 0.0044
+    },
+    {
+      "host": "www.abplive.com",
+      "documents": 431,
+      "characters": 1196217,
+      "share_of_manual_characters": 0.0032
+    },
+    {
+      "host": "bhaskar.com",
+      "documents": 1566,
+      "characters": 1142918,
+      "share_of_manual_characters": 0.003
+    },
+    {
+      "host": "nari.punjabkesari.in",
+      "documents": 397,
+      "characters": 837328,
+      "share_of_manual_characters": 0.0022
+    },
+    {
+      "host": "haryana.punjabkesari.in",
+      "documents": 404,
+      "characters": 834111,
+      "share_of_manual_characters": 0.0022
+    },
+    {
+      "host": "mp.punjabkesari.in",
+      "documents": 398,
+      "characters": 790210,
+      "share_of_manual_characters": 0.0021
+    },
+    {
+      "host": "up.punjabkesari.in",
+      "documents": 351,
+      "characters": 725045,
+      "share_of_manual_characters": 0.0019
+    },
+    {
+      "host": "himachal.punjabkesari.in",
+      "documents": 399,
+      "characters": 714560,
+      "share_of_manual_characters": 0.0019
+    }
+  ],
+  "manual_domain_count": 37,
+  "script": {
+    "mean_devanagari_ratio": 0.7708,
+    "median_devanagari_ratio": 0.7762,
+    "documents_below_50pct_devanagari": 0,
+    "note": "Should be near zero after the language filter. A non-trivial count means filtering is leaking."
+  },
+  "sentences": {
+    "total": 19878138,
+    "mean_per_document": 24.59,
+    "mean_words_per_sentence": 17.36,
+    "note": "Split on danda (U+0964), double danda, and ASCII . ! ? — Devanagari prose does not terminate sentences with a full stop."
+  },
+  "lexical": {
+    "sample_documents": 51470,
+    "sample_words": 21751312,
+    "word_types_in_sample": 790424,
+    "type_token_ratio": 0.036339,
+    "hapax_types": 518943,
+    "hapax_rate_of_types": 0.6565,
+    "note": "Type-token ratio falls as sample size grows, so it is only comparable against another measurement at the same sample_words. Types are whitespace-delimited surface forms, not lemmas -- for a morphologically rich language this overstates vocabulary relative to a lemmatised count."
+  },
+  "per_split": {
+    "train": {
+      "documents": 792123,
+      "characters": 1749885968,
+      "words": 338340396,
+      "tokens": 559913515,
+      "documents_by_provenance": {
+        "manual": 156108,
+        "downloaded": 636015
+      },
+      "characters_per_document": {
+        "count": 792123,
+        "total": 1749885968,
+        "mean": 2209.1,
+        "std": 2514.3,
+        "min": 400,
+        "p1": 434.0,
+        "p5": 574.0,
+        "p25": 1085.0,
+        "median": 1626.0,
+        "p75": 2394.0,
+        "p95": 5669.0,
+        "p99": 12892.0,
+        "max": 145303
+      },
+      "words_per_document": {
+        "count": 792123,
+        "total": 338340396,
+        "mean": 427.1,
+        "std": 478.0,
+        "min": 51,
+        "p1": 81.0,
+        "p5": 110.0,
+        "p25": 211.0,
+        "median": 318.0,
+        "p75": 465.0,
+        "p95": 1090.0,
+        "p99": 2471.0,
+        "max": 24209
+      },
+      "tokens_per_document": {
+        "count": 792123,
+        "total": 559913515,
+        "mean": 706.9,
+        "std": 857.2,
+        "min": 86,
+        "p1": 139.0,
+        "p5": 184.0,
+        "p25": 337.0,
+        "median": 508.0,
+        "p75": 757.0,
+        "p95": 1839.0,
+        "p99": 4292.8,
+        "max": 74900
+      }
+    },
+    "val": {
+      "documents": 8065,
+      "characters": 17625547,
+      "words": 3405314,
+      "tokens": 5635973,
+      "documents_by_provenance": {
+        "manual": 1576,
+        "downloaded": 6489
+      },
+      "characters_per_document": {
+        "count": 8065,
+        "total": 17625547,
+        "mean": 2185.4,
+        "std": 2398.6,
+        "min": 400,
+        "p1": 434.0,
+        "p5": 572.0,
+        "p25": 1094.0,
+        "median": 1635.0,
+        "p75": 2378.0,
+        "p95": 5602.0,
+        "p99": 11994.1,
+        "max": 43040
+      },
+      "words_per_document": {
+        "count": 8065,
+        "total": 3405314,
+        "mean": 422.2,
+        "std": 454.4,
+        "min": 61,
+        "p1": 80.0,
+        "p5": 109.0,
+        "p25": 210.0,
+        "median": 318.0,
+        "p75": 462.0,
+        "p95": 1091.2,
+        "p99": 2372.0,
+        "max": 8633
+      },
+      "tokens_per_document": {
+        "count": 8065,
+        "total": 5635973,
+        "mean": 698.8,
+        "std": 821.2,
+        "min": 99,
+        "p1": 136.0,
+        "p5": 183.0,
+        "p25": 339.0,
+        "median": 508.0,
+        "p75": 751.0,
+        "p95": 1788.0,
+        "p99": 4037.6,
+        "max": 15486
+      }
+    },
+    "test": {
+      "documents": 8065,
+      "characters": 17360679,
+      "words": 3359727,
+      "tokens": 5550824,
+      "documents_by_provenance": {
+        "manual": 1576,
+        "downloaded": 6489
+      },
+      "characters_per_document": {
+        "count": 8065,
+        "total": 17360679,
+        "mean": 2152.6,
+        "std": 2383.6,
+        "min": 400,
+        "p1": 435.0,
+        "p5": 571.0,
+        "p25": 1075.0,
+        "median": 1605.0,
+        "p75": 2348.0,
+        "p95": 5457.4,
+        "p99": 11728.1,
+        "max": 49648
+      },
+      "words_per_document": {
+        "count": 8065,
+        "total": 3359727,
+        "mean": 416.6,
+        "std": 454.7,
+        "min": 65,
+        "p1": 81.0,
+        "p5": 110.0,
+        "p25": 211.0,
+        "median": 315.0,
+        "p75": 458.0,
+        "p95": 1043.2,
+        "p99": 2344.1,
+        "max": 9356
+      },
+      "tokens_per_document": {
+        "count": 8065,
+        "total": 5550824,
+        "mean": 688.3,
+        "std": 802.9,
+        "min": 101,
+        "p1": 140.0,
+        "p5": 184.0,
+        "p25": 335.0,
+        "median": 502.0,
+        "p75": 745.0,
+        "p95": 1748.8,
+        "p99": 3899.9,
+        "max": 16053
+      }
+    }
+  }
+}

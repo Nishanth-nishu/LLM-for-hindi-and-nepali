@@ -65,7 +65,7 @@ from pathlib import Path
 
 STAGES = ["gcs-ingest", "ingest-existing", "discover", "plan", "scrape", "ocr",
           "pdf-harvest", "download", "build", "tokenizer", "count",
-          "report", "verify"]
+          "stats", "report", "verify"]
 
 # `download` re-fetches from HuggingFace (pointless once the bucket is
 # populated) and `pdf-harvest` needs an --out-dir the user chooses, so neither
@@ -494,8 +494,24 @@ def main() -> int:
             print("  [note] count exited non-zero: a target or the >=20% manual "
                   "requirement is not met. The report will show the numbers.")
 
+    if "stats" in stages and not args.dry_run:
+        # Dataset statistics (deliverable 3) describe what the corpus IS --
+        # length distribution, composition, lexical variety -- as opposed to
+        # what the build did to it. Runs before report so the reports can
+        # embed it.
+        rc = run([py, "-m", "pipeline.stats.dataset_stats", "--lang", lang,
+                  "--repo-root", str(root)])
+        if rc != 0:
+            failures.append("stats")
+
     if "report" in stages and not args.dry_run:
         stage_report(lang, root)
+        # Figures come from the same statistics files the reports read, so they
+        # belong to the same stage. Generating them separately is how a report
+        # ends up embedding a figure from two builds ago.
+        rc = run([py, "tools/make_figures.py", "--repo-root", str(root)])
+        if rc != 0:
+            failures.append("figures")
 
     if "verify" in stages:
         # Cross-language checks need both corpora built, so this is a no-op

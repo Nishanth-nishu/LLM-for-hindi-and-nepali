@@ -28,6 +28,11 @@ proxy.
 | Vocabulary utilisation | 95.8% | see `token_stats.json` |
 | Zipf slope | −1.1397 | see `token_stats.json` |
 
+<<<<<<< HEAD
+=======
+![Manual share of measured tokens, against the 20% requirement](report/figures/corpus_composition.png)
+
+>>>>>>> dc4537ef16695179241bd4e66d73ed30e0eac110
 > **A token count is meaningless without its tokenizer.** These figures are
 > valid only for the vocab-4,000 SentencePiece models in
 > `<lang>/tokenizer/vocab/`. The same Nepali corpus measures roughly **345M**
@@ -293,6 +298,11 @@ vocabulary is a sensible use of the parameter budget.
 | 16,000 | 1.4209 | 0.356% | 8,192,000 | 32.8% |
 | 32,000 | 1.3166 | 0.384% | 16,384,000 | 65.5% |
 
+<<<<<<< HEAD
+=======
+![Fertility against embedding cost across the vocabulary sweep](report/figures/vocab_tradeoff.png)
+
+>>>>>>> dc4537ef16695179241bd4e66d73ed30e0eac110
 At 32,000 the embedding matrix would consume 65.5% of the Phase 2 parameter
 budget, leaving 8.6M for the transformer itself. 4,000 sits at **1.21× the
 compute-optimal vocabulary** predicted by Tao et al. (2024), *Scaling Laws with

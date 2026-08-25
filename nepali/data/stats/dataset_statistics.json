@@ -1,0 +1,1688 @@
+{
+  "language": "nepali",
+  "totals": {
+    "documents": 75479,
+    "characters": 132234706,
+    "words": 19676140,
+    "tokens": 36017844,
+    "sentences": 1331107,
+    "tokenizer": "nepali_tokenizer.model",
+    "tokenizer_vocab_size": 4000
+  },
+  "document_length": {
+    "characters": {
+      "count": 75479,
+      "total": 132234706,
+      "mean": 1751.9,
+      "std": 1744.3,
+      "min": 400,
+      "p1": 425.0,
+      "p5": 507.0,
+      "p25": 811.0,
+      "median": 1239.0,
+      "p75": 2021.0,
+      "p95": 4610.2,
+      "p99": 9022.3,
+      "max": 87709
+    },
+    "words": {
+      "count": 75479,
+      "total": 19676140,
+      "mean": 260.7,
+      "std": 260.6,
+      "min": 50,
+      "p1": 62.0,
+      "p5": 76.0,
+      "p25": 120.0,
+      "median": 184.0,
+      "p75": 300.0,
+      "p95": 688.0,
+      "p99": 1332.2,
+      "max": 11810
+    },
+    "tokens": {
+      "count": 75479,
+      "total": 36017844,
+      "mean": 477.2,
+      "std": 478.8,
+      "min": 72,
+      "p1": 106.0,
+      "p5": 131.0,
+      "p25": 214.0,
+      "median": 332.0,
+      "p75": 574.0,
+      "p95": 1249.0,
+      "p99": 2439.2,
+      "max": 23371
+    }
+  },
+  "composition_by_provenance": {
+    "manual": {
+      "documents": 75479,
+      "characters": 132234706,
+      "words": 19676140,
+      "share_of_characters": 1.0,
+      "share_of_documents": 1.0
+    }
+  },
+  "composition_by_source": {
+    "www.karobardaily.com": {
+      "documents": 6428,
+      "characters": 17181662,
+      "words": 2541010,
+      "provenance_class": "manual",
+      "share_of_characters": 0.1299
+    },
+    "rajdhanidaily.com": {
+      "documents": 6103,
+      "characters": 13835570,
+      "words": 2040438,
+      "provenance_class": "manual",
+      "share_of_characters": 0.1046
+    },
+    "clickmandu.com": {
+      "documents": 6244,
+      "characters": 11923174,
+      "words": 1793529,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0902
+    },
+    "www.nepalpress.com": {
+      "documents": 6272,
+      "characters": 10648598,
+      "words": 1565173,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0805
+    },
+    "www.reportersnepal.com": {
+      "documents": 6053,
+      "characters": 10489665,
+      "words": 1529523,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0793
+    },
+    "www.dcnepal.com": {
+      "documents": 6212,
+      "characters": 10326578,
+      "words": 1534256,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0781
+    },
+    "bizmandu.com": {
+      "documents": 5631,
+      "characters": 10112800,
+      "words": 1532421,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0765
+    },
+    "khabarhub.com": {
+      "documents": 6106,
+      "characters": 10102157,
+      "words": 1496927,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0764
+    },
+    "kendrabindu.com": {
+      "documents": 6219,
+      "characters": 9971779,
+      "words": 1483287,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0754
+    },
+    "deshsanchar.com": {
+      "documents": 5974,
+      "characters": 9567375,
+      "words": 1427673,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0724
+    },
+    "arthasarokar.com": {
+      "documents": 5543,
+      "characters": 6632695,
+      "words": 1003780,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0502
+    },
+    "www.imagekhabar.com": {
+      "documents": 5018,
+      "characters": 5678073,
+      "words": 826220,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0429
+    },
+    "ocr:1715252289_10__40cb5888": {
+      "documents": 691,
+      "characters": 923536,
+      "words": 147783,
+      "provenance_class": "manual",
+      "share_of_characters": 0.007
+    },
+    "hamrakura.com": {
+      "documents": 371,
+      "characters": 886936,
+      "words": 131622,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0067
+    },
+    "ocr:1715252208_86__f4f6ca23": {
+      "documents": 222,
+      "characters": 316835,
+      "words": 50574,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0024
+    },
+    "ocr:Final__EDIT__145_x_210___2083-03-21_pcirbjq__1517b6e8": {
+      "documents": 133,
+      "characters": 188856,
+      "words": 30595,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0014
+    },
+    "ocr:__mqsvmdf__415af963": {
+      "documents": 109,
+      "characters": 159171,
+      "words": 24160,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0012
+    },
+    "ocr:1715248103_92__d80b56bd": {
+      "documents": 165,
+      "characters": 154095,
+      "words": 24680,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0012
+    },
+    "ocr:1715252125_25__6a88e193": {
+      "documents": 109,
+      "characters": 154010,
+      "words": 25492,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0012
+    },
+    "ocr:___unicode__mtbuyjt__3d20d886": {
+      "documents": 89,
+      "characters": 132823,
+      "words": 22126,
+      "provenance_class": "manual",
+      "share_of_characters": 0.001
+    },
+    "ocr:__ovhjhlm__e4f6b86a": {
+      "documents": 55,
+      "characters": 118974,
+      "words": 17706,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0009
+    },
+    "ocr:__tgydlry__dc2aca01": {
+      "documents": 83,
+      "characters": 114678,
+      "words": 17467,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0009
+    },
+    "www.bbc.com": {
+      "documents": 56,
+      "characters": 108004,
+      "words": 16482,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0008
+    },
+    "ocr:1720761923_39__417a3e0d": {
+      "documents": 58,
+      "characters": 102051,
+      "words": 16278,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0008
+    },
+    "ocr:Report_hprat6w__2e071468": {
+      "documents": 83,
+      "characters": 91544,
+      "words": 12880,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0007
+    },
+    "ocr:1720761782_41__214eb7c1": {
+      "documents": 52,
+      "characters": 88327,
+      "words": 14881,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0007
+    },
+    "ocr:_1_-_4-3_f7jjk4d__33afe2d7": {
+      "documents": 64,
+      "characters": 87045,
+      "words": 12446,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0007
+    },
+    "ocr:1715251918_12__21513440": {
+      "documents": 57,
+      "characters": 76389,
+      "words": 12312,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0006
+    },
+    "ocr:_-__rptvcvj__8f921b83": {
+      "documents": 42,
+      "characters": 73660,
+      "words": 11833,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0006
+    },
+    "ocr:_4__nomy0tn__99061545": {
+      "documents": 50,
+      "characters": 73579,
+      "words": 11907,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0006
+    },
+    "ocr:__oijygwa__e0476cc7": {
+      "documents": 27,
+      "characters": 72299,
+      "words": 11478,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0005
+    },
+    "ocr:1720762269_65__13d74680": {
+      "documents": 44,
+      "characters": 67633,
+      "words": 10537,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0005
+    },
+    "ocr:__yqmb7yz_tyqadjd__2535c8d5": {
+      "documents": 38,
+      "characters": 63143,
+      "words": 8583,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0005
+    },
+    "ocr:__it7vg66__9827f903": {
+      "documents": 33,
+      "characters": 56446,
+      "words": 9617,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0004
+    },
+    "ocr:final_annual_report_2081_acgbgbr_neckv8b__0ca53e86": {
+      "documents": 40,
+      "characters": 53868,
+      "words": 8319,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0004
+    },
+    "ocr:1714977589_71__2d56c6d7": {
+      "documents": 36,
+      "characters": 49899,
+      "words": 9210,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0004
+    },
+    "ocr:__5xnvu6w__4ca194d4": {
+      "documents": 33,
+      "characters": 49505,
+      "words": 7703,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0004
+    },
+    "ocr:_._._-__o1kpiso__db112695": {
+      "documents": 31,
+      "characters": 43590,
+      "words": 6733,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0003
+    },
+    "ocr:_PDF__s8gdu5v__6016e83a": {
+      "documents": 21,
+      "characters": 39344,
+      "words": 6124,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0003
+    },
+    "ocr:__xm4sbx2__7dabde39": {
+      "documents": 22,
+      "characters": 37266,
+      "words": 5492,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0003
+    },
+    "ocr:_-__qm4torj__df84439d": {
+      "documents": 15,
+      "characters": 33789,
+      "words": 4845,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0003
+    },
+    "ocr:__sojst2i__a7c1d75e": {
+      "documents": 20,
+      "characters": 33766,
+      "words": 5156,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0003
+    },
+    "ocr:1720761129_98__c6889f1e": {
+      "documents": 26,
+      "characters": 33257,
+      "words": 5180,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0003
+    },
+    "ocr:1719823289_72__37486dbc": {
+      "documents": 21,
+      "characters": 31570,
+      "words": 5416,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0002
+    },
+    "ocr:1720761248_24__330fd58a": {
+      "documents": 21,
+      "characters": 31359,
+      "words": 5475,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0002
+    },
+    "ocr:AI-new_ce2eme0_qhxoali__31fdd3ff": {
+      "documents": 17,
+      "characters": 29782,
+      "words": 4187,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0002
+    },
+    "ocr:1719908457_19__c4458ee1": {
+      "documents": 18,
+      "characters": 29520,
+      "words": 4882,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0002
+    },
+    "ocr:1_x65nexc__c4a28b95": {
+      "documents": 19,
+      "characters": 29515,
+      "words": 4289,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0002
+    },
+    "ocr:_-__4xkxjko__483c621a": {
+      "documents": 24,
+      "characters": 29233,
+      "words": 4278,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0002
+    },
+    "ocr:__qmmvnzq__ddcd0fdb": {
+      "documents": 10,
+      "characters": 28484,
+      "words": 4131,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0002
+    },
+    "ocr:__q2zawfm__45001906": {
+      "documents": 11,
+      "characters": 26093,
+      "words": 3922,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0002
+    },
+    "ocr:1720760996_82__06dab5b9": {
+      "documents": 15,
+      "characters": 25608,
+      "words": 3849,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0002
+    },
+    "ocr:shrawan_CABINET_2082_6gns1up__e0abf968": {
+      "documents": 9,
+      "characters": 24939,
+      "words": 3653,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0002
+    },
+    "ocr:1719820457_1__d90cf1c2": {
+      "documents": 16,
+      "characters": 24768,
+      "words": 4087,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0002
+    },
+    "ocr:BAISAKH_CABINET_2083_tionbkx__abaa6723": {
+      "documents": 10,
+      "characters": 23721,
+      "words": 3583,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0002
+    },
+    "ocr:_2081-12-4_qgvn9q6__e2bf2ee1": {
+      "documents": 15,
+      "characters": 23545,
+      "words": 3734,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0002
+    },
+    "lawcommission.gov.np": {
+      "documents": 4,
+      "characters": 22975,
+      "words": 3469,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0002
+    },
+    "ocr:__y8j1fh1__99b78f0a": {
+      "documents": 16,
+      "characters": 22119,
+      "words": 3344,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0002
+    },
+    "ocr:_-__kwlomq2__1e2cc83f": {
+      "documents": 13,
+      "characters": 20196,
+      "words": 2947,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0002
+    },
+    "ocr:_-__s511as7__99d24bb9": {
+      "documents": 12,
+      "characters": 19504,
+      "words": 2882,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1720760892_80__f32458aa": {
+      "documents": 14,
+      "characters": 17823,
+      "words": 2796,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:_-_-_-_-__myyaris__a9582739": {
+      "documents": 6,
+      "characters": 17815,
+      "words": 2679,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:__kuuvvrg__1cf7abc8": {
+      "documents": 9,
+      "characters": 16884,
+      "words": 2406,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:_-__anfoi7o__6e0e93bd": {
+      "documents": 8,
+      "characters": 16578,
+      "words": 2266,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:CABINET_2082_chaitra_veoiplv__787e37e7": {
+      "documents": 5,
+      "characters": 15738,
+      "words": 2359,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1714979111_63__0f9ccb38": {
+      "documents": 13,
+      "characters": 15447,
+      "words": 2541,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:__2vei9k2__9cf0607d": {
+      "documents": 7,
+      "characters": 15428,
+      "words": 2180,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:___________4f4157f9": {
+      "documents": 12,
+      "characters": 15370,
+      "words": 2383,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:_2080-02-32_A5_Size_pyxyao4__b8de9ec3": {
+      "documents": 9,
+      "characters": 14867,
+      "words": 2441,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:__fagqysm__07b1a402": {
+      "documents": 5,
+      "characters": 14842,
+      "words": 2223,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "www.opmcm.gov.np": {
+      "documents": 5,
+      "characters": 14168,
+      "words": 1885,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:__kpud6xl__7640314e": {
+      "documents": 12,
+      "characters": 13424,
+      "words": 2107,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:BHADRA_CABINET_2082_uk0h2ym__9474ed79": {
+      "documents": 5,
+      "characters": 13127,
+      "words": 1978,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:__6ihxhtm__04cd8f1f": {
+      "documents": 8,
+      "characters": 12245,
+      "words": 1970,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1720764070_72__5a8bcea4": {
+      "documents": 8,
+      "characters": 11954,
+      "words": 1943,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:__kvsnh9e__a8b75f57": {
+      "documents": 7,
+      "characters": 11691,
+      "words": 1921,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:_-_-__yeerrm0__85a02af3": {
+      "documents": 7,
+      "characters": 11138,
+      "words": 1657,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:___8__divop8n__7384ddb1": {
+      "documents": 8,
+      "characters": 11107,
+      "words": 1833,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:CABINET-2082-BAISAKH_d1mmxdv__9701c42d": {
+      "documents": 4,
+      "characters": 11004,
+      "words": 1623,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1720339028_48__d38afe22": {
+      "documents": 7,
+      "characters": 10976,
+      "words": 1765,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1719914613_79__d85b5f7f": {
+      "documents": 8,
+      "characters": 10943,
+      "words": 1712,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1715247709_25__87fecb51": {
+      "documents": 6,
+      "characters": 10848,
+      "words": 2098,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:_-__u0jr8pp__4ea44002": {
+      "documents": 7,
+      "characters": 10840,
+      "words": 1582,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1719914706_83__646fb09c": {
+      "documents": 8,
+      "characters": 10803,
+      "words": 1733,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1719822704_14__42139aee": {
+      "documents": 8,
+      "characters": 10696,
+      "words": 1947,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:__maglrxc__63e1a811": {
+      "documents": 7,
+      "characters": 10386,
+      "words": 1806,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:__qhsirsf__4410351e": {
+      "documents": 7,
+      "characters": 10338,
+      "words": 1600,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1719824227_70__75762c04": {
+      "documents": 7,
+      "characters": 10303,
+      "words": 1580,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:Cabinet-decision-Poush-2081_fz20yg9__c0e42a63": {
+      "documents": 4,
+      "characters": 10250,
+      "words": 1564,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1719914359_61__924311d9": {
+      "documents": 8,
+      "characters": 10075,
+      "words": 1627,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:__9nuk3f6__ded4d113": {
+      "documents": 7,
+      "characters": 10035,
+      "words": 1623,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1719822612_17__8a8a92b2": {
+      "documents": 8,
+      "characters": 9924,
+      "words": 1731,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:__pmwjaug__1dc01df4": {
+      "documents": 6,
+      "characters": 9919,
+      "words": 1318,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1719996824_96__db8674a9": {
+      "documents": 8,
+      "characters": 9889,
+      "words": 1535,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1719820999_24__61292d02": {
+      "documents": 8,
+      "characters": 9507,
+      "words": 1535,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:CABINET_2083_JESTHA_8lko6du__caae90d5": {
+      "documents": 3,
+      "characters": 9263,
+      "words": 1406,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:CABINET_2082_ASOJ_7uide2h__2bec58ad": {
+      "documents": 3,
+      "characters": 9093,
+      "words": 1307,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:__tgt2pkp__d8faf687": {
+      "documents": 6,
+      "characters": 9069,
+      "words": 1562,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1719909146_71__1a754b78": {
+      "documents": 5,
+      "characters": 8769,
+      "words": 1440,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1715242928_46__9b6d7b91": {
+      "documents": 6,
+      "characters": 8696,
+      "words": 1986,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:_2081.11.25_kanoon_bata_prapta_7pkrl9n__6ecb37e0": {
+      "documents": 8,
+      "characters": 8625,
+      "words": 1382,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:_______bb7ed037": {
+      "documents": 6,
+      "characters": 8539,
+      "words": 1354,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:_-__ygieuab__80f6948c": {
+      "documents": 5,
+      "characters": 8524,
+      "words": 1169,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1719822822_68__7d87e429": {
+      "documents": 6,
+      "characters": 7978,
+      "words": 1423,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1719917433_11__7a42ccb3": {
+      "documents": 5,
+      "characters": 7483,
+      "words": 1268,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:Final_Opmc_-_8-11_2w5ukgo__de9fdf4c": {
+      "documents": 5,
+      "characters": 7444,
+      "words": 1148,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:_1__h8j06ca__56e4240c": {
+      "documents": 5,
+      "characters": 7409,
+      "words": 1179,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1719916979_51__b4165a03": {
+      "documents": 5,
+      "characters": 7203,
+      "words": 1219,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:__gpekbmh__53267fe8": {
+      "documents": 5,
+      "characters": 6913,
+      "words": 1117,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:__hpbkmvv__ea84af51": {
+      "documents": 6,
+      "characters": 6768,
+      "words": 1086,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:1715064962_77__0f5c784e": {
+      "documents": 4,
+      "characters": 6719,
+      "words": 1492,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0001
+    },
+    "ocr:__6s0pvxv__ec161756": {
+      "documents": 5,
+      "characters": 6591,
+      "words": 1033,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:_-_-_-_-_-__ag2yndc__69f6bfdd": {
+      "documents": 5,
+      "characters": 6540,
+      "words": 883,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__flo6um9__842a02a7": {
+      "documents": 4,
+      "characters": 6386,
+      "words": 931,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:_-_-_-_._.-__iyawath__145b5ac9": {
+      "documents": 2,
+      "characters": 6354,
+      "words": 967,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:Cabinet-CHAITRA-2081_oldfjpa__c5ab3724": {
+      "documents": 2,
+      "characters": 6239,
+      "words": 935,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:____zse7v7b__fa35a007": {
+      "documents": 4,
+      "characters": 6189,
+      "words": 949,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__o1yj1u1__93744d9e": {
+      "documents": 4,
+      "characters": 6076,
+      "words": 995,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:CABINET_2082_Magh_97ulkfm__55ad97da": {
+      "documents": 2,
+      "characters": 5816,
+      "words": 869,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:CABINET_2082_Fagun_gzq0efw__ee2c3c2c": {
+      "documents": 2,
+      "characters": 5788,
+      "words": 844,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719919154_69__c834730f": {
+      "documents": 4,
+      "characters": 5711,
+      "words": 960,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719919055_30__57c7ecc1": {
+      "documents": 4,
+      "characters": 5699,
+      "words": 953,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719912647_68__c97c49ad": {
+      "documents": 4,
+      "characters": 5666,
+      "words": 942,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719918414_14__23c4230b": {
+      "documents": 4,
+      "characters": 5557,
+      "words": 943,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719912728_98__38d21145": {
+      "documents": 5,
+      "characters": 5413,
+      "words": 903,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719913779_66__719c395e": {
+      "documents": 5,
+      "characters": 5358,
+      "words": 892,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__wqtzxch__9e6322b4": {
+      "documents": 4,
+      "characters": 5329,
+      "words": 846,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1720762061_5__6a7faffc": {
+      "documents": 3,
+      "characters": 5310,
+      "words": 877,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__twvbuqg__aec332cb": {
+      "documents": 4,
+      "characters": 5259,
+      "words": 889,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__qwbsjqt__a8901a73": {
+      "documents": 4,
+      "characters": 5255,
+      "words": 819,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__3qj4j0d__cde76f55": {
+      "documents": 6,
+      "characters": 5197,
+      "words": 921,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719918613_2__d5386b70": {
+      "documents": 4,
+      "characters": 5133,
+      "words": 832,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719826307_12__cc5fa7cf": {
+      "documents": 3,
+      "characters": 5067,
+      "words": 817,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:_-__jo1ga5t__796c3de6": {
+      "documents": 6,
+      "characters": 4983,
+      "words": 756,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719825782_5__72a271ac": {
+      "documents": 4,
+      "characters": 4948,
+      "words": 838,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1720348813_90__3578b8a0": {
+      "documents": 5,
+      "characters": 4842,
+      "words": 817,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719919243_28__1674ac8a": {
+      "documents": 3,
+      "characters": 4459,
+      "words": 733,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__apkt4cj__5861a402": {
+      "documents": 3,
+      "characters": 4303,
+      "words": 624,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719917306_61__61b3db89": {
+      "documents": 3,
+      "characters": 4229,
+      "words": 728,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719821914_46__43c10c58": {
+      "documents": 3,
+      "characters": 4126,
+      "words": 687,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:____6rexgsn__825d54b5": {
+      "documents": 3,
+      "characters": 3948,
+      "words": 643,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1720764574_84__79eb2b4d": {
+      "documents": 3,
+      "characters": 3788,
+      "words": 587,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__ridtm22__1b47d2d8": {
+      "documents": 2,
+      "characters": 3599,
+      "words": 583,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719823600_7__a5994fbe": {
+      "documents": 3,
+      "characters": 3573,
+      "words": 699,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:_-__0ivkxnh__1d173e05": {
+      "documents": 4,
+      "characters": 3548,
+      "words": 661,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__uy6iozg__f04499e4": {
+      "documents": 2,
+      "characters": 3532,
+      "words": 573,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:_Final_m9sa1dx__2969d516": {
+      "documents": 2,
+      "characters": 3517,
+      "words": 543,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__cwgteql__5efd973e": {
+      "documents": 3,
+      "characters": 3494,
+      "words": 579,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:JESTHA-CABINET-2082_lowfrdc__9ce53a82": {
+      "documents": 1,
+      "characters": 3481,
+      "words": 486,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__ibwryjd__0ebcd830": {
+      "documents": 5,
+      "characters": 3441,
+      "words": 547,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__nju58og__1d6e5296": {
+      "documents": 2,
+      "characters": 3428,
+      "words": 521,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719820777_84__0d398b15": {
+      "documents": 3,
+      "characters": 3398,
+      "words": 606,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1720082630_5__d48d4acb": {
+      "documents": 4,
+      "characters": 3375,
+      "words": 543,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719823027_88__5f4076b5": {
+      "documents": 3,
+      "characters": 3323,
+      "words": 592,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__fdsasfz__7801f018": {
+      "documents": 3,
+      "characters": 3316,
+      "words": 536,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1720344306_97__df4d0b15": {
+      "documents": 4,
+      "characters": 3221,
+      "words": 516,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:CABINET_2082_POUSH_u0hjuue__b3f350fa": {
+      "documents": 1,
+      "characters": 3105,
+      "words": 488,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:Cabinet-MAGH-2081_oysiura__fe2a00eb": {
+      "documents": 1,
+      "characters": 3032,
+      "words": 445,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:_cabinet_bata_aayako__jlknzl2__ea5c5c96": {
+      "documents": 2,
+      "characters": 2993,
+      "words": 462,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:CABINET_2082_KARTIK_kvl6cyv__21a299c0": {
+      "documents": 1,
+      "characters": 2842,
+      "words": 426,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:_a5_Final_t3xdgyt__56c034ae": {
+      "documents": 2,
+      "characters": 2767,
+      "words": 456,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719823756_80__48a2bf5f": {
+      "documents": 2,
+      "characters": 2743,
+      "words": 554,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__alcy3tj__534e2169": {
+      "documents": 2,
+      "characters": 2715,
+      "words": 434,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__ld6ybbj__69c7f566": {
+      "documents": 2,
+      "characters": 2485,
+      "words": 429,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:_2073_vtphor5__4c843e2d": {
+      "documents": 1,
+      "characters": 2389,
+      "words": 350,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1720159241_3__4273228b": {
+      "documents": 2,
+      "characters": 2214,
+      "words": 334,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1720088365_31__07252f78": {
+      "documents": 2,
+      "characters": 2012,
+      "words": 329,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:_-__kxto59m__e60fad8f": {
+      "documents": 1,
+      "characters": 1962,
+      "words": 401,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1720520065_5__87ba1a0d": {
+      "documents": 3,
+      "characters": 1845,
+      "words": 299,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:______51c2bvn__4a158bab": {
+      "documents": 1,
+      "characters": 1813,
+      "words": 308,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__jovtmsp__0b56e029": {
+      "documents": 1,
+      "characters": 1628,
+      "words": 264,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719908256_11__37166913": {
+      "documents": 1,
+      "characters": 1603,
+      "words": 317,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1715247854_87__8f77bde3": {
+      "documents": 1,
+      "characters": 1575,
+      "words": 237,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:18.__jcswmyx__f658f57f": {
+      "documents": 1,
+      "characters": 1568,
+      "words": 284,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719818188_42__26334a9e": {
+      "documents": 1,
+      "characters": 1490,
+      "words": 253,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:_2082_b7fvuiz__88c7c567": {
+      "documents": 1,
+      "characters": 1375,
+      "words": 222,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:____7qzgyas__c2f7e19d": {
+      "documents": 1,
+      "characters": 1371,
+      "words": 126,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719909318_65__b812a210": {
+      "documents": 1,
+      "characters": 1362,
+      "words": 221,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:_208__yoek1bi__6b520d46": {
+      "documents": 1,
+      "characters": 1358,
+      "words": 250,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719908386_53__35834f0c": {
+      "documents": 1,
+      "characters": 1321,
+      "words": 236,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__hk0msuh__64c4307d": {
+      "documents": 1,
+      "characters": 1273,
+      "words": 293,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__bzpydam__6164f543": {
+      "documents": 1,
+      "characters": 1246,
+      "words": 207,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__cxk5kez__3d67e917": {
+      "documents": 1,
+      "characters": 1207,
+      "words": 206,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719907370_53__c2be6d5e": {
+      "documents": 1,
+      "characters": 1042,
+      "words": 188,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719918776_29__91cb0ff0": {
+      "documents": 1,
+      "characters": 980,
+      "words": 156,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:__._.__83v8bgr__2769450a": {
+      "documents": 1,
+      "characters": 861,
+      "words": 120,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:_-__3kqa7mz__ea3be71f": {
+      "documents": 1,
+      "characters": 801,
+      "words": 113,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:_1__rsyc06n__2215ab42": {
+      "documents": 1,
+      "characters": 784,
+      "words": 143,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719918524_95__51db3e69": {
+      "documents": 1,
+      "characters": 444,
+      "words": 70,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    },
+    "ocr:1719918861_15__6fe2c761": {
+      "documents": 1,
+      "characters": 443,
+      "words": 70,
+      "provenance_class": "manual",
+      "share_of_characters": 0.0
+    }
+  },
+  "documents_by_collection_method": {
+    "scrape": 72239,
+    "ocr": 3240
+  },
+  "top_manual_domains": [
+    {
+      "host": "www.karobardaily.com",
+      "documents": 6428,
+      "characters": 17181662,
+      "share_of_manual_characters": 0.1299
+    },
+    {
+      "host": "rajdhanidaily.com",
+      "documents": 6103,
+      "characters": 13835570,
+      "share_of_manual_characters": 0.1046
+    },
+    {
+      "host": "clickmandu.com",
+      "documents": 6244,
+      "characters": 11923174,
+      "share_of_manual_characters": 0.0902
+    },
+    {
+      "host": "www.nepalpress.com",
+      "documents": 6272,
+      "characters": 10648598,
+      "share_of_manual_characters": 0.0805
+    },
+    {
+      "host": "www.reportersnepal.com",
+      "documents": 6053,
+      "characters": 10489665,
+      "share_of_manual_characters": 0.0793
+    },
+    {
+      "host": "www.dcnepal.com",
+      "documents": 6212,
+      "characters": 10326578,
+      "share_of_manual_characters": 0.0781
+    },
+    {
+      "host": "bizmandu.com",
+      "documents": 5631,
+      "characters": 10112800,
+      "share_of_manual_characters": 0.0765
+    },
+    {
+      "host": "khabarhub.com",
+      "documents": 6106,
+      "characters": 10102157,
+      "share_of_manual_characters": 0.0764
+    },
+    {
+      "host": "kendrabindu.com",
+      "documents": 6219,
+      "characters": 9971779,
+      "share_of_manual_characters": 0.0754
+    },
+    {
+      "host": "deshsanchar.com",
+      "documents": 5974,
+      "characters": 9567375,
+      "share_of_manual_characters": 0.0724
+    },
+    {
+      "host": "arthasarokar.com",
+      "documents": 5543,
+      "characters": 6632695,
+      "share_of_manual_characters": 0.0502
+    },
+    {
+      "host": "www.imagekhabar.com",
+      "documents": 5018,
+      "characters": 5678073,
+      "share_of_manual_characters": 0.0429
+    },
+    {
+      "host": "hamrakura.com",
+      "documents": 371,
+      "characters": 886936,
+      "share_of_manual_characters": 0.0067
+    },
+    {
+      "host": "www.bbc.com",
+      "documents": 56,
+      "characters": 108004,
+      "share_of_manual_characters": 0.0008
+    },
+    {
+      "host": "lawcommission.gov.np",
+      "documents": 4,
+      "characters": 22975,
+      "share_of_manual_characters": 0.0002
+    },
+    {
+      "host": "www.opmcm.gov.np",
+      "documents": 5,
+      "characters": 14168,
+      "share_of_manual_characters": 0.0001
+    }
+  ],
+  "manual_domain_count": 16,
+  "script": {
+    "mean_devanagari_ratio": 0.841,
+    "median_devanagari_ratio": 0.8443,
+    "documents_below_50pct_devanagari": 0,
+    "note": "Should be near zero after the language filter. A non-trivial count means filtering is leaking."
+  },
+  "sentences": {
+    "total": 1331107,
+    "mean_per_document": 17.64,
+    "mean_words_per_sentence": 14.78,
+    "note": "Split on danda (U+0964), double danda, and ASCII . ! ? — Devanagari prose does not terminate sentences with a full stop."
+  },
+  "lexical": {
+    "sample_documents": 50971,
+    "sample_words": 13261509,
+    "word_types_in_sample": 607991,
+    "type_token_ratio": 0.045846,
+    "hapax_types": 352950,
+    "hapax_rate_of_types": 0.5805,
+    "note": "Type-token ratio falls as sample size grows, so it is only comparable against another measurement at the same sample_words. Types are whitespace-delimited surface forms, not lemmas -- for a morphologically rich language this overstates vocabulary relative to a lemmatised count."
+  },
+  "per_split": {
+    "train": {
+      "documents": 73969,
+      "characters": 129656440,
+      "words": 19293201,
+      "tokens": 35314141,
+      "documents_by_provenance": {
+        "manual": 73969
+      },
+      "characters_per_document": {
+        "count": 73969,
+        "total": 129656440,
+        "mean": 1752.8,
+        "std": 1747.1,
+        "min": 400,
+        "p1": 425.0,
+        "p5": 507.0,
+        "p25": 811.0,
+        "median": 1240.0,
+        "p75": 2022.0,
+        "p95": 4614.6,
+        "p99": 9014.2,
+        "max": 87709
+      },
+      "words_per_document": {
+        "count": 73969,
+        "total": 19293201,
+        "mean": 260.8,
+        "std": 261.0,
+        "min": 50,
+        "p1": 62.0,
+        "p5": 76.0,
+        "p25": 120.0,
+        "median": 184.0,
+        "p75": 300.0,
+        "p95": 690.0,
+        "p99": 1332.3,
+        "max": 11810
+      },
+      "tokens_per_document": {
+        "count": 73969,
+        "total": 35314141,
+        "mean": 477.4,
+        "std": 479.9,
+        "min": 72,
+        "p1": 106.0,
+        "p5": 131.0,
+        "p25": 214.0,
+        "median": 332.0,
+        "p75": 574.0,
+        "p95": 1249.6,
+        "p99": 2446.0,
+        "max": 23371
+      }
+    },
+    "val": {
+      "documents": 755,
+      "characters": 1291837,
+      "words": 191786,
+      "tokens": 351231,
+      "documents_by_provenance": {
+        "manual": 755
+      },
+      "characters_per_document": {
+        "count": 755,
+        "total": 1291837,
+        "mean": 1711.0,
+        "std": 1548.2,
+        "min": 402,
+        "p1": 430.6,
+        "p5": 518.0,
+        "p25": 804.5,
+        "median": 1271.0,
+        "p75": 1974.0,
+        "p95": 4082.8,
+        "p99": 9381.3,
+        "max": 15126
+      },
+      "words_per_document": {
+        "count": 755,
+        "total": 191786,
+        "mean": 254.0,
+        "std": 232.1,
+        "min": 53,
+        "p1": 63.5,
+        "p5": 76.7,
+        "p25": 120.0,
+        "median": 186.0,
+        "p75": 302.0,
+        "p95": 608.8,
+        "p99": 1393.8,
+        "max": 2434
+      },
+      "tokens_per_document": {
+        "count": 755,
+        "total": 351231,
+        "mean": 465.2,
+        "std": 410.1,
+        "min": 78,
+        "p1": 107.1,
+        "p5": 132.0,
+        "p25": 213.0,
+        "median": 341.0,
+        "p75": 583.5,
+        "p95": 1114.3,
+        "p99": 2373.6,
+        "max": 4018
+      }
+    },
+    "test": {
+      "documents": 755,
+      "characters": 1286429,
+      "words": 191153,
+      "tokens": 352472,
+      "documents_by_provenance": {
+        "manual": 755
+      },
+      "characters_per_document": {
+        "count": 755,
+        "total": 1286429,
+        "mean": 1703.9,
+        "std": 1641.8,
+        "min": 400,
+        "p1": 424.3,
+        "p5": 501.7,
+        "p25": 805.5,
+        "median": 1183.0,
+        "p75": 1962.0,
+        "p95": 4500.0,
+        "p99": 8364.7,
+        "max": 15613
+      },
+      "words_per_document": {
+        "count": 755,
+        "total": 191153,
+        "mean": 253.2,
+        "std": 243.4,
+        "min": 54,
+        "p1": 62.5,
+        "p5": 74.7,
+        "p25": 119.0,
+        "median": 177.0,
+        "p75": 289.5,
+        "p95": 671.9,
+        "p99": 1232.8,
+        "max": 2424
+      },
+      "tokens_per_document": {
+        "count": 755,
+        "total": 352472,
+        "mean": 466.9,
+        "std": 434.6,
+        "min": 91,
+        "p1": 110.1,
+        "p5": 130.7,
+        "p25": 215.0,
+        "median": 324.0,
+        "p75": 552.5,
+        "p95": 1265.9,
+        "p99": 2187.6,
+        "max": 3898
+      }
+    }
+  }
+}

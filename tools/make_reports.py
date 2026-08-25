@@ -69,6 +69,18 @@ def load(p: Path):
         return None
 
 
+def figure(c, name: str, caption: str, out_dir: str = "report") -> list[str]:
+    """Embed a figure if `make_figures.py` has produced it, and say how to
+    produce it if not. Reports stay valid either way -- a missing figure is a
+    named gap, not a broken image link."""
+    p = c.root / "report" / "figures" / f"{name}.png"
+    if not p.exists():
+        return [f"_{caption}_", "",
+                need("python tools/make_figures.py --repo-root ."), ""]
+    # Relative to the report file, which lives in report/.
+    return [f"![{caption}](figures/{name}.png)", "", f"_{caption}_", ""]
+
+
 def need(cmd: str) -> str:
     return f"{MISSING} — run `{cmd}`"
 
@@ -124,6 +136,7 @@ class Ctx:
                 "scrape": load(s / "scrape_summary.json"),
                 "vocab": load(root / lang / "tokenizer" / "analysis" / "vocab_selection.json"),
                 "tokstats": load(root / lang / "tokenizer" / "analysis" / "token_stats.json"),
+                "dataset": load(s / "dataset_statistics.json"),
                 "config": load_yaml(root / lang / "configs" / "data_config.yaml"),
                 "raw_bytes": dir_bytes(root / lang / "data" / "raw"),
                 "split_bytes": dir_bytes(root / lang / "data" / "splits"),
@@ -380,6 +393,8 @@ def r_cleaning(c: Ctx) -> str:
         if not cs:
             L += [need(f"python -m pipeline.process.build_corpus --lang {lang} --repo-root ."), ""]
             continue
+        L += figure(c, f"cleaning_{lang}",
+                    f"{lang.title()} — documents removed, by filter")
         raw, kept = cs["raw_documents"], cs["kept_documents"]
         final = cs.get("documents_in_final_corpus")
         L += ["### Before / after", "",
@@ -522,6 +537,10 @@ def r_tokenizer(c: Ctx) -> str:
           "tracks token inflation — stranded single bytes are what make "
           "English-centric tokenizers expensive on Indic scripts.", ""]
 
+    L += figure(c, "vocab_tradeoff",
+                "Fertility against embedding cost across the vocabulary sweep")
+    L += figure(c, "zipf",
+                "Token frequency against rank on held-out text, log-log")
     for lang in LANGS:
         v, ts, t = c.d[lang]["vocab"], c.d[lang]["tokstats"], c.d[lang]["tokens"]
         L += [f"## {lang.title()}", ""]
@@ -652,10 +671,128 @@ def _requirement_rows(c: Ctx) -> list[str]:
     return rows
 
 
+
+def _dataset_section(c) -> list[str]:
+    """Deliverable 3 proper: what the dataset IS, not what the build did to it.
+    Everything here comes from dataset_statistics.json."""
+    L = ["## Dataset statistics", "",
+         "Produced by `python -m pipeline.stats.dataset_stats --lang <lang> "
+         "--repo-root .`, measured over every document in the final splits.", ""]
+    L += figure(c, "doc_length",
+                "Document length by percentile, against typical context windows")
+
+    have = [l for l in LANGS if c.d[l].get("dataset")]
+    if not have:
+        L += [need("python -m pipeline.stats.dataset_stats --lang hindi "
+                   "--repo-root ."), ""]
+        return L
+
+    L += ["### Size and shape", "",
+          "| | " + " | ".join(l.title() for l in have) + " |",
+          "|---|" + "--:|" * len(have)]
+
+    def row(label, *keys, fmt=","):
+        vals = []
+        for l in have:
+            v = dig(c.d[l]["dataset"], *keys)
+            vals.append(f"{v:{fmt}}" if isinstance(v, (int, float)) else MISSING)
+        L.append(f"| {label} | " + " | ".join(vals) + " |")
+
+    row("Documents", "totals", "documents")
+    row("Characters", "totals", "characters")
+    row("Words (whitespace)", "totals", "words")
+    row("Tokens", "totals", "tokens")
+    row("Sentences", "totals", "sentences")
+    L.append("| Distinct sources | " + " | ".join(
+        str(len(dig(c.d[l]["dataset"], "composition_by_source") or {}))
+        for l in have) + " |")
+    L.append("| Manual domains | " + " | ".join(
+        f"{dig(c.d[l]['dataset'], 'manual_domain_count') or 0:,}"
+        for l in have) + " |")
+    L.append("")
+
+    for unit in ("characters", "words", "tokens"):
+        if not any(dig(c.d[l]["dataset"], "document_length", unit) for l in have):
+            continue
+        L += [f"### {unit.title()} per document", "",
+              "| Language | mean | std | p5 | p25 | median | p75 | p95 | p99 | max |",
+              "|---|--:|--:|--:|--:|--:|--:|--:|--:|--:|"]
+        for l in have:
+            d = dig(c.d[l]["dataset"], "document_length", unit) or {}
+            if not d:
+                continue
+            L.append("| " + l.title() + " | " + " | ".join(
+                f"{d.get(k, 0):,.0f}" for k in
+                ("mean", "std", "p5", "p25", "median", "p75", "p95", "p99", "max")) + " |")
+        L.append("")
+    L += ["A median far below the mean is the normal shape for web text: a long "
+          "right tail of very long documents pulls the mean up. The percentile "
+          "columns are what tell you how much of the corpus survives a fixed "
+          "context window in Phase 2 — read the p-column nearest your context "
+          "length.", ""]
+
+    for l in have:
+        ds = c.d[l]["dataset"]
+        L += [f"### {l.title()} — composition by source", "",
+              "| Source | Provenance | Documents | Characters | Share of chars |",
+              "|---|---|--:|--:|--:|"]
+        for src, v in (ds.get("composition_by_source") or {}).items():
+            L.append(f"| `{src}` | {v.get('provenance_class','—')} | "
+                     f"{v.get('documents', 0):,} | {v.get('characters', 0):,} | "
+                     f"{v.get('share_of_characters', 0):.2%} |")
+        L.append("")
+
+        doms = ds.get("top_manual_domains") or []
+        if doms:
+            L += [f"**Manually collected text came from "
+                  f"{ds.get('manual_domain_count', 0):,} domains.** Top 10 by "
+                  f"characters:", "",
+                  "| Host | Documents | Characters | Share of manual chars |",
+                  "|---|--:|--:|--:|"]
+            for d in doms[:10]:
+                L.append(f"| `{d['host']}` | {d['documents']:,} | "
+                         f"{d['characters']:,} | "
+                         f"{d['share_of_manual_characters']:.2%} |")
+            top3 = sum(d["share_of_manual_characters"] for d in doms[:3])
+            L += ["", f"The three largest hosts account for {top3:.1%} of the "
+                      f"manual characters. Concentration matters: a corpus "
+                      f"scraped from many domains but dominated by a few is, in "
+                      f"effect, a corpus of those few.", ""]
+
+    L += ["### Lexical variety", "",
+          "| | " + " | ".join(l.title() for l in have) + " |",
+          "|---|" + "--:|" * len(have)]
+    row("Word types in sample", "lexical", "word_types_in_sample")
+    row("Sample words", "lexical", "sample_words")
+    row("Type-token ratio", "lexical", "type_token_ratio", fmt=".6f")
+    row("Hapax share of types", "lexical", "hapax_rate_of_types", fmt=".2%")
+    L += ["",
+          "Type-token ratio falls as the sample grows, so it is comparable only "
+          "against a measurement over the same number of words — the sample "
+          "size is given above for that reason. Types are whitespace-delimited "
+          "surface forms rather than lemmas, which overstates vocabulary for a "
+          "morphologically rich language. The hapax share is the part that "
+          "bears on the tokenizer: those are the types that end up handled by "
+          "byte fallback.", ""]
+
+    L += ["### Script composition", "",
+          "| | " + " | ".join(l.title() for l in have) + " |",
+          "|---|" + "--:|" * len(have)]
+    row("Mean Devanagari ratio", "script", "mean_devanagari_ratio", fmt=".4f")
+    row("Documents below 50% Devanagari", "script", "documents_below_50pct_devanagari")
+    L += ["", "The second row should be at or near zero. Anything else means "
+               "the language filter is leaking.", ""]
+    return L
+
+
 def r_final_stats(c: Ctx) -> str:
     L = c.header("Phase 1 — Final Corpus Statistics")
     L += ["## Requirement compliance", ""]
     L += _requirement_rows(c)
+    L += [""]
+    L += figure(c, "corpus_composition",
+                "Manual share of measured tokens, against the 20% requirement")
+    L += _dataset_section(c)
     L += ["",
           "Every figure in this table is MEASURED: token counts come from "
           "encoding the final corpus with the final tokenizer "
@@ -992,6 +1129,11 @@ def main() -> int:
                     help="Drive folder URL holding the tokenizer models; "
                          "recorded in the README so the deliverable location "
                          "is in the repo rather than only in a chat log")
+    ap.add_argument("--overwrite-readme", action="store_true",
+                    help="replace the hand-written README.md with the "
+                         "generated summary. Off by default: the README "
+                         "carries reproduction steps and rationale that "
+                         "no generator can reconstruct.")
     ap.add_argument("--drive-data", default=None,
                     help="Drive folder URL holding clean_data_* and raw_data_*")
     args = ap.parse_args()
@@ -1013,8 +1155,18 @@ def main() -> int:
         print(f"  wrote {args.out_dir}/{name:<42} "
               f"{'(' + str(n) + ' fields not yet measured)' if n else '(complete)'}")
 
-    (root / "README.md").write_text(r_readme(c), encoding="utf-8")
-    print(f"  wrote README.md")
+    # The repository README is hand-written: it carries the reproduction steps,
+    # the layout, the design rationale. Overwriting it with a generated summary
+    # every time the reports refresh would destroy that. So the generated
+    # summary lands beside the other reports, and clobbering the README is an
+    # explicit opt-in.
+    if args.overwrite_readme:
+        (root / "README.md").write_text(r_readme(c), encoding="utf-8")
+        print(f"  wrote README.md  (--overwrite-readme: hand-written README replaced)")
+    else:
+        (out / "phase1_summary.md").write_text(r_readme(c), encoding="utf-8")
+        print(f"  wrote {args.out_dir}/phase1_summary.md"
+              f"  (README.md left alone; pass --overwrite-readme to replace it)")
 
     print()
     if missing_total:
