@@ -1,0 +1,45 @@
+{
+  "language": "hindi",
+  "model_type": "unigram",
+  "vocab_size": 4000,
+  "selection_reason": "OVERRIDE. The elbow criterion selected 32,000; 4,000 shipped instead. the elbow criterion optimises fertility alone and never stops while fertility keeps improving; at 32000 the embedding matrix is 16.4M of a 25M parameter budget (66%), leaving 8.6M for the transformer. 4000 sits at 1.21x the Tao et al. (2024) scaling-law optimum of 3311 for 15M non-vocab params at d_model=512, spends 8.2% of the budget on embeddings, and has the lowest byte-fallback rate in the sweep. The complete sweep is retained in sweep_results.csv so the trade-off stays inspectable. Original elbow reasoning: largest feasible size (32000); no elbow found within the swept range, so the sweep should be extended upward before treating this as optimal",
+  "scaling_law_reference_vocab": 3311,
+  "metrics_on_heldout": {
+    "fertility": 1.6553,
+    "chars_per_token": 3.1281,
+    "bytes_per_token": 7.9575,
+    "unk_rate": 0.0,
+    "byte_fallback_rate": 0.007358290176812415,
+    "fertility_by_provenance": {
+      "manual": 1.6808,
+      "downloaded": 1.6225
+    },
+    "eval_documents": 5000
+  },
+  "sentencepiece_params": {
+    "character_coverage": 0.9999,
+    "pad_id": 0,
+    "unk_id": 1,
+    "bos_id": 2,
+    "eos_id": 3,
+    "normalization_rule_name": "identity",
+    "remove_extra_whitespaces": true,
+    "input_sentence_size": 10000000,
+    "shuffle_input_sentence": true,
+    "byte_fallback": true,
+    "split_digits": true,
+    "allow_whitespace_only_pieces": false,
+    "max_sentence_length": 16384,
+    "minloglevel": 2
+  },
+  "trained_on": "/home/jupyter/LLM-for-hindi-and-nepali/hindi/data/splits/train.jsonl",
+  "corpus_stats": {
+    "documents": 792123,
+    "lines": 994201,
+    "characters": 399743807,
+    "lines_available": 4438177,
+    "sampled": true,
+    "non_nfc_sampled": 0,
+    "nfc_checked": 20000
+  }
+}

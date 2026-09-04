@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
+# Checkpoints and tokenization caches go to Google Drive, not git
+# (large binaries; see report/phase2_checkpoint_links.json)
+*/checkpoints/*
+!*/checkpoints/training_log.jsonl
+*/data/splits/*.npy
+*/data/raw/
+*/data/interim/
+*/data/splits/*.jsonl

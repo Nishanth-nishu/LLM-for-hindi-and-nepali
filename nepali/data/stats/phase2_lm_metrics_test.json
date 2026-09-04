@@ -1,0 +1,10 @@
+{
+  "checkpoint": "/home/jupyter/LLM-for-hindi-and-nepali/nepali/checkpoints/latest.pt",
+  "checkpoint_step": 199,
+  "eval_file": "/home/jupyter/LLM-for-hindi-and-nepali/nepali/data/splits/test.jsonl",
+  "tokens_evaluated": 4743168,
+  "bytes_in_reference_text": 46007964,
+  "cross_entropy_nats": 6.235673119572984,
+  "perplexity": 510.64422741466143,
+  "bits_per_byte": 0.9274561224672632
+}

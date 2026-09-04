@@ -1,0 +1,9 @@
+# Phase 2 — model, training, and evaluation dependencies.
+# (Phase 1's data-collection/cleaning dependencies live on the phase-1 branch.)
+
+torch>=2.2
+sentencepiece>=0.2
+pyyaml>=6.0
+numpy>=1.24
+matplotlib>=3.7
+pytest>=8.0
