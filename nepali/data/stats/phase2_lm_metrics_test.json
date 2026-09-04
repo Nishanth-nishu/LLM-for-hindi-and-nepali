@@ -1,10 +1,11 @@
 {
-  "checkpoint": "/home/jupyter/LLM-for-hindi-and-nepali/nepali/checkpoints/latest.pt",
-  "checkpoint_step": 199,
-  "eval_file": "/home/jupyter/LLM-for-hindi-and-nepali/nepali/data/splits/test.jsonl",
-  "tokens_evaluated": 4743168,
-  "bytes_in_reference_text": 46007964,
-  "cross_entropy_nats": 6.235673119572984,
-  "perplexity": 510.64422741466143,
-  "bits_per_byte": 0.9274561224672632
+  "checkpoint": "nepali/checkpoints/latest.pt (GCP CPU VM run)",
+  "checkpoint_step": 1250,
+  "eval_file": "nepali/data/splits/test.jsonl",
+  "note": "Bounded evaluation (25 batches x 16 x 512 tokens, deterministic first-N) due to CPU eval being too slow for a full pass; see docs/PHASE2_GCP_TRAINING.md.",
+  "tokens_evaluated": 204800,
+  "bytes_in_reference_text": 1768799,
+  "cross_entropy_nats": 4.204151573181153,
+  "perplexity": 66.96375970866269,
+  "bits_per_byte": 0.7022704143085289
 }

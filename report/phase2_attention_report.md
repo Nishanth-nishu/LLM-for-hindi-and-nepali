@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Generated (UTC) | 2026-09-04 06:39:46 |
-| Git commit | `d68cff126061309a911334f15371e3df0d4197c3` |
+| Generated (UTC) | 2026-09-04 18:20:27 |
+| Git commit | `593e6e79a54d90f533b73353471ce30cd6fe237a` |
 | Branch | `phase-2` |
 
 > Following the Phase 1 convention: every number below is read from a JSON file a script actually produced. A field with no source file renders as `⚠ **NOT YET MEASURED**` and names the command that fills it.
@@ -33,7 +33,7 @@ Low entropy + low distance = a head attending sharply to nearby positions (posit
 
 ## Model L (lower-resource, Nepali)
 
-Checkpoint step: **199**. Causal mask verified on every analyzed sentence: **True** (changing a future token left every earlier position's logits bit-for-bit identical).
+Checkpoint step: **1250**. Causal mask verified on every analyzed sentence: **True** (changing a future token left every earlier position's logits bit-for-bit identical).
 
 ### Heatmaps
 
@@ -44,13 +44,13 @@ Checkpoint step: **199**. Causal mask verified on every analyzed sentence: **Tru
 
 | Layer | Mean entropy | Mean attention distance |
 |--:|--:|--:|
-| 0 | 5.177 | 126.79 |
-| 1 | 4.871 | 126.15 |
-| 2 | 4.041 | 128.91 |
-| 3 | 4.021 | 127.41 |
-| 4 | 3.701 | 127.24 |
-| 5 | 4.813 | 127.62 |
-| 6 | 5.120 | 127.17 |
+| 0 | 4.529 | 64.95 |
+| 1 | 4.636 | 74.22 |
+| 2 | 4.625 | 70.14 |
+| 3 | 3.008 | 13.47 |
+| 4 | 2.990 | 11.84 |
+| 5 | 3.390 | 29.24 |
+| 6 | 4.339 | 84.82 |
 
 Low entropy + low distance = a head attending sharply to nearby positions (positional/local). High entropy = diffuse attention across many positions. High distance with moderate entropy = a head pulling in specific, far-back content (content-based, long-range).
 
