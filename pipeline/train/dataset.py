@@ -30,6 +30,63 @@ def load_documents(jsonl_path: str | Path, text_field: str = "text") -> list[str
     return docs
 
 
+def stream_tokenize_file(
+    jsonl_path: str | Path,
+    tokenizer_model: str | Path,
+    text_field: str = "text",
+    batch_size: int = 2000,
+) -> np.ndarray:
+    """Tokenize a JSONL file without ever holding the whole document list or
+    the whole raw-text corpus in memory at once — reads a batch of lines,
+    encodes it, appends a compact int32 array, and discards the raw text.
+
+    Peak memory is therefore one batch of raw text (a few thousand
+    documents) plus the growing list of small int32 arrays, not the full
+    corpus text (which for a ~2GB Hindi split was enough to OOM a 12GB
+    machine when materialized as a single Python list of strings).
+
+    int32 (not int64) for storage: vocab size 4,000 fits comfortably, and
+    it halves the array's memory footprint. Converted to int64 only when a
+    training block is materialized as a tensor (PyTorch embedding lookups
+    require it), in TokenBlockDataset.__getitem__.
+    """
+    sp = spm.SentencePieceProcessor(model_file=str(tokenizer_model))
+    eos = sp.eos_id()
+    chunks: list[np.ndarray] = []
+    batch: list[str] = []
+
+    def flush(batch: list[str]) -> None:
+        if not batch:
+            return
+        encoded = sp.encode(batch, out_type=int)
+        flat: list[int] = []
+        for doc_ids in encoded:
+            flat.extend(doc_ids)
+            if eos is not None and eos >= 0:
+                flat.append(eos)
+        chunks.append(np.asarray(flat, dtype=np.int32))
+
+    with open(jsonl_path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            text = obj.get(text_field)
+            if not text:
+                continue
+            batch.append(text)
+            if len(batch) >= batch_size:
+                flush(batch)
+                batch = []
+    flush(batch)
+
+    return np.concatenate(chunks) if chunks else np.asarray([], dtype=np.int32)
+
+
 def _encode_chunk(args: tuple[str, list[str], int]) -> np.ndarray:
     """Runs in a worker process: load the tokenizer once, batch-encode this
     chunk of documents. Module-level (not a closure) so it's picklable for
@@ -47,8 +104,8 @@ def _encode_chunk(args: tuple[str, list[str], int]) -> np.ndarray:
             flat.extend(doc_ids)
             if eos is not None and eos >= 0:
                 flat.append(eos)
-        arrays.append(np.asarray(flat, dtype=np.int64))
-    return np.concatenate(arrays) if arrays else np.asarray([], dtype=np.int64)
+        arrays.append(np.asarray(flat, dtype=np.int32))
+    return np.concatenate(arrays) if arrays else np.asarray([], dtype=np.int32)
 
 
 def tokenize_corpus(
@@ -57,23 +114,10 @@ def tokenize_corpus(
     batch_size: int = 2000,
     n_workers: int | None = None,
 ) -> np.ndarray:
-    """Concatenate token ids across documents, with the tokenizer's own EOS
-    id (if it has one) inserted between documents so a training block never
-    silently splices the end of one document onto the start of another
-    without a boundary marker.
-
-    Splits `documents` into `n_workers` chunks and tokenizes them in
-    parallel worker processes (each with its own SentencePieceProcessor —
-    the processor itself isn't picklable, so workers take the model *path*
-    and load it locally). At the scale of a ~500M-token corpus this is the
-    difference between tokenization taking tens of minutes single-threaded
-    versus a few minutes across an 8-core machine. Falls back to
-    single-process tokenization for small inputs, where process-pool
-    startup overhead would dominate.
-
-    Accepts either a loaded SentencePieceProcessor or a path so callers
-    that already have one open (small val/test files) don't pay to reload
-    it, while the parallel path can still hand each worker just a path.
+    """Concatenate token ids across already-in-memory documents. Kept for
+    small inputs (val/test splits) where loading the whole list is cheap;
+    the large-corpus path is stream_tokenize_file, which never materializes
+    the full document list.
     """
     if isinstance(sp_or_path, (str, Path)):
         tokenizer_path = str(sp_or_path)
@@ -91,7 +135,7 @@ def tokenize_corpus(
 
     with ProcessPoolExecutor(max_workers=n_workers) as ex:
         results = list(ex.map(_encode_chunk, tasks))
-    return np.concatenate(results) if results else np.asarray([], dtype=np.int64)
+    return np.concatenate(results) if results else np.asarray([], dtype=np.int32)
 
 
 def _tokenize_serial(sp: spm.SentencePieceProcessor, documents: list[str], batch_size: int) -> np.ndarray:
@@ -105,8 +149,8 @@ def _tokenize_serial(sp: spm.SentencePieceProcessor, documents: list[str], batch
             flat.extend(doc_ids)
             if eos is not None and eos >= 0:
                 flat.append(eos)
-        arrays.append(np.asarray(flat, dtype=np.int64))
-    return np.concatenate(arrays) if arrays else np.asarray([], dtype=np.int64)
+        arrays.append(np.asarray(flat, dtype=np.int32))
+    return np.concatenate(arrays) if arrays else np.asarray([], dtype=np.int32)
 
 
 class TokenBlockDataset(Dataset):
@@ -135,8 +179,8 @@ class TokenBlockDataset(Dataset):
     def __getitem__(self, idx: int):
         start = idx * self.block_size
         end = start + self.block_size
-        x = torch.from_numpy(self.tokens[start:end].copy())
-        y = torch.from_numpy(self.tokens[start + 1 : end + 1].copy())
+        x = torch.from_numpy(self.tokens[start:end].astype(np.int64))
+        y = torch.from_numpy(self.tokens[start + 1 : end + 1].astype(np.int64))
         return x, y
 
 
@@ -153,8 +197,7 @@ def build_dataset(
     if use_cache and cache.exists() and cache.stat().st_mtime >= jsonl_path.stat().st_mtime:
         ids = np.load(cache)
     else:
-        docs = load_documents(jsonl_path)
-        ids = tokenize_corpus(tokenizer_model, docs)
+        ids = stream_tokenize_file(jsonl_path, tokenizer_model)
         if use_cache:
             try:
                 np.save(cache, ids)
