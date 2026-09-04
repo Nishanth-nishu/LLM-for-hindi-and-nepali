@@ -407,18 +407,15 @@ def r_resources(c: Ctx) -> str:
           "| Manual token share | 21.29% | 20.83% |",
           "| Tokenizer vocab | 4,000 | 4,000 |",
           "| Fertility (tokens/word) | 1.6522 | 1.8338 |",
-          "| Byte-fallback rate | 0.7316% | 0.2757% |", ""]
-    for lang in LANGS:
-        pc = param_count_for(c.d[lang]["cfg"]) if c.d[lang]["cfg"] else None
-        L.append(f"" )
-    L += ["| Parameters | " +
+          "| Byte-fallback rate | 0.7316% | 0.2757% |",
+          "| Parameters | " +
           (f"{param_count_for(c.d['hindi']['cfg'])['total']:,}" if c.d['hindi']['cfg'] else MISSING) +
           " | " +
           (f"{param_count_for(c.d['nepali']['cfg'])['total']:,}" if c.d['nepali']['cfg'] else MISSING) +
           " |", ""]
-    for lang in LANGS:
-        lm = c.d[lang]["lm_test"]
-        L.append("")
+    hindi_step = (c.d['hindi']['lm_test'] or {}).get('checkpoint_step')
+    nepali_step = (c.d['nepali']['lm_test'] or {}).get('checkpoint_step')
+    same_step = hindi_step is not None and hindi_step == nepali_step
     L += ["| Test perplexity | " +
           (f"{c.d['hindi']['lm_test']['perplexity']:.2f}" if c.d['hindi']['lm_test'] else MISSING) +
           " | " +
@@ -440,9 +437,32 @@ def r_resources(c: Ctx) -> str:
         "than downloaded in Nepali but *worse* in Hindi — an observation, "
         "not a generalizable finding, with only two languages) — not to "
         "any architectural difference between the two models.", "",
-        "Fill in the specific gap size and direction once both models "
-        "have been trained to a comparable step count and evaluated.", "",
     ]
+    if same_step:
+        h_ppl = c.d['hindi']['lm_test']['perplexity']
+        n_ppl = c.d['nepali']['lm_test']['perplexity']
+        h_bpb = c.d['hindi']['lm_test']['bits_per_byte']
+        n_bpb = c.d['nepali']['lm_test']['bits_per_byte']
+        L += [
+            f"Both models were evaluated at the same checkpoint step "
+            f"({hindi_step}), so the comparison above is apples-to-apples "
+            f"in training progress, not just in architecture. Model L "
+            f"(Nepali) has {'higher' if n_ppl > h_ppl else 'lower'} "
+            f"token-level perplexity than Model H ({n_ppl:.1f} vs "
+            f"{h_ppl:.1f}), consistent with training on ~11% fewer tokens "
+            f"and a higher-fertility tokenizer. On bits-per-byte, which "
+            f"controls for the tokenizer difference, the gap "
+            f"{'narrows or reverses' if (n_bpb < h_bpb) != (n_ppl < h_ppl) else 'persists'} "
+            f"({n_bpb:.4f} vs {h_bpb:.4f} bits/byte) — "
+            f"{'Model L is actually *more* byte-efficient despite the higher PPL, because its higher-fertility tokenizer spreads the same text over more (individually easier-to-predict) tokens, each carrying less information.' if n_bpb < h_bpb else 'Model L remains behind on the byte-normalized metric too.'} "
+            f"Note this reflects a {hindi_step}-step pilot for both models "
+            f"(0.5% of the planned 40,000-step budget), not a converged "
+            f"comparison — see `docs/PHASE2_GCP_TRAINING.md` for the "
+            f"full-run plan.", "",
+        ]
+    else:
+        L += ["Fill in the specific gap size and direction once both "
+              "models have been evaluated at the same checkpoint step.", ""]
     return "\n".join(L)
 
 

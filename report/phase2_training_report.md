@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| Generated (UTC) | 2026-09-03 23:42:39 |
-| Git commit | `c2a82c02fa66e6395fd229e237a102fc4cb385f5` |
-| Branch | `phase-1` |
+| Generated (UTC) | 2026-09-04 06:39:46 |
+| Git commit | `d68cff126061309a911334f15371e3df0d4197c3` |
+| Branch | `phase-2` |
 
 > Following the Phase 1 convention: every number below is read from a JSON file a script actually produced. A field with no source file renders as `⚠ **NOT YET MEASURED**` and names the command that fills it.
 
@@ -44,7 +44,9 @@ Training progress: **199 / 40,000 steps (0.5%)**.
 
 **This is a partial/pilot run, not a converged model** — see `docs/PHASE2_GCP_TRAINING.md` for the full-budget run plan and estimated wall-clock time on the project's hardware.
 
-Loss curve: `report/figures/phase2/hindi/loss_curve.png`
+Loss curve: `report\figures\phase2\hindi\loss_curve.png`
+
+Checkpoint (Drive): https://drive.google.com/open?id=1Jb6hesJKgdeTYjpJh0SkL6IMl_ynG53P
 
 ## Model L (lower-resource, Nepali)
 
@@ -78,4 +80,6 @@ Training progress: **199 / 40,000 steps (0.5%)**.
 
 **This is a partial/pilot run, not a converged model** — see `docs/PHASE2_GCP_TRAINING.md` for the full-budget run plan and estimated wall-clock time on the project's hardware.
 
-Loss curve: `report/figures/phase2/nepali/loss_curve.png`
+Loss curve: `report\figures\phase2\nepali\loss_curve.png`
+
+Checkpoint (Drive): https://drive.google.com/open?id=1w8gCOZa5zHn09lQ3kMT_jRN2o_8poino
