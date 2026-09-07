@@ -274,6 +274,20 @@ def r_training(c: Ctx) -> str:
               else need(f"python tools/make_phase2_figures.py --repo-root ."), ""]
         if d.get("drive_checkpoint"):
             L += [f"Checkpoint (Drive): {d['drive_checkpoint']}", ""]
+
+    links_path = c.root / "report" / "phase2_checkpoint_links.json"
+    links = load(links_path) or {}
+    if links.get("note") or links.get("training_runs") or links.get("wandb"):
+        L += ["## Additional training-run evidence and links", ""]
+        if links.get("note"):
+            L += [f"**Checkpoint-links note:** {links['note']}", ""]
+        if links.get("training_runs"):
+            L += ["**Live/verifiable training runs:**", ""]
+            for name, url in links["training_runs"].items():
+                L += [f"- `{name}`: {url}"]
+            L += [""]
+        if links.get("wandb"):
+            L += [f"**Weights & Biases:** {links['wandb']}", ""]
     return "\n".join(L)
 
 
