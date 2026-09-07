@@ -13,8 +13,20 @@ from pathlib import Path
 
 import matplotlib
 matplotlib.use("Agg")
+import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 import numpy as np
+
+# Devanagari (Hindi/Nepali) tick labels render as tofu boxes under
+# matplotlib's default font. Use the first Devanagari-capable font actually
+# installed, in a cross-platform-friendly order; silently keep the default
+# if none exist rather than fail plotting.
+_DEVANAGARI_FONTS = ["Nirmala UI", "Noto Sans Devanagari", "Mangal", "Lohit Devanagari"]
+_installed = {f.name for f in fm.fontManager.ttflist}
+for _font in _DEVANAGARI_FONTS:
+    if _font in _installed:
+        plt.rcParams["font.family"] = _font
+        break
 import sentencepiece as spm
 import torch
 import yaml
@@ -120,9 +132,22 @@ def run_attention_analysis(lang: str, checkpoint_path: str | Path, repo_root: st
         causal_checks.append(verify_causal_mask(model, idx, mcfg.vocab_size))
 
         if si == 0:
-            tokens = [sp.id_to_piece(i) for i in ids]
-            plot_heatmap(attn[0], tokens, "layer_0_early", fig_dir / "heatmap_layer_early.png")
-            plot_heatmap(attn[-1], tokens, f"layer_{len(attn) - 1}_late", fig_dir / "heatmap_layer_late.png")
+            # The heatmap needs a SHORT, readable snippet (so per-token tick
+            # labels fit and individual weights are visible against the 0-1
+            # color scale) — that's a different requirement from the
+            # entropy/distance stats below, which want long, representative
+            # sequences. Phase 1's corpus has no naturally-short documents,
+            # so plotting `ids` (up to max_seq_len=512) directly produced
+            # heatmaps where a 512x512 grid of mostly-near-zero weights
+            # looked all but blank. Take a short prefix of the same
+            # document instead, with its own small forward pass.
+            heatmap_ids = ids[:20]
+            if len(heatmap_ids) >= 4:
+                heatmap_idx = torch.tensor([heatmap_ids], dtype=torch.long, device=device)
+                heatmap_attn = get_attention(model, heatmap_idx)
+                tokens = [sp.id_to_piece(i) for i in heatmap_ids]
+                plot_heatmap(heatmap_attn[0], tokens, "layer_0_early", fig_dir / "heatmap_layer_early.png")
+                plot_heatmap(heatmap_attn[-1], tokens, f"layer_{len(heatmap_attn) - 1}_late", fig_dir / "heatmap_layer_late.png")
 
         ent = torch.stack([attention_entropy(a) for a in attn])  # (n_layer, h)
         dist = torch.stack([mean_attention_distance(a) for a in attn])  # (n_layer, h)
