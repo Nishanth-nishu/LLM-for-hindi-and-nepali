@@ -613,9 +613,43 @@ def r_resources(c: Ctx) -> str:
             f"{'Model L is actually *more* byte-efficient despite the higher PPL, because its higher-fertility tokenizer spreads the same text over more (individually easier-to-predict) tokens, each carrying less information.' if n_bpb < h_bpb else 'Model L remains behind on the byte-normalized metric too.'} "
             f"{budget_note}", "",
         ]
+    elif hindi_step is not None and nepali_step is not None:
+        h_ppl = c.d['hindi']['lm_test']['perplexity']
+        n_ppl = c.d['nepali']['lm_test']['perplexity']
+        h_bpb = c.d['hindi']['lm_test']['bits_per_byte']
+        n_bpb = c.d['nepali']['lm_test']['bits_per_byte']
+        further = "Model H" if hindi_step > nepali_step else "Model L"
+        token_clause = (
+            f" ({num(h_train_tok)} Hindi vs {num(n_train_tok)} Nepali train "
+            f"tokens in the corpus itself, only "
+            f"{abs(100 * (n_train_tok - h_train_tok) / h_train_tok):.1f}% apart)"
+            if h_train_tok and n_train_tok else ""
+        )
+        L += [
+            f"**Not an apples-to-apples comparison on training progress:** "
+            f"Model H was evaluated at step {hindi_step:,} and Model L at "
+            f"step {nepali_step:,} — {further} has seen substantially more "
+            f"training, not just a different corpus{token_clause}. This "
+            f"happened because Hindi got a second, longer GPU run (Kaggle, "
+            f"after the shared CPU-VM run both models completed at step "
+            f"4,999) while Nepali's equivalent retry did not produce a "
+            f"usable checkpoint in time — see `report/phase2_checkpoint_links.json` "
+            f"for the full account. Read literally, Model L has "
+            f"{'higher' if n_ppl > h_ppl else 'lower'} test perplexity than "
+            f"Model H ({n_ppl:.2f} vs {h_ppl:.2f}) and "
+            f"{'higher' if n_bpb > h_bpb else 'lower'} BPB ({n_bpb:.4f} vs "
+            f"{h_bpb:.4f}), but with this much of a step gap between them "
+            f"that difference is not a clean signal about the languages or "
+            f"corpora — it is dominated by how much more Model H has been "
+            f"trained. The corpus-level comparison (fertility, "
+            f"byte-fallback rate, manual token share, and the near-equal "
+            f"raw token counts above) remains valid regardless, since those "
+            f"are properties of the data and tokenizer, not the training "
+            f"run.", "",
+        ]
     else:
         L += ["Fill in the specific gap size and direction once both "
-              "models have been evaluated at the same checkpoint step.", ""]
+              "models have been evaluated.", ""]
     return "\n".join(L)
 
 

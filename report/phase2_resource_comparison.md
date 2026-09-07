@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Generated (UTC) | 2026-09-07 17:56:20 |
-| Git commit | `782d6aa4888577530ac65febaa0a055a1abee75b` |
+| Generated (UTC) | 2026-09-07 18:02:40 |
+| Git commit | `4d0c599492fe62ef89b70a0854a8920e4c16bffc` |
 | Branch | `phase-2` |
 
 > Following the Phase 1 convention: every number below is read from a JSON file a script actually produced. A field with no source file renders as `⚠ **NOT YET MEASURED**` and names the command that fills it.
@@ -27,4 +27,4 @@
 
 Same architecture, same parameter budget, same vocabulary size, independently trained on independently collected corpora that share no documents (Phase 1 verification check C1-C3). Any gap in the metrics above is therefore attributable to the corpus (size, manual/downloaded mix, quality) and the language/script itself (Phase 1's own finding: manual text tokenizes *better* than downloaded in Nepali but *worse* in Hindi — an observation, not a generalizable finding, with only two languages) — not to any architectural difference between the two models.
 
-Fill in the specific gap size and direction once both models have been evaluated at the same checkpoint step.
+**Not an apples-to-apples comparison on training progress:** Model H was evaluated at step 6,500 and Model L at step 4,999 — Model H has seen substantially more training, not just a different corpus (474,751,658 Hindi vs 471,622,290 Nepali train tokens in the corpus itself, only 0.7% apart). This happened because Hindi got a second, longer GPU run (Kaggle, after the shared CPU-VM run both models completed at step 4,999) while Nepali's equivalent retry did not produce a usable checkpoint in time — see `report/phase2_checkpoint_links.json` for the full account. Read literally, Model L has higher test perplexity than Model H (32.07 vs 16.12) and higher BPB (0.5158 vs 0.3088), but with this much of a step gap between them that difference is not a clean signal about the languages or corpora — it is dominated by how much more Model H has been trained. The corpus-level comparison (fertility, byte-fallback rate, manual token share, and the near-equal raw token counts above) remains valid regardless, since those are properties of the data and tokenizer, not the training run.
