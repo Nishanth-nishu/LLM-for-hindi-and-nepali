@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Generated (UTC) | 2026-09-07 14:10:15 |
-| Git commit | `56f1af8ce71940257bb35160797e3dca584e57c2` |
+| Generated (UTC) | 2026-09-07 15:59:44 |
+| Git commit | `e37a9464bc305ced4bdf8c7d9ce62c9854063b6c` |
 | Branch | `phase-2` |
 
 > Following the Phase 1 convention: every number below is read from a JSON file a script actually produced. A field with no source file renders as `⚠ **NOT YET MEASURED**` and names the command that fills it.
@@ -82,12 +82,12 @@ Checkpoint (Drive): https://drive.google.com/open?id=1w8gCOZa5zHn09lQ3kMT_jRN2o_
 
 ## Additional training-run evidence and links
 
-**Checkpoint-links note:** The Drive links above point to intermediate checkpoints (Hindi step 1750) from the first Colab GPU attempt. The authoritative CPU-VM checkpoints (both languages, step 4999, val_ppl 21.83 H / 28.30 L) exist locally and on the training VM but were not re-synced to Drive before the deadline. A further GPU run on Kaggle (see training_runs below) trained Hindi past step 3600 (val_ppl < 18) and Nepali on the corrected full corpus - see the notebook logs for live, verifiable per-step results, which is stronger evidence than a static checkpoint file.
+**Checkpoint-links note:** The Drive links above point to intermediate checkpoints (Hindi step 1750) from the first Colab GPU attempt. The authoritative, fully-evaluated CPU-VM checkpoints (both languages, step 4999, val_ppl 21.83 H / 28.30 L; test PPL/BPB and all generation/attention deliverables in the reports) exist locally and on the training VM but were not re-synced to Drive before the deadline. A second GPU run on Kaggle (kaggle_hindi_and_nepali_bonus below) completed its full 8-hour budget and reached Hindi step 6600, val_ppl 14.67 (train_loss 3.1105) - a real, further improvement over the CPU-VM number, visible in the notebook's own logs. That run's Nepali side used a since-corrected deficient dataset (35M vs the real 471M tokens) so is bonus-only, not authoritative. A separate attempt to retrain Nepali on the corrected full corpus (kaggle_nepali_real_data below) downloaded the real data successfully but its session stopped before saving a checkpoint - no usable output from that attempt.
 
 **Live/verifiable training runs:**
 
-- `kaggle_hindi_and_nepali_bonus`: https://www.kaggle.com/code/nishantharikanta/notebookd6949b8470
-- `kaggle_nepali_real_data`: https://www.kaggle.com/code/nishantharikanta/notebookec2fd91dad
-- `gcp_cpu_vm_both_languages_authoritative`: nishanth-phase2-cpu (GCP instance, project lma-01, zone asia-south1-b) - training_log.jsonl and checkpoints committed to git under hindi/checkpoints/ and nepali/checkpoints/
+- `kaggle_hindi_and_nepali_bonus`: https://www.kaggle.com/code/nishantharikanta/notebookd6949b8470 (completed: Hindi reached step 6600 val_ppl 14.67; Nepali side used deficient data, bonus only)
+- `kaggle_nepali_real_data`: https://www.kaggle.com/code/nishantharikanta/notebookec2fd91dad (data downloaded successfully; session stopped before a checkpoint was saved - no usable result)
+- `gcp_cpu_vm_both_languages_authoritative`: nishanth-phase2-cpu (GCP instance, project lma-01, zone asia-south1-b) - training_log.jsonl and checkpoints committed to git under hindi/checkpoints/ and nepali/checkpoints/; this is the checkpoint all PPL/BPB/generation/attention numbers in the reports come from
 
 **Weights & Biases:** Not used - no Weights & Biases run was set up for this project. Training logs are in hindi/checkpoints/training_log.jsonl and nepali/checkpoints/training_log.jsonl (committed to git) and loss_curve.png figures.
