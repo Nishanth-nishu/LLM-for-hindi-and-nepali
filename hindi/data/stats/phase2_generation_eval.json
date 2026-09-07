@@ -1,6 +1,6 @@
 {
   "lang": "hindi",
-  "checkpoint": "hindi/checkpoints/latest.pt",
+  "checkpoint": "C:\\Users\\HP\\AppData\\Local\\Temp\\claude\\C--Users-HP-Downloads-phase1-repo-13\\1febaf1e-e9fc-41ea-8b06-1e7c43d142d3\\scratchpad\\ckpts\\hindi_latest_step4999.pt",
   "checkpoint_step": 4999,
   "n_examples": 30,
   "prompt_tokens": 48,
@@ -12,7 +12,11 @@
       "rouge_l": 0.1148255037000689,
       "distinct_1": 0.5408560311284046,
       "distinct_2": 0.8111298482293423,
-      "repetition_rate": 0.5437037037037038
+      "repetition_rate": 0.5437037037037038,
+      "repetition_rate_1gram": 0.6430555555555555,
+      "repetition_rate_2gram": 0.579432624113475,
+      "repetition_rate_3gram": 0.560144927536232,
+      "repetition_rate_4gram": 0.5437037037037038
     },
     "temp_0.5": {
       "bleu4": 0.026204278729946257,
@@ -20,7 +24,11 @@
       "rouge_l": 0.13326454113188907,
       "distinct_1": 0.49794801641586867,
       "distinct_2": 0.8248337028824834,
-      "repetition_rate": 0.23999999999999996
+      "repetition_rate": 0.23999999999999996,
+      "repetition_rate_1gram": 0.492361111111111,
+      "repetition_rate_2gram": 0.3602836879432623,
+      "repetition_rate_3gram": 0.2905797101449276,
+      "repetition_rate_4gram": 0.23999999999999996
     },
     "temp_1.0": {
       "bleu4": 0.01817176175141164,
@@ -28,7 +36,11 @@
       "rouge_l": 0.10349217408485653,
       "distinct_1": 0.565008025682183,
       "distinct_2": 0.9436310395314788,
-      "repetition_rate": 0.00814814814814815
+      "repetition_rate": 0.00814814814814815,
+      "repetition_rate_1gram": 0.13472222222222222,
+      "repetition_rate_2gram": 0.031205673758865248,
+      "repetition_rate_3gram": 0.016666666666666666,
+      "repetition_rate_4gram": 0.00814814814814815
     },
     "temp_1.5": {
       "bleu4": 0.0075034703116066285,
@@ -36,7 +48,11 @@
       "rouge_l": 0.057024716524233375,
       "distinct_1": 0.6431718061674009,
       "distinct_2": 0.9914285714285714,
-      "repetition_rate": 0.0
+      "repetition_rate": 0.0,
+      "repetition_rate_1gram": 0.05416666666666666,
+      "repetition_rate_2gram": 0.007092198581560283,
+      "repetition_rate_3gram": 0.0014492753623188406,
+      "repetition_rate_4gram": 0.0
     }
   },
   "examples": [

@@ -18,6 +18,7 @@ import yaml
 from pipeline.eval.text_metrics import (
     corpus_bleu4,
     corpus_chrf,
+    corpus_repetition_profile,
     corpus_rouge_l,
     distinct_n,
     repetition_rate,
@@ -121,6 +122,7 @@ def run_generation_eval(
                     "generated_continuation": gen_text,
                 })
 
+        rep_profile = corpus_repetition_profile(gen_token_lists, ns=(1, 2, 3, 4))
         results["settings"][name] = {
             "bleu4": corpus_bleu4(hyp_word_lists, ref_word_lists),
             "chrf": corpus_chrf(hyp_texts, ref_texts),
@@ -128,6 +130,10 @@ def run_generation_eval(
             "distinct_1": distinct_n(gen_token_lists, 1),
             "distinct_2": distinct_n(gen_token_lists, 2),
             "repetition_rate": sum(rep_rates) / max(1, len(rep_rates)),
+            "repetition_rate_1gram": rep_profile[1],
+            "repetition_rate_2gram": rep_profile[2],
+            "repetition_rate_3gram": rep_profile[3],
+            "repetition_rate_4gram": rep_profile[4],
         }
         if name == "temp_1.0":
             results["examples"] = examples

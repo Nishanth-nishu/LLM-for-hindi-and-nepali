@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Generated (UTC) | 2026-09-07 15:59:44 |
-| Git commit | `e37a9464bc305ced4bdf8c7d9ce62c9854063b6c` |
+| Generated (UTC) | 2026-09-07 17:07:40 |
+| Git commit | `82f28f5fe8d0bd385124f386d0c1d792b3f61c5a` |
 | Branch | `phase-2` |
 
 > Following the Phase 1 convention: every number below is read from a JSON file a script actually produced. A field with no source file renders as `⚠ **NOT YET MEASURED**` and names the command that fills it.
@@ -20,6 +20,17 @@ Checkpoint step: **4999**, 30 held-out prompt/reference pairs (48 prompt tokens,
 | temp_0.5 | 0.0262 | 0.1775 | 0.1333 | 0.498 | 0.825 | 0.240 |
 | temp_1.0 | 0.0182 | 0.1830 | 0.1035 | 0.565 | 0.944 | 0.008 |
 | temp_1.5 | 0.0075 | 0.1569 | 0.0570 | 0.643 | 0.991 | 0.000 |
+
+#### Repetition profile by n-gram order
+
+A single 4-gram rate can hide *where* a model degenerates — constant single-word repeats (high rep-1) look different from getting stuck re-emitting one short phrase (low rep-1/2, high rep-3/4). Reporting all four separates those failure modes (following the rep/l diagnostic in Welleck et al. 2019, *Neural Text Generation with Unlikelihood Training*).
+
+| Setting | rep-1 | rep-2 | rep-3 | rep-4 |
+|---|--:|--:|--:|--:|
+| greedy | 0.643 | 0.579 | 0.560 | 0.544 |
+| temp_0.5 | 0.492 | 0.360 | 0.291 | 0.240 |
+| temp_1.0 | 0.135 | 0.031 | 0.017 | 0.008 |
+| temp_1.5 | 0.054 | 0.007 | 0.001 | 0.000 |
 
 ### Example generations (temperature 1.0)
 
@@ -65,6 +76,17 @@ Checkpoint step: **4999**, 30 held-out prompt/reference pairs (48 prompt tokens,
 | temp_0.5 | 0.0092 | 0.0980 | 0.0369 | 0.412 | 0.780 | 0.581 |
 | temp_1.0 | 0.0039 | 0.1411 | 0.0240 | 0.467 | 0.914 | 0.013 |
 | temp_1.5 | 0.0024 | 0.1612 | 0.0144 | 0.631 | 0.996 | 0.000 |
+
+#### Repetition profile by n-gram order
+
+A single 4-gram rate can hide *where* a model degenerates — constant single-word repeats (high rep-1) look different from getting stuck re-emitting one short phrase (low rep-1/2, high rep-3/4). Reporting all four separates those failure modes (following the rep/l diagnostic in Welleck et al. 2019, *Neural Text Generation with Unlikelihood Training*).
+
+| Setting | rep-1 | rep-2 | rep-3 | rep-4 |
+|---|--:|--:|--:|--:|
+| greedy | 0.822 | 0.806 | 0.799 | 0.790 |
+| temp_0.5 | 0.717 | 0.652 | 0.610 | 0.581 |
+| temp_1.0 | 0.231 | 0.065 | 0.025 | 0.013 |
+| temp_1.5 | 0.044 | 0.001 | 0.000 | 0.000 |
 
 ### Example generations (temperature 1.0)
 

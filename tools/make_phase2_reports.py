@@ -386,6 +386,21 @@ def r_generation(c: Ctx) -> str:
         for name, m in gen["settings"].items():
             L.append(f"| {name} | {m['bleu4']:.4f} | {m['chrf']:.4f} | {m['rouge_l']:.4f} | "
                      f"{m['distinct_1']:.3f} | {m['distinct_2']:.3f} | {m['repetition_rate']:.3f} |")
+        has_profile = all("repetition_rate_1gram" in m for m in gen["settings"].values())
+        if has_profile:
+            L += ["", "#### Repetition profile by n-gram order", "",
+                  "A single 4-gram rate can hide *where* a model degenerates — "
+                  "constant single-word repeats (high rep-1) look different from "
+                  "getting stuck re-emitting one short phrase (low rep-1/2, high "
+                  "rep-3/4). Reporting all four separates those failure modes "
+                  "(following the rep/l diagnostic in Welleck et al. 2019, "
+                  "*Neural Text Generation with Unlikelihood Training*).", "",
+                  "| Setting | rep-1 | rep-2 | rep-3 | rep-4 |",
+                  "|---|--:|--:|--:|--:|"]
+            for name, m in gen["settings"].items():
+                L.append(f"| {name} | {m['repetition_rate_1gram']:.3f} | "
+                         f"{m['repetition_rate_2gram']:.3f} | {m['repetition_rate_3gram']:.3f} | "
+                         f"{m['repetition_rate_4gram']:.3f} |")
         L += ["", "### Example generations (temperature 1.0)", ""]
         for ex in gen.get("examples", [])[:5]:
             L += [f"- **Prompt:** {ex['prompt']}",

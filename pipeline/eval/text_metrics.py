@@ -106,3 +106,29 @@ def repetition_rate(tokens: list[str], n: int = 4) -> float:
     total = sum(ng.values())
     repeated = sum(c - 1 for c in ng.values() if c > 1)
     return repeated / max(1, total)
+
+
+def repetition_profile(tokens: list[str], ns: tuple[int, ...] = (1, 2, 3, 4)) -> dict[int, float]:
+    """repetition_rate at several n-gram orders in one generation.
+
+    A single n=4 rate can hide *where* a model degenerates: a model can
+    repeat individual words constantly (high rep-1) while rarely repeating
+    a full 4-gram verbatim (low rep-4), or the reverse (stuck in a short
+    phrase loop: low rep-1/2, high rep-3/4). Reporting the whole profile
+    (following the rep/l diagnostic in Welleck et al. 2019, "Neural Text
+    Generation with Unlikelihood Training") distinguishes those failure
+    modes instead of collapsing them into one number.
+    """
+    return {n: repetition_rate(tokens, n) for n in ns}
+
+
+def corpus_repetition_profile(token_lists: list[list[str]], ns: tuple[int, ...] = (1, 2, 3, 4)) -> dict[int, float]:
+    """Mean repetition_profile across a batch of generations."""
+    if not token_lists:
+        return {n: 0.0 for n in ns}
+    sums = {n: 0.0 for n in ns}
+    for toks in token_lists:
+        prof = repetition_profile(toks, ns)
+        for n in ns:
+            sums[n] += prof[n]
+    return {n: sums[n] / len(token_lists) for n in ns}
