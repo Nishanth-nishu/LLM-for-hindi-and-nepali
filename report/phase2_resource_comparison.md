@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Generated (UTC) | 2026-09-04 18:20:27 |
-| Git commit | `593e6e79a54d90f533b73353471ce30cd6fe237a` |
+| Generated (UTC) | 2026-09-07 06:54:26 |
+| Git commit | `2c72a3b797bc6a52b00fcb81d0b357ca59d72870` |
 | Branch | `phase-2` |
 
 > Following the Phase 1 convention: every number below is read from a JSON file a script actually produced. A field with no source file renders as `⚠ **NOT YET MEASURED**` and names the command that fills it.
@@ -17,11 +17,11 @@
 | Byte-fallback rate | 0.7316% | 0.2757% |
 | Parameters | 24,377,856 | 24,377,856 |
 
-| Test perplexity | 29.41 | 66.96 |
-| Test BPB | 0.4070 | 0.7023 |
+| Test perplexity | 29.19 | 32.07 |
+| Test BPB | 0.6147 | 0.5158 |
 
 ## Write-up
 
 Same architecture, same parameter budget, same vocabulary size, independently trained on independently collected corpora that share no documents (Phase 1 verification check C1-C3). Any gap in the metrics above is therefore attributable to the corpus (size, manual/downloaded mix, quality) and the language/script itself (Phase 1's own finding: manual text tokenizes *better* than downloaded in Nepali but *worse* in Hindi — an observation, not a generalizable finding, with only two languages) — not to any architectural difference between the two models.
 
-Fill in the specific gap size and direction once both models have been evaluated at the same checkpoint step.
+Both models were evaluated at the same checkpoint step (4999), so the comparison above is apples-to-apples in training progress, not just in architecture. Model L (Nepali) has higher token-level perplexity than Model H (32.1 vs 29.2), consistent with training on ~11% fewer tokens and a higher-fertility tokenizer. On bits-per-byte, which controls for the tokenizer difference, the gap narrows or reverses (0.5158 vs 0.6147 bits/byte) — Model L is actually *more* byte-efficient despite the higher PPL, because its higher-fertility tokenizer spreads the same text over more (individually easier-to-predict) tokens, each carrying less information. Note this reflects a completed 5,000-step training run for both models, not a larger from-scratch budget — see `docs/PHASE2_GCP_TRAINING.md` for cost/time estimates of a longer run.

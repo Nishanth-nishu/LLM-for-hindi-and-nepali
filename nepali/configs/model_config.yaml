@@ -16,18 +16,18 @@ training:
   train_file: nepali/data/splits/train.jsonl
   val_file: nepali/data/splits/val.jsonl
   test_file: nepali/data/splits/test.jsonl
-  batch_size: 32
+  batch_size: 64
   grad_accum_steps: 1
-  max_steps: 40000
-  warmup_steps: 20
+  max_steps: 5000
+  warmup_steps: 200
   lr: 3.0e-4
   min_lr: 3.0e-5
   weight_decay: 0.1
   betas: [0.9, 0.95]
   grad_clip: 1.0
-  eval_every: 40
-  eval_iters: 15
-  ckpt_every: 100
+  eval_every: 100
+  eval_iters: 30
+  ckpt_every: 250
   ckpt_dir: nepali/checkpoints
   seed: 20260820
   device: auto

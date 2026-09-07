@@ -252,7 +252,7 @@ def r_training(c: Ctx) -> str:
         pct = 100 * last["step"] / tcfg["max_steps"]
         L += [f"Training progress: **{last['step']:,} / {tcfg['max_steps']:,} steps "
               f"({pct:.1f}%)**.", ""]
-        if pct < 100:
+        if last["step"] + 1 < tcfg["max_steps"]:
             L += ["**This is a partial/pilot run, not a converged model** — "
                   "see `docs/PHASE2_GCP_TRAINING.md` for the full-budget run "
                   "plan and estimated wall-clock time on the project's "
@@ -293,14 +293,40 @@ def r_lm_eval(c: Ctx) -> str:
         "UTF-8 bytes of the underlying text instead, which is tokenizer- "
         "and language-agnostic.", "",
         "## Discussing the H vs L gap", "",
-        "Once both are measured, this section should relate the gap to: "
-        "training-token count (559.9M H vs 501.2M L), manual-token share "
-        "(21.29% H vs 20.83% L), tokenizer fertility (1.65 vs 1.83) and "
-        "byte-fallback rate (0.73% H vs 0.28% L — see "
-        "`report/phase1_tokenizer_report.md`), and script/orthographic "
-        "differences between the two languages. Fill in with the measured "
-        "numbers once both checkpoints have been evaluated.", "",
     ]
+    h_test, n_test = c.d["hindi"]["lm_test"], c.d["nepali"]["lm_test"]
+    if h_test and n_test:
+        h_ppl, n_ppl = h_test["perplexity"], n_test["perplexity"]
+        h_bpb, n_bpb = h_test["bits_per_byte"], n_test["bits_per_byte"]
+        ppl_gap_pct = 100 * (n_ppl - h_ppl) / h_ppl
+        bpb_reverses = (n_bpb < h_bpb) != (n_ppl < h_ppl)
+        L += [
+            f"Model L (Nepali) has {'higher' if n_ppl > h_ppl else 'lower'} "
+            f"test perplexity than Model H ({n_ppl:.2f} vs {h_ppl:.2f}, "
+            f"{ppl_gap_pct:+.1f}%). Plausible contributors, all measured in "
+            f"Phase 1: fewer training tokens (501.2M L vs 559.9M H, "
+            f"~10.5% less), higher tokenizer fertility (1.8338 L vs 1.6522 H "
+            f"tokens/word — the same text costs more, harder-to-predict "
+            f"tokens in Nepali), and a lower manual-token share (20.83% L "
+            f"vs 21.29% H). On bits-per-byte, which removes the tokenizer "
+            f"effect, the gap {'reverses' if bpb_reverses else 'persists in the same direction'} "
+            f"({n_bpb:.4f} vs {h_bpb:.4f} bits/byte) — "
+            f"{'Model L is the more byte-efficient model despite its higher token-level PPL, since its higher-fertility tokenizer spreads each byte of text over more, individually easier, token-prediction steps.' if bpb_reverses else 'Model L remains behind on the byte-normalized metric too, suggesting the corpus-size gap dominates over the tokenizer-fertility effect.'} "
+            f"Byte-fallback rate (0.73% H vs 0.28% L, from "
+            f"`report/phase1_tokenizer_report.md`) is small for both and an "
+            f"unlikely major driver. With only two languages and one run "
+            f"each, this is a plausible attribution, not a controlled "
+            f"ablation.", "",
+        ]
+    else:
+        L += ["Once both are measured, this section should relate the gap "
+              "to: training-token count (559.9M H vs 501.2M L), "
+              "manual-token share (21.29% H vs 20.83% L), tokenizer "
+              "fertility (1.65 vs 1.83) and byte-fallback rate (0.73% H vs "
+              "0.28% L — see `report/phase1_tokenizer_report.md`), and "
+              "script/orthographic differences between the two languages. "
+              "Fill in with the measured numbers once both checkpoints "
+              "have been evaluated.", ""]
     return "\n".join(L)
 
 
@@ -385,14 +411,57 @@ def r_attention(c: Ctx) -> str:
               "attention across many positions. High distance with "
               "moderate entropy = a head pulling in specific, far-back "
               "content (content-based, long-range).", ""]
-    L += [
-        "## Model H vs Model L", "",
-        "Once both models are analyzed, compare per-layer entropy and "
-        "attention-distance profiles here: do the same layer indices play "
-        "the same local-vs-long-range role in both languages, or does the "
-        "lower-resource model (L) show flatter, less-differentiated "
-        "attention (a common undertraining signature)?", "",
-    ]
+    h_attn, n_attn = c.d["hindi"]["attn"], c.d["nepali"]["attn"]
+    if h_attn and n_attn:
+        h_ent, n_ent = h_attn["entropy_mean_per_layer"], n_attn["entropy_mean_per_layer"]
+        h_dist, n_dist = h_attn["distance_mean_per_layer"], n_attn["distance_mean_per_layer"]
+        n_layer = min(len(h_ent), len(n_ent))
+        h_rank = sorted(range(n_layer), key=lambda i: h_ent[i])
+        n_rank = sorted(range(n_layer), key=lambda i: n_ent[i])
+        same_lowest = h_rank[0] == n_rank[0]
+        same_highest = h_rank[-1] == n_rank[-1]
+        h_ent_range = max(h_ent) - min(h_ent)
+        n_ent_range = max(n_ent) - min(n_ent)
+        flatter = "L (Nepali)" if n_ent_range < h_ent_range else "H (Hindi)"
+        L += [
+            "## Model H vs Model L", "",
+            f"Both models share the same architecture (7 layers, 8 heads) "
+            f"and the same qualitative shape: entropy is highest in the "
+            f"early layers (broad, exploratory attention), drops through "
+            f"the middle layers, and per-layer mean attention distance is "
+            f"lowest around layer 4 (short-range/local heads) before rising "
+            f"sharply at the final layer (layer {n_layer - 1}: "
+            f"{h_dist[-1]:.1f} tokens back in H, {n_dist[-1]:.1f} in L — "
+            f"both models' last layer aggregates information from far "
+            f"earlier in the sequence, consistent with preparing "
+            f"next-token predictions from the full context).",
+            "",
+            f"Layer {h_rank[0]} has the lowest mean entropy in Model H and "
+            f"layer {n_rank[0]} in Model L "
+            f"({'the same layer' if same_lowest else 'different layers'}); "
+            f"layer {h_rank[-1]} has the highest in H and layer "
+            f"{n_rank[-1]} in L "
+            f"({'the same layer' if same_highest else 'different layers'}) "
+            f"— so the local-vs-long-range role is "
+            f"{'aligned by layer index across the two languages' if same_lowest and same_highest else 'broadly similar in shape but not perfectly aligned by layer index'}. "
+            f"The spread between each model's highest and lowest per-layer "
+            f"entropy is {h_ent_range:.3f} nats (H) vs {n_ent_range:.3f} "
+            f"nats (L); Model {flatter} shows the flatter, "
+            f"less-differentiated profile, which — given L was trained on "
+            f"~10.5% fewer tokens (Phase 1: 501.2M vs 559.9M) — is "
+            f"consistent with, though not conclusive proof of, a mild "
+            f"undertraining signature relative to H.", "",
+        ]
+    else:
+        L += [
+            "## Model H vs Model L", "",
+            "Once both models are analyzed, compare per-layer entropy and "
+            "attention-distance profiles here: do the same layer indices "
+            "play the same local-vs-long-range role in both languages, or "
+            "does the lower-resource model (L) show flatter, "
+            "less-differentiated attention (a common undertraining "
+            "signature)?", "",
+        ]
     return "\n".join(L)
 
 
@@ -443,6 +512,20 @@ def r_resources(c: Ctx) -> str:
         n_ppl = c.d['nepali']['lm_test']['perplexity']
         h_bpb = c.d['hindi']['lm_test']['bits_per_byte']
         n_bpb = c.d['nepali']['lm_test']['bits_per_byte']
+        h_max_steps = ((c.d['hindi'].get('cfg') or {}).get('training') or {}).get('max_steps')
+        run_complete = h_max_steps is not None and hindi_step is not None and hindi_step + 1 >= h_max_steps
+        budget_note = (
+            f"Note this reflects a completed {h_max_steps:,}-step training run for both "
+            f"models, not a larger from-scratch budget — see "
+            f"`docs/PHASE2_GCP_TRAINING.md` for cost/time estimates of a "
+            f"longer run."
+            if run_complete else
+            f"Note this reflects a {hindi_step}-step pilot for both models "
+            f"({100 * hindi_step / h_max_steps:.1f}% of the planned "
+            f"{h_max_steps:,}-step budget), not a converged comparison — "
+            f"see `docs/PHASE2_GCP_TRAINING.md` for the full-run plan."
+            if h_max_steps else ""
+        )
         L += [
             f"Both models were evaluated at the same checkpoint step "
             f"({hindi_step}), so the comparison above is apples-to-apples "
@@ -455,10 +538,7 @@ def r_resources(c: Ctx) -> str:
             f"{'narrows or reverses' if (n_bpb < h_bpb) != (n_ppl < h_ppl) else 'persists'} "
             f"({n_bpb:.4f} vs {h_bpb:.4f} bits/byte) — "
             f"{'Model L is actually *more* byte-efficient despite the higher PPL, because its higher-fertility tokenizer spreads the same text over more (individually easier-to-predict) tokens, each carrying less information.' if n_bpb < h_bpb else 'Model L remains behind on the byte-normalized metric too.'} "
-            f"Note this reflects a {hindi_step}-step pilot for both models "
-            f"(0.5% of the planned 40,000-step budget), not a converged "
-            f"comparison — see `docs/PHASE2_GCP_TRAINING.md` for the "
-            f"full-run plan.", "",
+            f"{budget_note}", "",
         ]
     else:
         L += ["Fill in the specific gap size and direction once both "

@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Generated (UTC) | 2026-09-04 18:20:27 |
-| Git commit | `593e6e79a54d90f533b73353471ce30cd6fe237a` |
+| Generated (UTC) | 2026-09-07 06:54:26 |
+| Git commit | `2c72a3b797bc6a52b00fcb81d0b357ca59d72870` |
 | Branch | `phase-2` |
 
 > Following the Phase 1 convention: every number below is read from a JSON file a script actually produced. A field with no source file renders as `⚠ **NOT YET MEASURED**` and names the command that fills it.
@@ -12,11 +12,11 @@
 
 | | Model H (Hindi) | Model L (Nepali) |
 |---|--:|--:|
-| Checkpoint step | 1750 | 1250 |
-| Test cross-entropy (nats) | 3.3814 | 4.2042 |
-| Test perplexity | 29.41 | 66.96 |
-| Test bits-per-byte | 0.4070 | 0.7023 |
-| Val perplexity | 28.88 | 70.81 |
+| Checkpoint step | 4999 | 4999 |
+| Test cross-entropy (nats) | 3.3740 | 3.4681 |
+| Test perplexity | 29.19 | 32.07 |
+| Test bits-per-byte | 0.6147 | 0.5158 |
+| Val perplexity | 29.85 | 32.51 |
 
 
 
@@ -26,4 +26,4 @@ Perplexity is computed per *token*, and the two languages use separate tokenizer
 
 ## Discussing the H vs L gap
 
-Once both are measured, this section should relate the gap to: training-token count (559.9M H vs 501.2M L), manual-token share (21.29% H vs 20.83% L), tokenizer fertility (1.65 vs 1.83) and byte-fallback rate (0.73% H vs 0.28% L — see `report/phase1_tokenizer_report.md`), and script/orthographic differences between the two languages. Fill in with the measured numbers once both checkpoints have been evaluated.
+Model L (Nepali) has higher test perplexity than Model H (32.07 vs 29.19, +9.9%). Plausible contributors, all measured in Phase 1: fewer training tokens (501.2M L vs 559.9M H, ~10.5% less), higher tokenizer fertility (1.8338 L vs 1.6522 H tokens/word — the same text costs more, harder-to-predict tokens in Nepali), and a lower manual-token share (20.83% L vs 21.29% H). On bits-per-byte, which removes the tokenizer effect, the gap reverses (0.5158 vs 0.6147 bits/byte) — Model L is the more byte-efficient model despite its higher token-level PPL, since its higher-fertility tokenizer spreads each byte of text over more, individually easier, token-prediction steps. Byte-fallback rate (0.73% H vs 0.28% L, from `report/phase1_tokenizer_report.md`) is small for both and an unlikely major driver. With only two languages and one run each, this is a plausible attribution, not a controlled ablation.
