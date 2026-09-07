@@ -1,0 +1,45 @@
+{
+  "language": "hindi",
+  "model_type": "unigram",
+  "vocab_size": 8000,
+  "selection_reason": "largest feasible size (8000); no elbow found within the swept range, so the sweep should be extended upward before treating this as optimal",
+  "scaling_law_reference_vocab": 3311,
+  "metrics_on_heldout": {
+    "fertility": 1.4762,
+    "chars_per_token": 3.5046,
+    "bytes_per_token": 8.9182,
+    "unk_rate": 0.0,
+    "byte_fallback_rate": 0.008547887031766753,
+    "fertility_by_provenance": {
+      "manual": 1.4873,
+      "downloaded": 1.44
+    },
+    "eval_documents": 5000
+  },
+  "sentencepiece_params": {
+    "character_coverage": 0.9999,
+    "pad_id": 0,
+    "unk_id": 1,
+    "bos_id": 2,
+    "eos_id": 3,
+    "normalization_rule_name": "identity",
+    "remove_extra_whitespaces": true,
+    "input_sentence_size": 10000000,
+    "shuffle_input_sentence": true,
+    "byte_fallback": true,
+    "split_digits": true,
+    "allow_whitespace_only_pieces": false,
+    "max_sentence_length": 16384,
+    "minloglevel": 2
+  },
+  "trained_on": "/home2/nishanth.r/phase3_8k_vocab/repo/hindi/data/splits/train.jsonl",
+  "corpus_stats": {
+    "documents": 664070,
+    "lines": 1035392,
+    "characters": 400463166,
+    "lines_available": 3888424,
+    "sampled": true,
+    "non_nfc_sampled": 0,
+    "nfc_checked": 20000
+  }
+}

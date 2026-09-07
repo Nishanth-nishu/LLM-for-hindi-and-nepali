@@ -1,0 +1,45 @@
+{
+  "language": "nepali",
+  "model_type": "unigram",
+  "vocab_size": 4000,
+  "selection_reason": "OVERRIDE. The elbow criterion selected 4,000; 4,000 shipped instead. see sweep_results_selection.csv for the four-point sweep this choice was made from. The complete sweep is retained in sweep_results.csv so the trade-off stays inspectable. Original elbow reasoning: largest feasible size (4000); no elbow found within the swept range, so the sweep should be extended upward before treating this as optimal",
+  "scaling_law_reference_vocab": 3311,
+  "metrics_on_heldout": {
+    "fertility": 1.8387,
+    "chars_per_token": 3.6452,
+    "bytes_per_token": 9.7749,
+    "unk_rate": 0.0,
+    "byte_fallback_rate": 0.0021647160973346465,
+    "fertility_by_provenance": {
+      "manual": 1.8045,
+      "downloaded": 1.8383
+    },
+    "eval_documents": 5000
+  },
+  "sentencepiece_params": {
+    "character_coverage": 0.9999,
+    "pad_id": 0,
+    "unk_id": 1,
+    "bos_id": 2,
+    "eos_id": 3,
+    "normalization_rule_name": "identity",
+    "remove_extra_whitespaces": true,
+    "input_sentence_size": 5000000,
+    "shuffle_input_sentence": true,
+    "byte_fallback": true,
+    "split_digits": true,
+    "allow_whitespace_only_pieces": false,
+    "max_sentence_length": 16384,
+    "minloglevel": 2
+  },
+  "trained_on": "/home/jupyter/LLM-for-hindi-and-nepali/nepali/data/splits/train.jsonl",
+  "corpus_stats": {
+    "documents": 939563,
+    "lines": 416489,
+    "characters": 401639645,
+    "lines_available": 1868108,
+    "sampled": true,
+    "non_nfc_sampled": 0,
+    "nfc_checked": 20000
+  }
+}
