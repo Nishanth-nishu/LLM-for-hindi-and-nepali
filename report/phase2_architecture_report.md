@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Generated (UTC) | 2026-09-07 17:07:40 |
-| Git commit | `82f28f5fe8d0bd385124f386d0c1d792b3f61c5a` |
+| Generated (UTC) | 2026-09-07 17:40:27 |
+| Git commit | `a5902e127c823786f344be37373a6ffc0a09a543` |
 | Branch | `phase-2` |
 
 > Following the Phase 1 convention: every number below is read from a JSON file a script actually produced. A field with no source file renders as `⚠ **NOT YET MEASURED**` and names the command that fills it.

@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Generated (UTC) | 2026-09-07 17:07:40 |
-| Git commit | `82f28f5fe8d0bd385124f386d0c1d792b3f61c5a` |
+| Generated (UTC) | 2026-09-07 17:40:27 |
+| Git commit | `a5902e127c823786f344be37373a6ffc0a09a543` |
 | Branch | `phase-2` |
 
 > Following the Phase 1 convention: every number below is read from a JSON file a script actually produced. A field with no source file renders as `⚠ **NOT YET MEASURED**` and names the command that fills it.
@@ -16,18 +16,18 @@ AdamW (`betas`, `weight_decay` per config; weight decay applied only to >=2D par
 
 | Setting | Value |
 |---|--:|
-| `batch_size` | 64 |
-| `grad_accum_steps` | 1 |
-| `max_steps` | 5000 |
-| `warmup_steps` | 200 |
+| `batch_size` | 16 |
+| `grad_accum_steps` | 8 |
+| `max_steps` | 15000 |
+| `warmup_steps` | 300 |
 | `lr` | 0.0003 |
 | `min_lr` | 3e-05 |
 | `weight_decay` | 0.1 |
 | `grad_clip` | 1.0 |
-| `eval_every` | 100 |
-| `ckpt_every` | 250 |
+| `eval_every` | 200 |
+| `ckpt_every` | 500 |
 
-Effective tokens/step: **32,768**
+Effective tokens/step: **65,536**
 
 ### Progress
 
@@ -40,7 +40,9 @@ Effective tokens/step: **32,768**
 | LR | 1.50e-06 | 3.00e-05 |
 
 Best val loss so far: **3.0833**  
-Training progress: **4,999 / 5,000 steps (100.0%)**.
+Training progress: **4,999 / 15,000 steps (33.3%)**.
+
+**This is a partial/pilot run, not a converged model** — see `docs/PHASE2_GCP_TRAINING.md` for the full-budget run plan and estimated wall-clock time on the project's hardware.
 
 Loss curve: `report\figures\phase2\hindi\loss_curve.png`
 

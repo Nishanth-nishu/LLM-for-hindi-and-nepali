@@ -1,10 +1,11 @@
 {
-  "checkpoint": "/home/HP/LLM-for-hindi-and-nepali/hindi/checkpoints/latest.pt",
-  "checkpoint_step": 4999,
-  "eval_file": "/home/HP/LLM-for-hindi-and-nepali/hindi/data/splits/test.jsonl",
-  "tokens_evaluated": 4759552,
-  "bytes_in_reference_text": 37692122,
-  "cross_entropy_nats": 3.3739502959325267,
-  "perplexity": 29.193623026855445,
-  "bits_per_byte": 0.6146511623265397
+  "checkpoint": "Kaggle GPU T4x2 run (notebookd6949b8470), hindi/checkpoints/latest.pt",
+  "checkpoint_step": 6500,
+  "eval_file": "hindi/data/splits/test.jsonl",
+  "note": "Bounded evaluation (25 batches x 16 x 512 tokens, deterministic first-N) for a fast turnaround before the deadline; see docs/PHASE2_GCP_TRAINING.md.",
+  "tokens_evaluated": 204800,
+  "bytes_in_reference_text": 2660415,
+  "cross_entropy_nats": 2.7803267574310304,
+  "perplexity": 16.12428881851429,
+  "bits_per_byte": 0.3087812654789992
 }
