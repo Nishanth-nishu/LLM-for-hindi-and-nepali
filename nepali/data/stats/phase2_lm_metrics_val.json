@@ -1,11 +1,10 @@
 {
-  "checkpoint": "nepali/checkpoints/latest.pt (GCP CPU VM run)",
-  "checkpoint_step": 1250,
-  "eval_file": "nepali/data/splits/val.jsonl",
-  "note": "Bounded evaluation (25 batches x 16 x 512 tokens, deterministic first-N) due to CPU eval being too slow for a full pass; see docs/PHASE2_GCP_TRAINING.md.",
-  "tokens_evaluated": 204800,
-  "bytes_in_reference_text": 2011126,
-  "cross_entropy_nats": 4.2600706195831295,
-  "perplexity": 70.81498420236281,
-  "bits_per_byte": 0.6258669365191818
+  "checkpoint": "/home/HP/LLM-for-hindi-and-nepali/nepali/checkpoints/latest.pt",
+  "checkpoint_step": 4999,
+  "eval_file": "/home/HP/LLM-for-hindi-and-nepali/nepali/data/splits/val.jsonl",
+  "tokens_evaluated": 4808704,
+  "bytes_in_reference_text": 46740093,
+  "cross_entropy_nats": 3.4815503084679884,
+  "perplexity": 32.5100836857949,
+  "bits_per_byte": 0.5167561890638164
 }

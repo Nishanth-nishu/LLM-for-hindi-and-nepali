@@ -38,6 +38,17 @@ def num(v, fmt: str = ",") -> str:
     return f"{v:{fmt}}" if isinstance(v, (int, float)) else MISSING
 
 
+def real_train_tokens(c: "Ctx", lang: str) -> int | None:
+    """The train-split token count the run actually consumed, measured
+    from the cached token array (see tools/measure_phase2_corpus_tokens.py)
+    — not the Phase 1 handoff's claimed final-corpus figure, which the GCS
+    copy synced onto the training VM turned out not to match."""
+    ct = c.d[lang].get("corpus_tokens")
+    if not ct or ct.get("total") is None:
+        return None
+    return ct["tokens"]["train"]
+
+
 def sh(cmd: list[str]) -> str:
     try:
         return subprocess.run(cmd, capture_output=True, text=True, timeout=20).stdout.strip() or "unavailable"
@@ -72,6 +83,7 @@ class Ctx:
                 "lm_test": load(stats / "phase2_lm_metrics_test.json"),
                 "gen": load(stats / "phase2_generation_eval.json"),
                 "attn": load(stats / "phase2_attention_analysis.json"),
+                "corpus_tokens": load(stats / "phase2_corpus_token_counts.json"),
                 "log": log,
                 "ckpt_dir": root / lang / "checkpoints",
             }
@@ -300,15 +312,23 @@ def r_lm_eval(c: Ctx) -> str:
         h_bpb, n_bpb = h_test["bits_per_byte"], n_test["bits_per_byte"]
         ppl_gap_pct = 100 * (n_ppl - h_ppl) / h_ppl
         bpb_reverses = (n_bpb < h_bpb) != (n_ppl < h_ppl)
+        h_tt, n_tt = real_train_tokens(c, "hindi"), real_train_tokens(c, "nepali")
+        token_clause = (
+            f"fewer training tokens ({n_tt / 1e6:.1f}M L vs {h_tt / 1e6:.1f}M H, "
+            f"~{abs(100 * (n_tt - h_tt) / h_tt):.1f}% "
+            f"{'less' if n_tt < h_tt else 'more'} — the corpus actually "
+            f"tokenized for this run, not the Phase 1 handoff's claimed "
+            f"final-corpus figures; see `report/phase2_resource_comparison.md`), "
+            if h_tt and n_tt else ""
+        )
         L += [
             f"Model L (Nepali) has {'higher' if n_ppl > h_ppl else 'lower'} "
             f"test perplexity than Model H ({n_ppl:.2f} vs {h_ppl:.2f}, "
-            f"{ppl_gap_pct:+.1f}%). Plausible contributors, all measured in "
-            f"Phase 1: fewer training tokens (501.2M L vs 559.9M H, "
-            f"~10.5% less), higher tokenizer fertility (1.8338 L vs 1.6522 H "
+            f"{ppl_gap_pct:+.1f}%). Plausible contributors: {token_clause}"
+            f"higher tokenizer fertility (1.8338 L vs 1.6522 H "
             f"tokens/word — the same text costs more, harder-to-predict "
             f"tokens in Nepali), and a lower manual-token share (20.83% L "
-            f"vs 21.29% H). On bits-per-byte, which removes the tokenizer "
+            f"vs 21.29% H, both Phase 1 measurements). On bits-per-byte, which removes the tokenizer "
             f"effect, the gap {'reverses' if bpb_reverses else 'persists in the same direction'} "
             f"({n_bpb:.4f} vs {h_bpb:.4f} bits/byte) — "
             f"{'Model L is the more byte-efficient model despite its higher token-level PPL, since its higher-fertility tokenizer spreads each byte of text over more, individually easier, token-prediction steps.' if bpb_reverses else 'Model L remains behind on the byte-normalized metric too, suggesting the corpus-size gap dominates over the tokenizer-fertility effect.'} "
@@ -447,9 +467,12 @@ def r_attention(c: Ctx) -> str:
             f"The spread between each model's highest and lowest per-layer "
             f"entropy is {h_ent_range:.3f} nats (H) vs {n_ent_range:.3f} "
             f"nats (L); Model {flatter} shows the flatter, "
-            f"less-differentiated profile, which — given L was trained on "
-            f"~10.5% fewer tokens (Phase 1: 501.2M vs 559.9M) — is "
-            f"consistent with, though not conclusive proof of, a mild "
+            f"less-differentiated profile, which" +
+            (lambda h_tt=real_train_tokens(c, "hindi"), n_tt=real_train_tokens(c, "nepali"):
+             f" — given L was trained on ~{abs(100 * (n_tt - h_tt) / h_tt):.1f}% "
+             f"fewer tokens ({n_tt / 1e6:.1f}M vs {h_tt / 1e6:.1f}M, this run's "
+             f"measured corpus) — is" if h_tt and n_tt else " is")(),
+            f" consistent with, though not conclusive proof of, a mild "
             f"undertraining signature relative to H.", "",
         ]
     else:
@@ -471,8 +494,10 @@ def r_attention(c: Ctx) -> str:
 
 def r_resources(c: Ctx) -> str:
     L = c.header("Phase 2 — Resource-Level Comparison (Model H vs Model L)")
+    h_train_tok, n_train_tok = real_train_tokens(c, "hindi"), real_train_tokens(c, "nepali")
     L += ["| | Model H (Hindi) | Model L (Nepali) |", "|---|--:|--:|",
-          "| Training tokens (Phase 1, measured) | 559,913,515 | 501,226,336 |",
+          "| Training tokens (this run, measured) | " + num(h_train_tok) + " | " + num(n_train_tok) + " |",
+          "| Training tokens (Phase 1 handoff, claimed final corpus) | 559,913,515 | 501,226,336 |",
           "| Manual token share | 21.29% | 20.83% |",
           "| Tokenizer vocab | 4,000 | 4,000 |",
           "| Fertility (tokens/word) | 1.6522 | 1.8338 |",
@@ -495,6 +520,22 @@ def r_resources(c: Ctx) -> str:
           " | " +
           (f"{c.d['nepali']['lm_test']['bits_per_byte']:.4f}" if c.d['nepali']['lm_test'] else MISSING) +
           " |", ""]
+    if h_train_tok is not None and h_train_tok != 559_913_515:
+        L += [
+            f"**Note on the two token-count rows:** the corpus actually "
+            f"tokenized and trained on for Phase 2 ({num(h_train_tok)} Hindi "
+            f"/ {num(n_train_tok)} Nepali train tokens) is smaller than the "
+            f"Phase 1 handoff's claimed final-corpus figures "
+            f"(559,913,515 / 501,226,336). The data synced from GCS "
+            f"`work/<lang>/data/splits/` onto the training VM was an "
+            f"earlier pipeline pass, not the literal final rebuild the "
+            f"handoff quotes — both are still real, substantial corpora "
+            f"(~{(h_train_tok + (c.d['hindi']['corpus_tokens']['tokens']['val'] + c.d['hindi']['corpus_tokens']['tokens']['test']) if c.d['hindi'].get('corpus_tokens') else 0) / 1e6:.0f}M "
+            f"Hindi / "
+            f"~{(n_train_tok + (c.d['nepali']['corpus_tokens']['tokens']['val'] + c.d['nepali']['corpus_tokens']['tokens']['test']) if c.d['nepali'].get('corpus_tokens') else 0) / 1e6:.0f}M "
+            f"Nepali across all splits, roughly 96-97% of the ~500M target "
+            f"each) — just not the exact numbers previously reported here.", "",
+        ]
     L += [
         "## Write-up", "",
         "Same architecture, same parameter budget, same vocabulary size, "
@@ -532,7 +573,10 @@ def r_resources(c: Ctx) -> str:
             f"in training progress, not just in architecture. Model L "
             f"(Nepali) has {'higher' if n_ppl > h_ppl else 'lower'} "
             f"token-level perplexity than Model H ({n_ppl:.1f} vs "
-            f"{h_ppl:.1f}), consistent with training on ~11% fewer tokens "
+            f"{h_ppl:.1f}), " +
+            (f"consistent with training on {abs(100 * (n_train_tok - h_train_tok) / h_train_tok):.1f}% "
+             f"{'fewer' if n_train_tok < h_train_tok else 'more'} tokens ({num(n_train_tok)} vs {num(h_train_tok)}) "
+             if h_train_tok and n_train_tok else "") +
             f"and a higher-fertility tokenizer. On bits-per-byte, which "
             f"controls for the tokenizer difference, the gap "
             f"{'narrows or reverses' if (n_bpb < h_bpb) != (n_ppl < h_ppl) else 'persists'} "
