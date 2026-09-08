@@ -1,0 +1,159 @@
+{
+  "lang": "nepali",
+  "seed": 20260909,
+  "splits": {
+    "train": {
+      "n_examples": 3000,
+      "by_family": {
+        "C_endpoints_less": 318,
+        "B_most": 337,
+        "A_more": 491,
+        "B_least": 343,
+        "C_least": 146,
+        "C_endpoints_more": 330,
+        "D_equal": 325,
+        "A_less": 539,
+        "C_most": 171
+      },
+      "by_attribute": {
+        "weight": 737,
+        "height": 757,
+        "price": 734,
+        "age": 772
+      },
+      "by_n_entities": {
+        "3": 1645,
+        "2": 1355
+      },
+      "prompt_char_len_min": 63,
+      "prompt_char_len_max": 136,
+      "prompt_char_len_mean": 98.19433333333333,
+      "names_used": [
+        "अनिता",
+        "अर्जुन",
+        "इन्दिरा",
+        "कलम",
+        "कान्छी",
+        "किताब",
+        "गीता",
+        "घडी",
+        "चश्मा",
+        "छाता",
+        "ज्याकेट",
+        "झोला",
+        "टंक",
+        "टिभी",
+        "टेबुल",
+        "टोपी",
+        "दराज",
+        "दिपक",
+        "देवी",
+        "नारायण",
+        "निर्मल",
+        "पंखा",
+        "पार्वती",
+        "बल",
+        "बिनोद",
+        "माया",
+        "मोहन",
+        "रमेश",
+        "राधा",
+        "लक्ष्मी",
+        "विकास",
+        "विजय",
+        "विनोद",
+        "विष्णु",
+        "वीरेन्द्र",
+        "शारदा",
+        "सन्तोष",
+        "सरिता",
+        "सीता",
+        "सुमन",
+        "सुशीला",
+        "स्कुटर"
+      ]
+    },
+    "val": {
+      "n_examples": 400,
+      "by_family": {
+        "B_most": 37,
+        "C_endpoints_more": 39,
+        "A_less": 83,
+        "A_more": 63,
+        "C_endpoints_less": 37,
+        "B_least": 47,
+        "C_most": 23,
+        "D_equal": 57,
+        "C_least": 14
+      },
+      "by_attribute": {
+        "weight": 88,
+        "price": 101,
+        "age": 109,
+        "height": 102
+      },
+      "by_n_entities": {
+        "3": 197,
+        "2": 203
+      },
+      "prompt_char_len_min": 63,
+      "prompt_char_len_max": 131,
+      "prompt_char_len_mean": 97.61,
+      "names_used": [
+        "कल्पना",
+        "कुर्सी",
+        "कृष्ण",
+        "गंगा",
+        "थैलो",
+        "बिमला",
+        "बोतल",
+        "सावित्री",
+        "हरि"
+      ]
+    },
+    "test": {
+      "n_examples": 400,
+      "by_family": {
+        "B_least": 53,
+        "A_more": 70,
+        "B_most": 38,
+        "C_endpoints_less": 39,
+        "A_less": 70,
+        "D_equal": 52,
+        "C_endpoints_more": 43,
+        "C_most": 19,
+        "C_least": 16
+      },
+      "by_attribute": {
+        "height": 105,
+        "price": 94,
+        "age": 110,
+        "weight": 91
+      },
+      "by_n_entities": {
+        "3": 208,
+        "2": 192
+      },
+      "prompt_char_len_min": 70,
+      "prompt_char_len_max": 115,
+      "prompt_char_len_mean": 89.83,
+      "names_used": [
+        "कमला",
+        "गोपाल",
+        "जुत्ता",
+        "प्रकाश",
+        "मोबाइल",
+        "राजु",
+        "शिव",
+        "साइकल",
+        "सुनिता"
+      ]
+    }
+  },
+  "name_pool_sizes": {
+    "train": 42,
+    "val": 9,
+    "test": 9
+  },
+  "leakage_avoidance": "Entity names are partitioned into disjoint train/val/test pools before any example is generated (split_names, seed=20260909); no name in the test set was ever used to generate a train or val example. Additionally, for every template family with more than one phrasing, the last phrasing is reserved exclusively for the test split (templates_for_split) -- some test sentence structures were never seen during training either."
+}
