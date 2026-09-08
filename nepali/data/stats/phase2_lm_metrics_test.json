@@ -1,10 +1,10 @@
 {
-  "checkpoint": "/home/HP/LLM-for-hindi-and-nepali/nepali/checkpoints/latest.pt",
-  "checkpoint_step": 4999,
-  "eval_file": "/home/HP/LLM-for-hindi-and-nepali/nepali/data/splits/test.jsonl",
+  "checkpoint": "/kaggle/input/notebooks/nishantharikanta/notebook317a0be86b/repo/nepali/checkpoints/latest.pt",
+  "checkpoint_step": 6799,
+  "eval_file": "/kaggle/working/repo/nepali/data/splits/test.jsonl",
   "tokens_evaluated": 4743168,
   "bytes_in_reference_text": 46007964,
-  "cross_entropy_nats": 3.4680748368791967,
-  "perplexity": 32.07493348862716,
-  "bits_per_byte": 0.515820373993326
+  "cross_entropy_nats": 3.224641510036119,
+  "perplexity": 25.144558468041115,
+  "bits_per_byte": 0.47961358042608276
 }

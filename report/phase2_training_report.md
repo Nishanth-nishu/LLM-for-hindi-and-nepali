@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Generated (UTC) | 2026-09-08 16:45:21 |
-| Git commit | `9ca6c1de4c71bedc835ee996a6960d672e850a4d` |
+| Generated (UTC) | 2026-09-08 17:22:48 |
+| Git commit | `95d64d64b9b122cea18c7162e68cd1e26c02c648` |
 | Branch | `phase-2` |
 
 > Following the Phase 1 convention: every number below is read from a JSON file a script actually produced. A field with no source file renders as `⚠ **NOT YET MEASURED**` and names the command that fills it.
@@ -69,16 +69,14 @@ Effective tokens/step: **65,536**
 
 | Metric | First logged step | Latest logged step |
 |---|--:|--:|
-| Step | 0 | 6600 |
-| Train loss | 8.3936 | 3.1105 |
-| Val loss | 8.3817 | 2.6859 |
-| Val PPL | 4366.31 | 14.67 |
-| LR | 1.00e-06 | 1.95e-04 |
+| Step | 0 | 6799 |
+| Train loss | 8.3890 | 3.3817 |
+| Val loss | 8.3865 | 3.1426 |
+| Val PPL | 4387.37 | 23.16 |
+| LR | 1.50e-06 | 3.00e-05 |
 
-Best val loss so far: **2.6859**  
-Training progress: **6,600 / 6,800 steps (97.1%)**.
-
-**This is a partial/pilot run, not a converged model** — see `docs/PHASE2_GCP_TRAINING.md` for the full-budget run plan and estimated wall-clock time on the project's hardware.
+Best val loss so far: **3.1426**  
+Training progress: **6,799 / 6,800 steps (100.0%)**.
 
 Loss curve: `report/figures/phase2/nepali/loss_curve.png`
 
