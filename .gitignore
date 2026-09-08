@@ -7,6 +7,8 @@ __pycache__/
 # (large binaries; see report/phase2_checkpoint_links.json)
 */checkpoints/*
 !*/checkpoints/training_log.jsonl
+*/checkpoints_ablation_*/*
+!*/checkpoints_ablation_*/training_log.jsonl
 */data/splits/*.npy
 */data/raw/
 */data/interim/

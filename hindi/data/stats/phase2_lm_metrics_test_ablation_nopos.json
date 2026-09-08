@@ -1,0 +1,10 @@
+{
+  "checkpoint": "/scratch/nishanth.r/LMA/repo/hindi/checkpoints_ablation_nopos/latest.pt",
+  "checkpoint_step": 2999,
+  "eval_file": "/scratch/nishanth.r/LMA/repo/hindi/data/splits/test.jsonl",
+  "tokens_evaluated": 4759552,
+  "bytes_in_reference_text": 37692122,
+  "cross_entropy_nats": 3.5712689360324776,
+  "perplexity": 35.56169004291333,
+  "bits_per_byte": 0.650597788935811
+}
