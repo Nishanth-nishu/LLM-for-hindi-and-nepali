@@ -101,9 +101,10 @@ def plot_heatmap(attn_layer: torch.Tensor, tokens: list[str], layer_name: str, o
 
 
 def run_attention_analysis(lang: str, checkpoint_path: str | Path, repo_root: str | Path = ".",
-                            n_sentences: int = 5, device: str = "cpu") -> dict:
+                            n_sentences: int = 5, device: str = "cpu",
+                            config_name: str = "model_config.yaml") -> dict:
     root = Path(repo_root).resolve()
-    with open(root / lang / "configs" / "model_config.yaml", encoding="utf-8") as f:
+    with open(root / lang / "configs" / config_name, encoding="utf-8") as f:
         cfg = yaml.safe_load(f)
     tcfg = cfg["training"]
 
@@ -119,7 +120,8 @@ def run_attention_analysis(lang: str, checkpoint_path: str | Path, repo_root: st
     if not sentences:
         sentences = documents[:n_sentences]
 
-    fig_dir = root / "report" / "figures" / "phase2" / lang
+    run_tag = lang if config_name == "model_config.yaml" else f"{lang}__{Path(config_name).stem}"
+    fig_dir = root / "report" / "figures" / "phase2" / run_tag
     per_layer_entropy, per_layer_distance = [], []
     causal_checks = []
 
@@ -185,10 +187,12 @@ def main() -> int:
     ap.add_argument("--n-sentences", type=int, default=5)
     ap.add_argument("--device", default="cpu")
     ap.add_argument("--out", default=None)
+    ap.add_argument("--config", default="model_config.yaml")
     args = ap.parse_args()
 
     root = Path(args.repo_root).resolve()
-    result = run_attention_analysis(args.lang, args.checkpoint, root, args.n_sentences, args.device)
+    result = run_attention_analysis(args.lang, args.checkpoint, root, args.n_sentences, args.device,
+                                     config_name=args.config)
     print(json.dumps(result, indent=2, ensure_ascii=False))
 
     out = Path(args.out) if args.out else root / args.lang / "data" / "stats" / "phase2_attention_analysis.json"

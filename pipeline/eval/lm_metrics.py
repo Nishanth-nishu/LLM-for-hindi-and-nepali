@@ -73,10 +73,11 @@ def main() -> int:
     ap.add_argument("--repo-root", default=".")
     ap.add_argument("--device", default="cpu")
     ap.add_argument("--out", default=None)
+    ap.add_argument("--config", default="model_config.yaml")
     args = ap.parse_args()
 
     root = Path(args.repo_root).resolve()
-    with open(root / args.lang / "configs" / "model_config.yaml", encoding="utf-8") as f:
+    with open(root / args.lang / "configs" / args.config, encoding="utf-8") as f:
         cfg = yaml.safe_load(f)
     tcfg = cfg["training"]
     split_file = root / (tcfg["val_file"] if args.split == "val" else tcfg["test_file"])

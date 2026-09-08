@@ -71,14 +71,19 @@ def evaluate(model: GPTLanguageModel, loader: DataLoader, device: torch.device, 
     return sum(losses) / max(1, len(losses))
 
 
-def load_config(repo_root: Path, lang: str) -> dict:
-    with open(repo_root / lang / "configs" / "model_config.yaml", encoding="utf-8") as f:
+def load_config(repo_root: Path, lang: str, config_name: str = "model_config.yaml") -> dict:
+    with open(repo_root / lang / "configs" / config_name, encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
-def train(lang: str, repo_root: str = ".", max_steps_override: int | None = None) -> dict:
+def train(
+    lang: str,
+    repo_root: str = ".",
+    max_steps_override: int | None = None,
+    config_name: str = "model_config.yaml",
+) -> dict:
     root = Path(repo_root).resolve()
-    cfg = load_config(root, lang)
+    cfg = load_config(root, lang, config_name)
     mcfg, tcfg = cfg["model"], cfg["training"]
 
     torch.manual_seed(tcfg["seed"])
@@ -188,8 +193,10 @@ def main() -> int:
     ap.add_argument("--lang", required=True, choices=["hindi", "nepali"])
     ap.add_argument("--repo-root", default=".")
     ap.add_argument("--max-steps", type=int, default=None, help="override training.max_steps (e.g. for a smoke run)")
+    ap.add_argument("--config", default="model_config.yaml",
+                     help="config filename under <lang>/configs/ (e.g. model_config_ablation_nopos.yaml)")
     args = ap.parse_args()
-    train(args.lang, args.repo_root, args.max_steps)
+    train(args.lang, args.repo_root, args.max_steps, args.config)
     return 0
 
 

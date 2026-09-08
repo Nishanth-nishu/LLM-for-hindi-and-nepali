@@ -129,3 +129,57 @@ def test_generate_respects_max_seq_len():
     idx = torch.randint(0, cfg.vocab_size, (1, cfg.max_seq_len - 2))
     out = model.generate(idx, max_new_tokens=5, greedy=True)
     assert out.shape[1] == idx.shape[1] + 5
+
+
+def test_no_positional_embeddings_breaks_order_sensitivity():
+    """Bonus ablation (report/phase2_ablation_report.md): without a
+    positional signal, ONE causal self-attention layer's output at a
+    fixed query position is a weighted sum over the *set* of preceding
+    (key, value) pairs -- Q/K/V here are pure per-token linear maps of
+    tok_emb with no position mixed in, so permuting the tokens BEFORE the
+    final query token must leave that layer's output unchanged. (This
+    property is specifically single-layer: stacked layers reintroduce an
+    implicit order signal even with no positional embedding at all,
+    because causal masking gives position i a DIFFERENT visible history
+    under a permutation -- "3 tokens precede me, in this order" is itself
+    positional information, just not an explicit embedding of it. That
+    stacking caveat is exactly the kind of subtlety report/phase2_ablation_report.md
+    discusses.) With positional embeddings restored, the same permutation
+    must change the output, since position 0 and position 3 now carry
+    different embeddings even for identical token content.
+    """
+    torch.manual_seed(0)
+    model_kwargs = dict(vocab_size=200, max_seq_len=32, d_model=64, n_layer=1, n_head=4, d_ff=256)
+
+    no_pos = GPTLanguageModel(GPTConfig(
+        **model_kwargs, embed_dropout=0.0, attn_dropout=0.0, resid_dropout=0.0,
+        use_positional_embeddings=False,
+    ))
+    assert no_pos.pos_emb is None
+    with_pos, _ = make_model(**model_kwargs)
+    assert with_pos.pos_emb is not None
+    assert count_parameters(no_pos)["total"] < count_parameters(with_pos)["total"]
+
+    no_pos.eval()
+    with_pos.eval()
+
+    query_token = torch.tensor([[7]])
+    prefix = torch.tensor([[10, 20, 30, 40]])
+    shuffled_prefix = torch.tensor([[40, 10, 30, 20]])  # same multiset, different order
+    idx_a = torch.cat([prefix, query_token], dim=1)
+    idx_b = torch.cat([shuffled_prefix, query_token], dim=1)
+
+    with torch.no_grad():
+        logits_no_pos_a, _, _ = no_pos(idx_a)
+        logits_no_pos_b, _, _ = no_pos(idx_b)
+        logits_with_pos_a, _, _ = with_pos(idx_a)
+        logits_with_pos_b, _, _ = with_pos(idx_b)
+
+    last = -1
+    assert torch.allclose(logits_no_pos_a[:, last, :], logits_no_pos_b[:, last, :], atol=1e-5), (
+        "removing positional embeddings should make the final-position logits invariant "
+        "to reordering the preceding context, but they differ"
+    )
+    assert not torch.allclose(logits_with_pos_a[:, last, :], logits_with_pos_b[:, last, :], atol=1e-5), (
+        "with positional embeddings present, reordering the context should change the logits"
+    )

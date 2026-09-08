@@ -75,10 +75,11 @@ def run_generation_eval(
     ref_tokens: int = 48,
     device: str = "cpu",
     seed: int = 20260820,
+    config_name: str = "model_config.yaml",
 ) -> dict:
     torch.manual_seed(seed)
     root = Path(repo_root).resolve()
-    with open(root / lang / "configs" / "model_config.yaml", encoding="utf-8") as f:
+    with open(root / lang / "configs" / config_name, encoding="utf-8") as f:
         cfg = yaml.safe_load(f)
     tcfg = cfg["training"]
 
@@ -149,10 +150,12 @@ def main() -> int:
     ap.add_argument("--n-examples", type=int, default=30)
     ap.add_argument("--device", default="cpu")
     ap.add_argument("--out", default=None)
+    ap.add_argument("--config", default="model_config.yaml")
     args = ap.parse_args()
 
     root = Path(args.repo_root).resolve()
-    result = run_generation_eval(args.lang, args.checkpoint, root, n_examples=args.n_examples, device=args.device)
+    result = run_generation_eval(args.lang, args.checkpoint, root, n_examples=args.n_examples,
+                                  device=args.device, config_name=args.config)
     print(json.dumps(result, indent=2, ensure_ascii=False))
 
     out = Path(args.out) if args.out else root / args.lang / "data" / "stats" / "phase2_generation_eval.json"

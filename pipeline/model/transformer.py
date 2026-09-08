@@ -52,6 +52,19 @@ class GPTConfig:
     attn_dropout: float = 0.1
     resid_dropout: float = 0.1
     tie_weights: bool = True
+    use_positional_embeddings: bool = True
+    """Ablation switch (bonus deliverable). False removes the learned
+    positional embedding table entirely -- the model then sees only
+    token identity at every position, with position never injected
+    anywhere else in the forward pass. Self-attention itself is
+    permutation-equivariant (Q/K/V projections, the softmax(QK^T/sqrt(d))
+    weighting, and the output projection all act identically regardless
+    of how the T token vectors are ordered), and the position-wise FFN
+    is applied per-position with no cross-position mixing -- so with this
+    off, the only sequence-order signal reaching the model at all is the
+    causal mask's admissible-key-set (position t can attend to <= t
+    keys), which shrinks monotonically with t but does not distinguish
+    *which* earlier position a key came from. See report/phase2_ablation_report.md."""
 
     def __post_init__(self):
         if self.d_model % self.n_head != 0:
@@ -186,7 +199,11 @@ class GPTLanguageModel(nn.Module):
         self.cfg = cfg
 
         self.tok_emb = nn.Embedding(cfg.vocab_size, cfg.d_model)
-        self.pos_emb = nn.Embedding(cfg.max_seq_len, cfg.d_model)
+        # Ablation: when disabled, no positional embedding table is even
+        # allocated (not just zeroed/unused) -- the parameter-count
+        # reported for this model is honestly smaller, not padded with
+        # dead weights.
+        self.pos_emb = nn.Embedding(cfg.max_seq_len, cfg.d_model) if cfg.use_positional_embeddings else None
         self.embed_dropout = nn.Dropout(cfg.embed_dropout)
 
         self.blocks = nn.ModuleList([Block(cfg) for _ in range(cfg.n_layer)])
@@ -226,8 +243,10 @@ class GPTLanguageModel(nn.Module):
         if T > self.cfg.max_seq_len:
             raise ValueError(f"sequence length {T} exceeds max_seq_len {self.cfg.max_seq_len}")
 
-        pos = torch.arange(T, device=idx.device)
-        x = self.tok_emb(idx) + self.pos_emb(pos)[None, :, :]  # (B, T, d_model)
+        x = self.tok_emb(idx)  # (B, T, d_model)
+        if self.pos_emb is not None:
+            pos = torch.arange(T, device=idx.device)
+            x = x + self.pos_emb(pos)[None, :, :]
         x = self.embed_dropout(x)
 
         attn_weights = [] if return_attn else None
