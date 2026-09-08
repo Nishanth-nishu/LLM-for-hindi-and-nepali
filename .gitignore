@@ -9,6 +9,8 @@ __pycache__/
 !*/checkpoints/training_log.jsonl
 */checkpoints_ablation_*/*
 !*/checkpoints_ablation_*/training_log.jsonl
+*/checkpoints_reasoning/*
+!*/checkpoints_reasoning/training_log.jsonl
 */data/splits/*.npy
 */data/raw/
 */data/interim/
