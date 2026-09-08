@@ -1,0 +1,116 @@
+{
+  "lang": "hindi",
+  "checkpoint": "hindi/checkpoints_reasoning/latest.pt",
+  "checkpoint_step": 744,
+  "split": "test",
+  "n_examples": 400,
+  "exact_match_accuracy": 0.325,
+  "accuracy_by_family": {
+    "B_most": 0.06666666666666667,
+    "A_less": 0.2318840579710145,
+    "B_least": 0.0,
+    "D_equal": 0.5348837209302325,
+    "C_endpoints_more": 0.6363636363636364,
+    "A_more": 0.08450704225352113,
+    "C_most": 0.52,
+    "C_endpoints_less": 0.9285714285714286,
+    "C_least": 0.9545454545454546
+  },
+  "n_by_family": {
+    "B_most": 60,
+    "A_less": 69,
+    "B_least": 49,
+    "D_equal": 43,
+    "C_endpoints_more": 33,
+    "A_more": 71,
+    "C_most": 25,
+    "C_endpoints_less": 28,
+    "C_least": 22
+  },
+  "qualitative_examples": [
+    {
+      "family": "B_most",
+      "prompt": "मोबाइल, जूता और साइकिल की कीमत क्रमशः 338, 238 और 887 रुपये है। सबसे अधिक कीमत किसकी है?",
+      "gold": "साइकिल",
+      "predicted": "रीना",
+      "correct": false
+    },
+    {
+      "family": "A_less",
+      "prompt": "यदि जूता का वज़न 23 किलोग्राम और मोबाइल का वज़न 39 किलोग्राम हो, तो किसका वज़न कम होगा?",
+      "gold": "जूता",
+      "predicted": "जूता",
+      "correct": true
+    },
+    {
+      "family": "B_least",
+      "prompt": "मोबाइल, साइकिल और जूता की कीमत क्रमशः 511, 132 और 1871 रुपये है। सबसे कम कीमत किसकी है?",
+      "gold": "साइकिल",
+      "predicted": "1 1 1 1",
+      "correct": false
+    },
+    {
+      "family": "D_equal",
+      "prompt": "मोबाइल का वज़न 25 किलोग्राम है और साइकिल का वज़न 25 किलोग्राम है। क्या दोनों का वज़न बराबर है?",
+      "gold": "हाँ",
+      "predicted": "हाँ",
+      "correct": true
+    },
+    {
+      "family": "C_endpoints_more",
+      "prompt": "अर्जुन, उम्र में सुनीता से आगे है। सुनीता, उम्र में मनोज से आगे है। अर्जुन और मनोज में से किसकी उम्र अधिक है?",
+      "gold": "अर्जुन",
+      "predicted": "अर्जुन",
+      "correct": true
+    },
+    {
+      "family": "A_more",
+      "prompt": "यदि मोहन की ऊंचाई 152 सेंटीमीटर और अर्जुन की ऊंचाई 151 सेंटीमीटर हो, तो किसकी ऊंचाई अधिक होगी?",
+      "gold": "मोहन",
+      "predicted": "गेंद",
+      "correct": false
+    },
+    {
+      "family": "A_more",
+      "prompt": "यदि प्रिया की उम्र 35 वर्ष और मनोज की उम्र 30 वर्ष हो, तो किसकी उम्र अधिक होगी?",
+      "gold": "प्रिया",
+      "predicted": "रीना",
+      "correct": false
+    },
+    {
+      "family": "B_most",
+      "prompt": "मोबाइल, साइकिल और जूता का वज़न क्रमशः 24, 5 और 38 किलोग्राम है। सबसे अधिक वज़न किसका है?",
+      "gold": "जूता",
+      "predicted": "रीना",
+      "correct": false
+    },
+    {
+      "family": "D_equal",
+      "prompt": "मोहन की ऊंचाई 190 सेंटीमीटर है और यश की ऊंचाई 152 सेंटीमीटर है। क्या दोनों की ऊंचाई बराबर है?",
+      "gold": "नहीं",
+      "predicted": "नहीं",
+      "correct": true
+    },
+    {
+      "family": "A_more",
+      "prompt": "यदि मनोज की उम्र 68 वर्ष और अर्जुन की उम्र 33 वर्ष हो, तो किसकी उम्र अधिक होगी?",
+      "gold": "मनोज",
+      "predicted": "गेंद",
+      "correct": false
+    },
+    {
+      "family": "C_most",
+      "prompt": "मनोज की उम्र, सुनीता से अधिक है। सुनीता की उम्र, प्रिया से अधिक है। तीनों में सबसे अधिक उम्र किसकी है?",
+      "gold": "मनोज",
+      "predicted": "विजय",
+      "correct": false
+    },
+    {
+      "family": "A_more",
+      "prompt": "यदि अर्जुन की उम्र 49 वर्ष और मोहन की उम्र 23 वर्ष हो, तो किसकी उम्र अधिक होगी?",
+      "gold": "अर्जुन",
+      "predicted": "कामिनी",
+      "correct": false
+    }
+  ]
+}

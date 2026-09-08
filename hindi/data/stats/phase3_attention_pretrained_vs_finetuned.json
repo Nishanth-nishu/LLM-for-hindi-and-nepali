@@ -1,0 +1,128 @@
+{
+  "lang": "hindi",
+  "split": "test",
+  "n_layer": 7,
+  "n_head": 8,
+  "prompts_analyzed": [
+    {
+      "family": "C_endpoints_more",
+      "prompt": "अर्जुन, उम्र में सुनीता से आगे है। सुनीता, उम्र में मनोज से आगे है। अर्जुन और मनोज में से किसकी उम्र अधिक है?",
+      "answer": "अर्जुन"
+    },
+    {
+      "family": "C_most",
+      "prompt": "मनोज की उम्र, सुनीता से अधिक है। सुनीता की उम्र, प्रिया से अधिक है। तीनों में सबसे अधिक उम्र किसकी है?",
+      "answer": "मनोज"
+    },
+    {
+      "family": "C_most",
+      "prompt": "सुनीता की ऊंचाई, मोहन से अधिक है। मोहन की ऊंचाई, यश से अधिक है। तीनों में सबसे अधिक ऊंचाई किसकी है?",
+      "answer": "सुनीता"
+    },
+    {
+      "family": "C_endpoints_less",
+      "prompt": "जूता की कीमत, साइकिल से अधिक है। साइकिल की कीमत, मोबाइल से अधिक है। जूता और मोबाइल में से किसकी कीमत कम है?",
+      "answer": "मोबाइल"
+    },
+    {
+      "family": "C_endpoints_more",
+      "prompt": "सुनीता, ऊंचाई में प्रिया से आगे है। प्रिया, ऊंचाई में मोहन से आगे है। सुनीता और मोहन में से किसकी ऊंचाई अधिक है?",
+      "answer": "सुनीता"
+    },
+    {
+      "family": "C_most",
+      "prompt": "मोबाइल का वज़न, साइकिल से अधिक है। साइकिल का वज़न, जूता से अधिक है। तीनों में सबसे अधिक वज़न किसका है?",
+      "answer": "मोबाइल"
+    },
+    {
+      "family": "C_most",
+      "prompt": "जूता का वज़न, मोबाइल से अधिक है। मोबाइल का वज़न, साइकिल से अधिक है। तीनों में सबसे अधिक वज़न किसका है?",
+      "answer": "जूता"
+    },
+    {
+      "family": "C_most",
+      "prompt": "साइकिल की कीमत, मोबाइल से अधिक है। मोबाइल की कीमत, जूता से अधिक है। तीनों में सबसे अधिक कीमत किसकी है?",
+      "answer": "साइकिल"
+    }
+  ],
+  "pretrained": {
+    "n_sentences_analyzed": 8,
+    "causal_mask_verified_all_sentences": true,
+    "entropy_mean_per_layer": [
+      2.4365644454956055,
+      2.1241979598999023,
+      2.0466880798339844,
+      1.8450312614440918,
+      1.3981338739395142,
+      1.4646369218826294,
+      1.7008724212646484
+    ],
+    "distance_mean_per_layer": [
+      8.794763565063477,
+      10.782666206359863,
+      8.56045150756836,
+      4.406280517578125,
+      4.463931560516357,
+      10.802436828613281,
+      11.492523193359375
+    ],
+    "entropy_overall_mean": 1.8594465255737305,
+    "distance_overall_mean": 8.4718656539917,
+    "heatmaps": [
+      "/scratch/nishanth.r/LMA/repo_phase3/report/figures/phase3/hindi/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_early.png",
+      "/scratch/nishanth.r/LMA/repo_phase3/report/figures/phase3/hindi/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_late.png"
+    ],
+    "checkpoint": "hindi/checkpoints/latest.pt",
+    "checkpoint_step": 6500
+  },
+  "finetuned": {
+    "n_sentences_analyzed": 8,
+    "causal_mask_verified_all_sentences": true,
+    "entropy_mean_per_layer": [
+      2.3948981761932373,
+      2.209230661392212,
+      1.8887747526168823,
+      1.6191020011901855,
+      1.1576430797576904,
+      1.2539986371994019,
+      1.5989772081375122
+    ],
+    "distance_mean_per_layer": [
+      9.24228286743164,
+      10.01253890991211,
+      7.679381847381592,
+      3.7191991806030273,
+      4.627362251281738,
+      10.005578994750977,
+      10.739263534545898
+    ],
+    "entropy_overall_mean": 1.7318035364151,
+    "distance_overall_mean": 8.003658294677734,
+    "heatmaps": [
+      "/scratch/nishanth.r/LMA/repo_phase3/report/figures/phase3/hindi/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_early.png",
+      "/scratch/nishanth.r/LMA/repo_phase3/report/figures/phase3/hindi/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_late.png"
+    ],
+    "checkpoint": "hindi/checkpoints_reasoning/epoch_0.pt",
+    "checkpoint_step": 93
+  },
+  "delta_entropy_per_layer_finetuned_minus_pretrained": [
+    -0.041666269302368164,
+    0.08503270149230957,
+    -0.15791332721710205,
+    -0.22592926025390625,
+    -0.24049079418182373,
+    -0.21063828468322754,
+    -0.10189521312713623
+  ],
+  "delta_distance_per_layer_finetuned_minus_pretrained": [
+    0.44751930236816406,
+    -0.7701272964477539,
+    -0.8810696601867676,
+    -0.6870813369750977,
+    0.16343069076538086,
+    -0.7968578338623047,
+    -0.7532596588134766
+  ],
+  "delta_entropy_overall": -0.12764298915863037,
+  "delta_distance_overall": -0.46820735931396484
+}
