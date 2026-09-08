@@ -1,0 +1,128 @@
+{
+  "lang": "nepali",
+  "split": "test",
+  "n_layer": 7,
+  "n_head": 8,
+  "prompts_analyzed": [
+    {
+      "family": "C_endpoints_less",
+      "prompt": "कमला को उचाइ, राजु भन्दा बढी छ। राजु को उचाइ, प्रकाश भन्दा बढी छ। कमला र प्रकाश मध्ये कसको उचाइ कम छ?",
+      "answer": "प्रकाश"
+    },
+    {
+      "family": "C_endpoints_more",
+      "prompt": "कमला, उमेर मा सुनिता भन्दा अगाडि छ। सुनिता, उमेर मा राजु भन्दा अगाडि छ। कमला र राजु मध्ये कसको उमेर बढी छ?",
+      "answer": "कमला"
+    },
+    {
+      "family": "C_endpoints_more",
+      "prompt": "कमला, उचाइ मा गोपाल भन्दा अगाडि छ। गोपाल, उचाइ मा शिव भन्दा अगाडि छ। कमला र शिव मध्ये कसको उचाइ बढी छ?",
+      "answer": "कमला"
+    },
+    {
+      "family": "C_most",
+      "prompt": "सुनिता को उचाइ, प्रकाश भन्दा बढी छ। प्रकाश को उचाइ, शिव भन्दा बढी छ। तीनैमध्ये सबैभन्दा बढी उचाइ कसको छ?",
+      "answer": "सुनिता"
+    },
+    {
+      "family": "C_least",
+      "prompt": "सुनिता को उमेर, राजु भन्दा बढी छ। राजु को उमेर, कमला भन्दा बढी छ। तीनैमध्ये सबैभन्दा कम उमेर कसको छ?",
+      "answer": "कमला"
+    },
+    {
+      "family": "C_endpoints_less",
+      "prompt": "शिव को उचाइ, प्रकाश भन्दा बढी छ। प्रकाश को उचाइ, सुनिता भन्दा बढी छ। शिव र सुनिता मध्ये कसको उचाइ कम छ?",
+      "answer": "सुनिता"
+    },
+    {
+      "family": "C_endpoints_more",
+      "prompt": "शिव, उचाइ मा सुनिता भन्दा अगाडि छ। सुनिता, उचाइ मा प्रकाश भन्दा अगाडि छ। शिव र प्रकाश मध्ये कसको उचाइ बढी छ?",
+      "answer": "शिव"
+    },
+    {
+      "family": "C_endpoints_more",
+      "prompt": "शिव, उमेर मा प्रकाश भन्दा अगाडि छ। प्रकाश, उमेर मा राजु भन्दा अगाडि छ। शिव र राजु मध्ये कसको उमेर बढी छ?",
+      "answer": "शिव"
+    }
+  ],
+  "pretrained": {
+    "n_sentences_analyzed": 8,
+    "causal_mask_verified_all_sentences": true,
+    "entropy_mean_per_layer": [
+      2.4106431007385254,
+      2.319424629211426,
+      2.3144378662109375,
+      1.8464276790618896,
+      1.756509780883789,
+      1.651569128036499,
+      1.6021965742111206
+    ],
+    "distance_mean_per_layer": [
+      7.8256096839904785,
+      8.76520824432373,
+      7.091985702514648,
+      3.479891300201416,
+      3.9901561737060547,
+      6.144947052001953,
+      10.236485481262207
+    ],
+    "entropy_overall_mean": 1.985887050628662,
+    "distance_overall_mean": 6.790612697601318,
+    "heatmaps": [
+      "/scratch/nishanth.r/LMA/repo_phase3/report/figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_early.png",
+      "/scratch/nishanth.r/LMA/repo_phase3/report/figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_late.png"
+    ],
+    "checkpoint": "nepali/checkpoints/latest.pt",
+    "checkpoint_step": 6799
+  },
+  "finetuned": {
+    "n_sentences_analyzed": 8,
+    "causal_mask_verified_all_sentences": true,
+    "entropy_mean_per_layer": [
+      2.2227067947387695,
+      2.312514543533325,
+      2.100332736968994,
+      1.5256060361862183,
+      1.563741683959961,
+      1.3696630001068115,
+      1.6640911102294922
+    ],
+    "distance_mean_per_layer": [
+      8.987759590148926,
+      8.349984169006348,
+      6.015028476715088,
+      5.313081741333008,
+      5.363834381103516,
+      7.335606575012207,
+      8.31529426574707
+    ],
+    "entropy_overall_mean": 1.8226652145385742,
+    "distance_overall_mean": 7.097227573394775,
+    "heatmaps": [
+      "/scratch/nishanth.r/LMA/repo_phase3/report/figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_early.png",
+      "/scratch/nishanth.r/LMA/repo_phase3/report/figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_late.png"
+    ],
+    "checkpoint": "nepali/checkpoints_reasoning/epoch_0.pt",
+    "checkpoint_step": 93
+  },
+  "delta_entropy_per_layer_finetuned_minus_pretrained": [
+    -0.18793630599975586,
+    -0.006910085678100586,
+    -0.21410512924194336,
+    -0.3208216428756714,
+    -0.19276809692382812,
+    -0.2819061279296875,
+    0.06189453601837158
+  ],
+  "delta_distance_per_layer_finetuned_minus_pretrained": [
+    1.1621499061584473,
+    -0.4152240753173828,
+    -1.0769572257995605,
+    1.8331904411315918,
+    1.373678207397461,
+    1.190659523010254,
+    -1.9211912155151367
+  ],
+  "delta_entropy_overall": -0.1632218360900879,
+  "delta_distance_overall": 0.30661487579345703
+}
