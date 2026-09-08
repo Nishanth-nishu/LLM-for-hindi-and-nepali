@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Generated (UTC) | 2026-09-07 18:23:01 |
-| Git commit | `3d2fb366c7fcf2e0757186cd592d0b4076e307a7` |
+| Generated (UTC) | 2026-09-08 16:45:21 |
+| Git commit | `9ca6c1de4c71bedc835ee996a6960d672e850a4d` |
 | Branch | `phase-2` |
 
 > Following the Phase 1 convention: every number below is read from a JSON file a script actually produced. A field with no source file renders as `⚠ **NOT YET MEASURED**` and names the command that fills it.
@@ -44,7 +44,7 @@ Training progress: **6,600 / 15,000 steps (44.0%)**.
 
 **This is a partial/pilot run, not a converged model** — see `docs/PHASE2_GCP_TRAINING.md` for the full-budget run plan and estimated wall-clock time on the project's hardware.
 
-Loss curve: `report\figures\phase2\hindi\loss_curve.png`
+Loss curve: `report/figures/phase2/hindi/loss_curve.png`
 
 Checkpoint (Drive): https://drive.google.com/file/d/1M2jZQ_e_o0mh1WwGEYoXGOqqE0VgpcK1/view?usp=drive_link
 
@@ -52,33 +52,35 @@ Checkpoint (Drive): https://drive.google.com/file/d/1M2jZQ_e_o0mh1WwGEYoXGOqqE0V
 
 | Setting | Value |
 |---|--:|
-| `batch_size` | 64 |
-| `grad_accum_steps` | 1 |
-| `max_steps` | 5000 |
-| `warmup_steps` | 200 |
+| `batch_size` | 16 |
+| `grad_accum_steps` | 8 |
+| `max_steps` | 6800 |
+| `warmup_steps` | 300 |
 | `lr` | 0.0003 |
 | `min_lr` | 3e-05 |
 | `weight_decay` | 0.1 |
 | `grad_clip` | 1.0 |
-| `eval_every` | 100 |
-| `ckpt_every` | 250 |
+| `eval_every` | 200 |
+| `ckpt_every` | 500 |
 
-Effective tokens/step: **32,768**
+Effective tokens/step: **65,536**
 
 ### Progress
 
 | Metric | First logged step | Latest logged step |
 |---|--:|--:|
-| Step | 0 | 4999 |
-| Train loss | 8.3890 | 3.6113 |
-| Val loss | 8.3865 | 3.3429 |
-| Val PPL | 4387.37 | 28.30 |
-| LR | 1.50e-06 | 3.00e-05 |
+| Step | 0 | 6600 |
+| Train loss | 8.3936 | 3.1105 |
+| Val loss | 8.3817 | 2.6859 |
+| Val PPL | 4366.31 | 14.67 |
+| LR | 1.00e-06 | 1.95e-04 |
 
-Best val loss so far: **3.3429**  
-Training progress: **4,999 / 5,000 steps (100.0%)**.
+Best val loss so far: **2.6859**  
+Training progress: **6,600 / 6,800 steps (97.1%)**.
 
-Loss curve: `report\figures\phase2\nepali\loss_curve.png`
+**This is a partial/pilot run, not a converged model** — see `docs/PHASE2_GCP_TRAINING.md` for the full-budget run plan and estimated wall-clock time on the project's hardware.
+
+Loss curve: `report/figures/phase2/nepali/loss_curve.png`
 
 Checkpoint (Drive): https://drive.google.com/open?id=1w8gCOZa5zHn09lQ3kMT_jRN2o_8poino
 
