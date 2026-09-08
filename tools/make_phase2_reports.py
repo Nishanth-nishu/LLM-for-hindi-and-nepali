@@ -78,7 +78,7 @@ class Ctx:
             links = load(links_path) or {}
             self.d[lang] = {
                 "cfg": cfg,
-                "drive_checkpoint": links.get(lang),
+                "drive_checkpoint": links.get(f"{lang}_pretrained") or links.get(lang),
                 "lm_val": load(stats / "phase2_lm_metrics_val.json"),
                 "lm_test": load(stats / "phase2_lm_metrics_test.json"),
                 "gen": load(stats / "phase2_generation_eval.json"),
