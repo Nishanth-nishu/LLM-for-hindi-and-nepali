@@ -15,3 +15,6 @@ __pycache__/
 */data/raw/
 */data/interim/
 */data/splits/*.jsonl
+
+# Personal study notes -- never intended for the submission, must never be committed
+NOTES_*.md
