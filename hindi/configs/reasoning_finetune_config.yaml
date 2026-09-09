@@ -9,13 +9,23 @@ finetune:
   max_len: 128
   batch_size: 32
   epochs: 15
-  lr: 6.0e-5
-  min_lr: 6.0e-6
+  lr: 1.5e-5
+  min_lr: 1.5e-6
   warmup_steps: 150
   weight_decay: 0.1
   betas: [0.9, 0.95]
   grad_clip: 1.0
   eval_every: 25
+  # Frozen-backbone regularization (see apply_finetune_regularization in
+  # pipeline/train/finetune.py): freeze token/positional embeddings plus
+  # the first 5 of 7 transformer blocks; only the last 2 blocks, ln_f, and
+  # an untied (separately trainable) lm_head update. Dropout raised for
+  # the finetuning phase specifically, independent of the pretraining
+  # config's 0.1 -- a 12k-example finetuning set needs more regularization
+  # than the ~475M-token pretraining corpus did.
+  freeze_embeddings: true
+  freeze_layers: 5
+  finetune_dropout: 0.3
   ckpt_dir: hindi/checkpoints_reasoning
   seed: 20260909
   device: auto

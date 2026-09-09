@@ -66,6 +66,70 @@ def evaluate(model: GPTLanguageModel, loader: DataLoader, device: torch.device) 
     return sum(losses) / max(1, len(losses))
 
 
+def apply_finetune_regularization(model: GPTLanguageModel, fcfg: dict) -> dict:
+    """Frozen-backbone + trainable-head transfer learning, the standard fix
+    for a pretrained model overfitting almost immediately on a small
+    finetuning set (a few thousand examples vs. millions seen in
+    pretraining): freezing early layers preserves the general-language
+    representations pretraining built, and training only the last few
+    layers plus the head matches trainable capacity to the actual amount
+    of task-specific data available. See report/phase3_reasoning_report.md
+    for the overfitting this fixes (best val_loss at 1.3% of one epoch,
+    val PPL exploding past 500 while train loss fell toward 0) and the
+    research this design follows (freezing ~75% of layers reaches ~90% of
+    full-finetune quality with far less overfitting risk; higher
+    finetuning learning rates are independently linked to worse
+    catastrophic forgetting/overtraining).
+
+    - `freeze_embeddings`: freezes tok_emb and pos_emb. If the base model
+      used weight tying (lm_head.weight IS tok_emb.weight), the head is
+      first *untied* into its own trainable nn.Linear (initialized as a
+      copy of the tied weight) so the model can still learn to shift its
+      *output* distribution toward this task's small answer vocabulary
+      even though the *input* embedding table stays frozen.
+    - `freeze_layers`: freezes the first N of the model's transformer
+      blocks (0-indexed from the input side); the remaining blocks, ln_f,
+      and the (possibly newly-untied) lm_head stay trainable.
+    - `finetune_dropout`: overrides every nn.Dropout module's probability
+      (embed/attention/residual dropout alike) for the finetuning run,
+      independent of whatever the pretraining config used -- a small
+      dataset needs more regularization than a several-hundred-million-
+      token pretraining corpus did.
+
+    Returns a dict of what was actually changed, for logging.
+    """
+    summary = {"frozen_embeddings": False, "untied_lm_head": False, "frozen_blocks": 0, "dropout_override": None}
+
+    if fcfg.get("freeze_embeddings"):
+        model.tok_emb.weight.requires_grad = False
+        if model.pos_emb is not None:
+            model.pos_emb.weight.requires_grad = False
+        summary["frozen_embeddings"] = True
+
+        if model.lm_head.weight is model.tok_emb.weight:
+            new_head = torch.nn.Linear(model.cfg.d_model, model.cfg.vocab_size, bias=False)
+            new_head.weight = torch.nn.Parameter(model.lm_head.weight.detach().clone())
+            new_head.to(model.tok_emb.weight.device)
+            model.lm_head = new_head
+            summary["untied_lm_head"] = True
+
+    n_freeze = fcfg.get("freeze_layers", 0)
+    if n_freeze > 0:
+        for block in model.blocks[:n_freeze]:
+            for p in block.parameters():
+                p.requires_grad = False
+        summary["frozen_blocks"] = n_freeze
+
+    dropout_p = fcfg.get("finetune_dropout")
+    if dropout_p is not None:
+        for module in model.modules():
+            if isinstance(module, torch.nn.Dropout):
+                module.p = dropout_p
+        summary["dropout_override"] = dropout_p
+
+    return summary
+
+
 def finetune(lang: str, repo_root: str = ".", config_name: str = "reasoning_finetune_config.yaml") -> dict:
     root = Path(repo_root).resolve()
     cfg = load_config(root, lang, config_name)
@@ -82,6 +146,15 @@ def finetune(lang: str, repo_root: str = ".", config_name: str = "reasoning_fine
     print(
         f"[{lang}] loaded base checkpoint {fcfg['base_checkpoint']} (step {base_ckpt.get('step')}); "
         f"{pcount['total']:,} params on {device}",
+        flush=True,
+    )
+
+    reg_summary = apply_finetune_regularization(model, fcfg)
+    n_trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(
+        f"[{lang}] finetune regularization: {reg_summary} "
+        f"-- {n_trainable:,}/{pcount['total']:,} params trainable "
+        f"({n_trainable / pcount['total']:.1%})",
         flush=True,
     )
 
