@@ -1,20 +1,20 @@
 {
   "lang": "nepali",
-  "checkpoint": "nepali/checkpoints/latest.pt",
-  "checkpoint_step": 6799,
+  "checkpoint": "nepali/checkpoints_reasoning/best.pt",
+  "checkpoint_step": 75,
   "split": "test",
   "n_examples": 1500,
-  "exact_match_accuracy": 0.0,
+  "exact_match_accuracy": 0.36133333333333334,
   "accuracy_by_family": {
-    "B_most": 0.0,
-    "A_more": 0.0,
-    "D_equal": 0.0,
-    "B_least": 0.0,
-    "A_less": 0.0,
-    "C_endpoints_less": 0.0,
-    "C_endpoints_more": 0.0,
-    "C_most": 0.0,
-    "C_least": 0.0
+    "B_most": 0.18007662835249041,
+    "A_more": 0.41896024464831805,
+    "D_equal": 0.5161290322580645,
+    "B_least": 0.1776061776061776,
+    "A_less": 0.40923076923076923,
+    "C_endpoints_less": 0.7777777777777778,
+    "C_endpoints_more": 0.4375,
+    "C_most": 0.11538461538461539,
+    "C_least": 0.6666666666666666
   },
   "n_by_family": {
     "B_most": 261,
@@ -32,85 +32,85 @@
       "family": "B_most",
       "prompt": "जुत्ता, साइकल र मोबाइल को तौल क्रमशः 24, 42 र 11 किलोग्राम छ। सबैभन्दा बढी तौल कसको छ?",
       "gold": "साइकल",
-      "predicted": "1 9 9 9",
+      "predicted": "स्कुटर",
       "correct": false
     },
     {
       "family": "A_more",
       "prompt": "यदि सुनिता को उमेर 71 वर्ष र राजु को उमेर 76 वर्ष भए, कसको उमेर बढी हुन्छ?",
       "gold": "राजु",
-      "predicted": "- 1 9 9",
-      "correct": false
+      "predicted": "राजु",
+      "correct": true
     },
     {
       "family": "A_more",
       "prompt": "यदि साइकल को मूल्य 519 रुपैयाँ र मोबाइल को मूल्य 689 रुपैयाँ भए, कसको मूल्य बढी हुन्छ?",
       "gold": "मोबाइल",
-      "predicted": "- Ande",
-      "correct": false
+      "predicted": "मोबाइल",
+      "correct": true
     },
     {
       "family": "D_equal",
       "prompt": "साइकल को तौल 28 किलोग्राम छ र मोबाइल को तौल 42 किलोग्राम छ। के दुवैको तौल बराबर छ?",
       "gold": "होइन",
-      "predicted": "1000 ग्राम छ",
-      "correct": false
+      "predicted": "होइन",
+      "correct": true
     },
     {
       "family": "B_most",
       "prompt": "सुनिता, प्रकाश र गोपाल को उमेर क्रमशः 49, 27 र 13 वर्ष छ। सबैभन्दा बढी उमेर कसको छ?",
       "gold": "सुनिता",
-      "predicted": "- 1999 मा",
+      "predicted": "19",
       "correct": false
     },
     {
       "family": "D_equal",
       "prompt": "राजु को उमेर 24 वर्ष छ र कमला को उमेर 24 वर्ष छ। के दुवैको उमेर बराबर छ?",
       "gold": "हो",
-      "predicted": "- 1 9 9",
+      "predicted": "होइन",
       "correct": false
     },
     {
       "family": "B_least",
       "prompt": "कमला, सुनिता र प्रकाश को उचाइ क्रमशः 192, 149 र 183 सेन्टिमिटर छ। सबैभन्दा कम उचाइ कसको छ?",
       "gold": "सुनिता",
-      "predicted": "- 199 1",
+      "predicted": "19",
       "correct": false
     },
     {
       "family": "A_less",
       "prompt": "यदि साइकल को मूल्य 189 रुपैयाँ र मोबाइल को मूल्य 1607 रुपैयाँ भए, कसको मूल्य कम हुन्छ?",
       "gold": "साइकल",
-      "predicted": "- Ande",
+      "predicted": "मोबाइल",
       "correct": false
     },
     {
       "family": "B_most",
       "prompt": "जुत्ता, मोबाइल र साइकल को तौल क्रमशः 40, 34 र 31 किलोग्राम छ। सबैभन्दा बढी तौल कसको छ?",
       "gold": "जुत्ता",
-      "predicted": "1000 ग्राम छ",
+      "predicted": "स्कुटर",
       "correct": false
     },
     {
       "family": "C_endpoints_less",
       "prompt": "मोबाइल को तौल, साइकल भन्दा बढी छ। साइकल को तौल, जुत्ता भन्दा बढी छ। मोबाइल र जुत्ता मध्ये कसको तौल कम छ?",
       "gold": "जुत्ता",
-      "predicted": "- Samet",
-      "correct": false
+      "predicted": "जुत्ता",
+      "correct": true
     },
     {
       "family": "B_most",
       "prompt": "साइकल, मोबाइल र जुत्ता को मूल्य क्रमशः 1841, 50 र 838 रुपैयाँ छ। सबैभन्दा बढी मूल्य कसको छ?",
       "gold": "साइकल",
-      "predicted": "10000 ग्राम",
-      "correct": false
+      "predicted": "साइकल",
+      "correct": true
     },
     {
       "family": "C_endpoints_more",
       "prompt": "गोपाल, उमेर मा राजु भन्दा अगाडि छ। राजु, उमेर मा शिव भन्दा अगाडि छ। गोपाल र शिव मध्ये कसको उमेर बढी छ?",
       "gold": "गोपाल",
-      "predicted": "- मीठो रंगको",
-      "correct": false
+      "predicted": "गोपाल",
+      "correct": true
     }
   ]
 }

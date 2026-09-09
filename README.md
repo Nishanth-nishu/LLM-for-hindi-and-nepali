@@ -71,8 +71,8 @@ what it superseded, and why). Summary:
 |---|---|---|
 | **Hindi pretrained** | [Uploaded](https://drive.google.com/file/d/1M2jZQ_e_o0mh1WwGEYoXGOqqE0VgpcK1/view?usp=drive_link) | step 6500/15000, test PPL 16.12 / BPB 0.309 |
 | **Nepali pretrained** | *pending upload* | step 6799/6800, test PPL 25.07 / BPB 0.479 — see recovery note in the JSON above |
-| **Hindi reasoning-finetuned** | *pending upload* | epoch_0 (best val_loss), 32.5% test exact-match |
-| **Nepali reasoning-finetuned** | *pending upload* | epoch_0 (best val_loss), 17.5% test exact-match |
+| **Hindi reasoning-finetuned** | *pending upload* | best.pt (lowest val_loss, step 75), 33.5% test exact-match |
+| **Nepali reasoning-finetuned** | *pending upload* | best.pt (lowest val_loss, step 75), 36.1% test exact-match |
 
 Shared Drive folder (all checkpoints, viewable by anyone with the link):
 https://drive.google.com/open?id=18GnBNUb7v0GlF5d1Ob7imOP4QaGElM1Q
@@ -86,7 +86,7 @@ https://drive.google.com/open?id=18GnBNUb7v0GlF5d1Ob7imOP4QaGElM1Q
 | Real pretraining corpus (train tokens) | 474,751,658 | 471,622,290 |
 | Test perplexity / BPB (pretrained) | 16.12 / 0.309 | 25.07 / 0.479 |
 | Generation quality, greedy (BLEU-4 / chrF / ROUGE-L) | 0.032 / 0.159 / 0.119 | 0.010 / 0.099 / 0.051 |
-| Reasoning accuracy, pretrained → finetuned | 0.0% → **32.5%** | 0.0% → **17.5%** |
+| Reasoning accuracy, pretrained → finetuned | 0.0% → 33.5% | 0.0% → **36.1%** |
 
 Full analysis and the evidence chain behind these numbers:
 [`report/phase3_final_report.md`](report/phase3_final_report.md).
@@ -132,13 +132,13 @@ python -m pipeline.train.finetune --lang nepali --repo-root .
 
 # 3. pretrained vs finetuned reasoning accuracy
 python -m pipeline.eval.reasoning_eval --lang hindi --checkpoint hindi/checkpoints/latest.pt --tag pretrained
-python -m pipeline.eval.reasoning_eval --lang hindi --checkpoint hindi/checkpoints_reasoning/epoch_0.pt --tag finetuned_best
+python -m pipeline.eval.reasoning_eval --lang hindi --checkpoint hindi/checkpoints_reasoning/best.pt --tag finetuned
 # repeat with --lang nepali
 
 # 4. pretrained vs finetuned attention comparison
 python -m pipeline.eval.reasoning_attention_compare --lang hindi \
     --pretrained-checkpoint hindi/checkpoints/latest.pt \
-    --finetuned-checkpoint hindi/checkpoints_reasoning/epoch_0.pt
+    --finetuned-checkpoint hindi/checkpoints_reasoning/best.pt
 # repeat with --lang nepali
 ```
 

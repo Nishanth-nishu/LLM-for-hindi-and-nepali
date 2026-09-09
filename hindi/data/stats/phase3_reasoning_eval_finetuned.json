@@ -1,20 +1,20 @@
 {
   "lang": "hindi",
-  "checkpoint": "hindi/checkpoints/latest.pt",
-  "checkpoint_step": 6500,
+  "checkpoint": "hindi/checkpoints_reasoning/best.pt",
+  "checkpoint_step": 75,
   "split": "test",
   "n_examples": 1500,
-  "exact_match_accuracy": 0.0,
+  "exact_match_accuracy": 0.33466666666666667,
   "accuracy_by_family": {
-    "A_less": 0.0,
-    "D_equal": 0.0,
-    "B_most": 0.0,
-    "B_least": 0.0,
-    "A_more": 0.0,
-    "C_endpoints_more": 0.0,
-    "C_endpoints_less": 0.0,
-    "C_least": 0.0,
-    "C_most": 0.0
+    "A_less": 0.39820359281437123,
+    "D_equal": 0.504,
+    "B_most": 0.1391941391941392,
+    "B_least": 0.13333333333333333,
+    "A_more": 0.44,
+    "C_endpoints_more": 0.5,
+    "C_endpoints_less": 0.6153846153846154,
+    "C_least": 0.5384615384615384,
+    "C_most": 0.09090909090909091
   },
   "n_by_family": {
     "A_less": 334,
@@ -32,84 +32,84 @@
       "family": "A_less",
       "prompt": "यदि मोहन की ऊंचाई 195 सेंटीमीटर और मनोज की ऊंचाई 179 सेंटीमीटर हो, तो किसकी ऊंचाई कम होगी?",
       "gold": "मनोज",
-      "predicted": "उत्तर: उत्तर: उत्तर: उत्तर:",
-      "correct": false
+      "predicted": "मनोज",
+      "correct": true
     },
     {
       "family": "A_less",
       "prompt": "यदि यश की ऊंचाई 157 सेंटीमीटर और अर्जुन की ऊंचाई 193 सेंटीमीटर हो, तो किसकी ऊंचाई कम होगी?",
       "gold": "यश",
-      "predicted": "1. 2022",
+      "predicted": "अर्जुन",
       "correct": false
     },
     {
       "family": "A_less",
       "prompt": "यदि मोबाइल का वज़न 3 किलोग्राम और जूता का वज़न 35 किलोग्राम हो, तो किसका वज़न कम होगा?",
       "gold": "मोबाइल",
-      "predicted": "- 2014 में",
+      "predicted": "हाँ",
       "correct": false
     },
     {
       "family": "D_equal",
       "prompt": "साइकिल की कीमत 1579 रुपये है और मोबाइल की कीमत 328 रुपये है। क्या दोनों की कीमत बराबर है?",
       "gold": "नहीं",
-      "predicted": "उत्तर: उत्तर: उत्तर: उत्तर:",
-      "correct": false
+      "predicted": "नहीं",
+      "correct": true
     },
     {
       "family": "A_less",
       "prompt": "यदि साइकिल की कीमत 778 रुपये और जूता की कीमत 674 रुपये हो, तो किसकी कीमत कम होगी?",
       "gold": "जूता",
-      "predicted": "साइकिल की कीमत 77",
+      "predicted": "साइकिल",
       "correct": false
     },
     {
       "family": "B_most",
       "prompt": "प्रिया, सुनीता और यश की उम्र क्रमशः 48, 71 और 63 वर्ष है। सबसे अधिक उम्र किसकी है?",
       "gold": "सुनीता",
-      "predicted": "48, 71,",
+      "predicted": "हाँ",
       "correct": false
     },
     {
       "family": "B_least",
       "prompt": "मोबाइल, साइकिल और जूता की कीमत क्रमशः 1786, 820 और 1342 रुपये है। सबसे कम कीमत किसकी है?",
       "gold": "साइकिल",
-      "predicted": "- 1786 में",
+      "predicted": "हाँ",
       "correct": false
     },
     {
       "family": "B_least",
       "prompt": "साइकिल, मोबाइल और जूता की कीमत क्रमशः 1024, 893 और 1207 रुपये है। सबसे कम कीमत किसकी है?",
       "gold": "मोबाइल",
-      "predicted": "- 1024 में",
+      "predicted": "हाँ",
       "correct": false
     },
     {
       "family": "A_less",
       "prompt": "यदि प्रिया की ऊंचाई 192 सेंटीमीटर और मनोज की ऊंचाई 183 सेंटीमीटर हो, तो किसकी ऊंचाई कम होगी?",
       "gold": "मनोज",
-      "predicted": "उत्तर: उत्तर: उत्तर: उत्तर:",
+      "predicted": "प्रिया",
       "correct": false
     },
     {
       "family": "A_more",
       "prompt": "यदि साइकिल की कीमत 486 रुपये और जूता की कीमत 1370 रुपये हो, तो किसकी कीमत अधिक होगी?",
       "gold": "जूता",
-      "predicted": "साइकिल की कीमत 48",
+      "predicted": "साइकिल",
       "correct": false
     },
     {
       "family": "A_more",
       "prompt": "यदि मोबाइल का वज़न 15 किलोग्राम और जूता का वज़न 33 किलोग्राम हो, तो किसका वज़न अधिक होगा?",
       "gold": "जूता",
-      "predicted": "- 15 किलोग्राम",
+      "predicted": "हाँ",
       "correct": false
     },
     {
       "family": "A_more",
       "prompt": "यदि जूता की कीमत 782 रुपये और मोबाइल की कीमत 1031 रुपये हो, तो किसकी कीमत अधिक होगी?",
       "gold": "मोबाइल",
-      "predicted": "उत्तर: उत्तर: उत्तर: उत्तर:",
+      "predicted": "जूता",
       "correct": false
     }
   ]

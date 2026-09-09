@@ -21,9 +21,9 @@ into one place and answers the four questions the assignment asks for.
 | **Test perplexity / BPB (pretrained)** | **16.12 / 0.309** | **25.07 / 0.479** |
 | **Generation quality, greedy (BLEU-4 / chrF / ROUGE-L)** | **0.032 / 0.159 / 0.119** | 0.010 / 0.099 / 0.051 |
 | **Reasoning accuracy, pretrained (zero-shot, exact match)** | 0.0% | 0.0% |
-| **Reasoning accuracy, finetuned (best val_loss epoch)** | **32.5%** | **17.5%** |
-| **Attention entropy shift after reasoning finetuning** | −0.128 nats (sharper) | −0.163 nats (sharper) |
-| **Attention distance shift after reasoning finetuning** | −0.47 tokens (more local) | +0.31 tokens (less local) |
+| **Reasoning accuracy, finetuned (best val_loss checkpoint)** | 33.5% | **36.1%** |
+| **Attention entropy shift after reasoning finetuning** | −0.025 nats (mild sharpening) | −0.090 nats (sharpening) |
+| **Attention distance shift after reasoning finetuning** | small, not a reliable signal (see `phase3_attention_report.md` §3) | same |
 
 Sources: `report/phase1_tokenizer_report.md` (fertility),
 `<lang>/data/stats/phase2_corpus_token_counts.json` (real token counts,
@@ -55,26 +55,37 @@ efficiency**, not raw token count (see §4).
 
 ## 3. How do language-modeling and reasoning results compare across the two resource tiers?
 
-Every evaluation axis in this project — intrinsic LM quality (PPL/BPB),
-generation quality (BLEU-4/chrF/ROUGE-L), and reasoning accuracy — points
-the same direction: **Model H outperforms Model L by a wide, consistent
-margin**, despite starting from near-identical corpus sizes:
+**Intrinsic LM quality and generation quality both favor Model H by a
+wide, consistent margin.** Reasoning accuracy does **not** follow the same
+pattern — a genuinely interesting divergence, not a data-quality artifact
+(see below for how that was checked):
 
 - LM quality: Hindi's test perplexity (16.12) is **36% lower** than
   Nepali's (25.07); bits-per-byte (the tokenizer-agnostic metric) shows
   the same gap (0.309 vs 0.479).
 - Generation quality: Hindi's greedy BLEU-4 is **3.2×** Nepali's
   (0.032 vs 0.010); chrF and ROUGE-L show the same ~1.6–2.3× gap.
-- Reasoning: after identical finetuning protocols (same hyperparameters,
-  same epoch count, same early-stopping criterion), Hindi reaches
-  **32.5%** exact-match accuracy on the synthetic reasoning test set vs.
-  Nepali's **17.5%** — roughly **1.9×**.
+- **Reasoning: Model L finetunes to slightly *higher* accuracy than
+  Model H** — 36.1% (Nepali) vs. 33.5% (Hindi) — under identical
+  finetuning protocols (same hyperparameters, same dataset size and
+  construction, same checkpoint-selection criterion).
 
-The reasoning gap is the widest, proportionally, of the three — consistent
-with reasoning finetuning being the task most sensitive to the *quality*
-of the base language model's representations (finetuning only ran 744
-steps on 3000 examples; it cannot compensate for a weaker starting point
-the way another 6000+ steps of pretraining might).
+This is not the result of an easier first pass: an initial, smaller-data
+finetuning attempt *did* show Hindi ahead (32.5% vs. 17.5%), but that gap
+turned out to be a confound of insufficient training data and a
+checkpoint-selection bug rather than a real capability difference — see
+`report/phase3_reasoning_report.md` §3 for the full diagnosis. Once fixed
+(4x more finetuning data, correctly identifying the true best-val-loss
+checkpoint), Nepali's disadvantage in LM quality did not carry over into a
+reasoning-finetuning disadvantage — if anything, it reversed, driven
+specifically by Nepali's stronger performance on the pure-relational
+transitive-chain families (`C_endpoints_less` 77.8% vs. Hindi's 61.5%;
+`C_least` 66.7% vs. 53.8%), while the two languages are close to even on
+the harder numeric-comparison families. **Takeaway: a weaker pretrained
+language model does not necessarily produce a weaker finetuned reasoner,
+once both models are given adequate task-specific data** — reasoning
+finetuning on a small, templated task can partly decouple from the base
+model's general language-modeling quality.
 
 ## 4. What tokenizer / corpus factors most affected the lower-resource model?
 
@@ -111,43 +122,53 @@ corpus/script complexity are doing more of the work.
 Putting §§2–4 together, the evidence chain is:
 
 1. **Corpus token counts are nearly equal** (474.75M vs. 471.62M) —
-   ruling out "Model L just saw less data" as the primary explanation.
+   ruling out "Model L just saw less data" as the primary explanation for
+   anything.
 2. **Tokenizer fertility is measurably worse for Nepali** (1.8457 vs.
    1.6522 tokens/word, Phase 1, held-out test split) — meaning the
    *effective* text coverage per training step was lower for Nepali even
    at matched token counts.
-3. **Every downstream metric degrades in the same direction and by a
-   similar relative magnitude** — PPL/BPB (+36%/+55%), generation quality
-   (BLEU-4 –68%, chrF –38%, ROUGE-L –57%), and reasoning accuracy (–46%,
-   32.5%→17.5%) — which is what you would expect if a single upstream
-   factor (effective per-token text coverage, driven by fertility) were
-   propagating through the whole pipeline, rather than each metric having
-   an unrelated, independent cause.
-4. **The reasoning-finetuning attention analysis adds a mechanistic
-   detail** (`report/phase3_attention_report.md`): finetuning sharpens
-   attention (lower entropy) in *both* models similarly, but Hindi's
-   attention becomes more local while Nepali's becomes slightly less
-   local. A plausible reading is that Hindi's stronger base
-   representations let finetuning sharpen attention onto the *correct*
-   nearby evidence (the specific number or entity just mentioned), while
-   Nepali's weaker base representations let finetuning sharpen attention
-   without it converging on the right evidence as reliably — consistent
-   with Nepali's much lower reasoning accuracy despite a similar-sized
-   entropy drop.
-5. **The specific reasoning failure analysis** (`report/phase3_reasoning_report.md`
-   §3.2–3.3) shows *both* languages struggle far more with numeric-
-   magnitude comparison than with pure relational chaining, but Model L's
-   struggle is broader and deeper — its finetuned checkpoint fails
-   entirely (0%) on both `B_most` and `B_least`, while Model H's partially
-   succeeds on both (13.3%, 20.4%) — the same qualitative failure mode
-   the weaker base model, appearing more severely.
+3. **Pretraining-adjacent metrics degrade together, in the direction
+   fertility predicts.** PPL/BPB (+36%/+55% for Nepali) and generation
+   quality (BLEU-4 –68%, chrF –38%, ROUGE-L –57%) both move the same way
+   and by comparable relative magnitude — consistent with a single
+   upstream factor (effective per-token text coverage, driven by
+   fertility) propagating through both, rather than two unrelated causes.
+4. **Reasoning accuracy breaks that pattern, and the break is informative
+   rather than noise.** If the fertility story were the *whole* story,
+   Nepali's finetuned reasoning accuracy should also lag — it doesn't
+   (36.1% vs. Hindi's 33.5%, §3). The natural reading: reasoning
+   finetuning on a small, templated task depends much more on how well
+   3000+ task-specific examples can be fit and generalized from than on
+   the base model's general-purpose language-modeling quality inherited
+   from a several-hundred-million-token pretraining corpus. Fertility (and
+   whatever underlying corpus/script factor it reflects) predicts
+   pretraining-adjacent metrics well; it does not predict finetuned
+   downstream task performance on its own.
+5. **The attention comparison is consistent with a narrower, more modest
+   effect than initially suspected** (`report/phase3_attention_report.md`
+   §3): entropy drops in both models after reasoning finetuning (a
+   genuine, if small, effect, more pronounced in Nepali), concentrated in
+   late layers — but attention-*distance* shifts are small and were shown
+   to flip direction between two different (successively corrected)
+   finetuning runs for the same language, so no distance-based
+   Hindi-vs-Nepali claim is made here.
+6. **The specific reasoning failure analysis** (`report/phase3_reasoning_report.md`
+   §4) shows both languages struggle far more with numeric-magnitude
+   comparison (`A_*`/`B_*` families, 13–44%) than with pure relational
+   chaining (`C_endpoints_*`/`C_least`, 50–78%) — a shared limitation of
+   this model scale and finetuning budget, not one specific to the
+   lower-resource language.
 
 None of this rules out other contributing factors this project did not
 directly measure (script complexity, morphological richness, or the
 specific web-text sources each corpus drew from in Phase 1) — but
-tokenizer fertility is the one factor with a direct, held-out-measured
-number showing a real, non-trivial gap in the direction that matches
-every downstream result.
+tokenizer fertility remains the one factor with a direct, held-out-measured
+number showing a real, non-trivial gap that lines up with every
+*pretraining-adjacent* downstream result. Reasoning accuracy is the one
+axis on which "lower-resource model" does not simply mean "worse at
+everything," and the final numbers report that honestly rather than
+forcing a single narrative across all three evaluation types.
 
 ## 6. Report index
 
