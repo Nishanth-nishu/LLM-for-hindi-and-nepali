@@ -107,6 +107,7 @@ def finetune(lang: str, repo_root: str = ".", config_name: str = "reasoning_fine
     model.train()
     step = 0
     t0 = time.time()
+    best_val_loss = float("inf")
     with open(log_path, "a", encoding="utf-8") as logf:
         for epoch in range(fcfg["epochs"]):
             for x, y in train_loader:
@@ -134,6 +135,23 @@ def finetune(lang: str, repo_root: str = ".", config_name: str = "reasoning_fine
                           f"val_ppl {rec['val_ppl']:.2f}  lr {lr:.2e}", flush=True)
                     logf.write(json.dumps(rec) + "\n")
                     logf.flush()
+
+                    # Track the best checkpoint by validation loss at EVAL
+                    # granularity (eval_every steps), not just at epoch
+                    # boundaries -- with a small finetuning set the true
+                    # optimum can fall well inside the first epoch, and an
+                    # epoch-only checkpoint would silently miss it.
+                    if val_loss < best_val_loss:
+                        best_val_loss = val_loss
+                        save_checkpoint(
+                            ckpt_dir / "best.pt", model, optimizer, scheduler_state, step,
+                            {"model": base_ckpt["config"]["model"], "finetune": fcfg},
+                            extra={
+                                "base_checkpoint": fcfg["base_checkpoint"],
+                                "base_checkpoint_step": base_ckpt.get("step"),
+                                "best_val_loss": best_val_loss,
+                            },
+                        )
                 step += 1
 
             save_checkpoint(
