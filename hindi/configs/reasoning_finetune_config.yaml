@@ -8,14 +8,14 @@ finetune:
   delimiter: "उत्तर:"
   max_len: 128
   batch_size: 32
-  epochs: 8
-  lr: 1.0e-4
-  min_lr: 1.0e-5
-  warmup_steps: 50
+  epochs: 15
+  lr: 6.0e-5
+  min_lr: 6.0e-6
+  warmup_steps: 150
   weight_decay: 0.1
   betas: [0.9, 0.95]
   grad_clip: 1.0
-  eval_every: 20
+  eval_every: 100
   ckpt_dir: hindi/checkpoints_reasoning
   seed: 20260909
   device: auto

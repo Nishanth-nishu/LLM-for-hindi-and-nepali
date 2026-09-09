@@ -183,8 +183,14 @@ ALL_FAMILIES = FAMILIES_2E + FAMILIES_3E_NUM + FAMILIES_3E_REL + [FAMILY_EQ]
 # rough weighting: keep 2-entity numeric comparisons (the simplest case) most
 # common, transitive chains and equality as substantial but smaller slices
 FAMILY_WEIGHTS = {
-    "A_more": 3, "A_less": 3,
-    "B_most": 2, "B_least": 2,
+    # Numeric-magnitude-comparison families (A_*, B_*) are weighted up:
+    # reasoning_eval showed these are the weak spot (5-25% accuracy vs
+    # 80-95%+ for the pure-relational C_* families even at matched
+    # data-sparsity conditions) -- sparse coverage of the (value_a, value_b)
+    # space, not tokenization (digits already get one token each), is the
+    # bottleneck, so these get proportionally more generated examples.
+    "A_more": 5, "A_less": 5,
+    "B_most": 4, "B_least": 4,
     "C_endpoints_more": 2, "C_endpoints_less": 2, "C_most": 1, "C_least": 1,
     "D_equal": 2,
 }

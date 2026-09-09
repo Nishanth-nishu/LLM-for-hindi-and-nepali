@@ -3,31 +3,31 @@
   "seed": 20260909,
   "splits": {
     "train": {
-      "n_examples": 3000,
+      "n_examples": 12000,
       "by_family": {
-        "C_endpoints_less": 318,
-        "B_most": 337,
-        "A_more": 491,
-        "B_least": 343,
-        "C_least": 146,
-        "C_endpoints_more": 330,
-        "D_equal": 325,
-        "A_less": 539,
-        "C_most": 171
+        "A_less": 2312,
+        "B_least": 1780,
+        "C_least": 468,
+        "C_endpoints_more": 878,
+        "C_endpoints_less": 952,
+        "B_most": 1875,
+        "A_more": 2314,
+        "C_most": 456,
+        "D_equal": 965
       },
       "by_attribute": {
-        "weight": 737,
-        "height": 757,
-        "price": 734,
-        "age": 772
+        "weight": 2986,
+        "price": 2983,
+        "age": 3046,
+        "height": 2985
       },
       "by_n_entities": {
-        "3": 1645,
-        "2": 1355
+        "2": 5591,
+        "3": 6409
       },
-      "prompt_char_len_min": 63,
+      "prompt_char_len_min": 61,
       "prompt_char_len_max": 136,
-      "prompt_char_len_mean": 98.19433333333333,
+      "prompt_char_len_mean": 99.33475,
       "names_used": [
         "अनिता",
         "अर्जुन",
@@ -74,31 +74,31 @@
       ]
     },
     "val": {
-      "n_examples": 400,
+      "n_examples": 1500,
       "by_family": {
-        "B_most": 37,
-        "C_endpoints_more": 39,
-        "A_less": 83,
-        "A_more": 63,
-        "C_endpoints_less": 37,
-        "B_least": 47,
-        "C_most": 23,
-        "D_equal": 57,
-        "C_least": 14
+        "D_equal": 136,
+        "A_less": 314,
+        "A_more": 318,
+        "C_endpoints_less": 68,
+        "B_most": 253,
+        "B_least": 267,
+        "C_endpoints_more": 56,
+        "C_most": 46,
+        "C_least": 42
       },
       "by_attribute": {
-        "weight": 88,
-        "price": 101,
-        "age": 109,
-        "height": 102
+        "age": 368,
+        "weight": 373,
+        "height": 403,
+        "price": 356
       },
       "by_n_entities": {
-        "3": 197,
-        "2": 203
+        "2": 768,
+        "3": 732
       },
-      "prompt_char_len_min": 63,
-      "prompt_char_len_max": 131,
-      "prompt_char_len_mean": 97.61,
+      "prompt_char_len_min": 62,
+      "prompt_char_len_max": 133,
+      "prompt_char_len_mean": 100.22933333333333,
       "names_used": [
         "कल्पना",
         "कुर्सी",
@@ -112,31 +112,31 @@
       ]
     },
     "test": {
-      "n_examples": 400,
+      "n_examples": 1500,
       "by_family": {
-        "B_least": 53,
-        "A_more": 70,
-        "B_most": 38,
-        "C_endpoints_less": 39,
-        "A_less": 70,
-        "D_equal": 52,
-        "C_endpoints_more": 43,
-        "C_most": 19,
-        "C_least": 16
+        "B_most": 261,
+        "A_more": 327,
+        "D_equal": 124,
+        "B_least": 259,
+        "A_less": 325,
+        "C_endpoints_less": 72,
+        "C_endpoints_more": 64,
+        "C_most": 26,
+        "C_least": 42
       },
       "by_attribute": {
-        "height": 105,
-        "price": 94,
-        "age": 110,
-        "weight": 91
+        "weight": 362,
+        "age": 418,
+        "price": 331,
+        "height": 389
       },
       "by_n_entities": {
-        "3": 208,
-        "2": 192
+        "3": 724,
+        "2": 776
       },
-      "prompt_char_len_min": 70,
+      "prompt_char_len_min": 69,
       "prompt_char_len_max": 115,
-      "prompt_char_len_mean": 89.83,
+      "prompt_char_len_mean": 86.24933333333334,
       "names_used": [
         "कमला",
         "गोपाल",
