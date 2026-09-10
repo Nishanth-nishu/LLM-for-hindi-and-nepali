@@ -285,9 +285,9 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--lang", required=True, choices=["hindi", "nepali"])
     ap.add_argument("--repo-root", default=".")
-    ap.add_argument("--n-train", type=int, default=12000)
-    ap.add_argument("--n-val", type=int, default=1500)
-    ap.add_argument("--n-test", type=int, default=1500)
+    ap.add_argument("--n-train", type=int, default=5_000_000)
+    ap.add_argument("--n-val", type=int, default=10_000)
+    ap.add_argument("--n-test", type=int, default=10_000)
     ap.add_argument("--seed", type=int, default=20260909)
     args = ap.parse_args()
 

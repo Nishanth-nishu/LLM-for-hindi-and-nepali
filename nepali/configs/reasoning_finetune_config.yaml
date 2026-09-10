@@ -8,21 +8,27 @@ finetune:
   delimiter: "जवाफ:"
   max_len: 128
   batch_size: 32
-  epochs: 15
+  # 1 epoch over 5,000,000 train examples at batch_size 32 is ~156,250
+  # steps -- already 28x the ENTIRE previous 15-epoch/5625-step run on the
+  # 12,000-example dataset, so 1 epoch is not a typo. best.pt tracking
+  # (see finetune.py) picks the true optimum regardless of how far into
+  # this it falls; --max-steps can cap the run early if the curve
+  # converges/degrades well before the full epoch completes.
+  epochs: 1
   lr: 1.5e-5
   min_lr: 1.5e-6
   warmup_steps: 150
   weight_decay: 0.1
   betas: [0.9, 0.95]
   grad_clip: 1.0
-  eval_every: 25
+  eval_every: 1000
   # Frozen-backbone regularization (see apply_finetune_regularization in
   # pipeline/train/finetune.py): freeze token/positional embeddings plus
   # the first 5 of 7 transformer blocks; only the last 2 blocks, ln_f, and
   # an untied (separately trainable) lm_head update. Dropout raised for
   # the finetuning phase specifically, independent of the pretraining
-  # config's 0.1 -- a 12k-example finetuning set needs more regularization
-  # than the ~472M-token pretraining corpus did.
+  # config's 0.1. Kept unchanged from the 12k-example run so the dataset-
+  # size increase is the only variable changing between the two.
   freeze_embeddings: true
   freeze_layers: 5
   finetune_dropout: 0.3

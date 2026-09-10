@@ -16,5 +16,12 @@ __pycache__/
 */data/interim/
 */data/splits/*.jsonl
 
+# Reasoning dataset at 5M+ examples/language is several GB -- not a git-sized
+# binary, and (unlike checkpoints) it doesn't need a Drive link either: it's
+# fully and exactly reproducible from the committed, seeded generator
+# (pipeline/reasoning/generate_dataset.py). Keep dataset_stats.json (small,
+# informative) tracked; drop the raw jsonl.
+*/data/reasoning/*.jsonl
+
 # Personal study notes -- never intended for the submission, must never be committed
 NOTES_*.md

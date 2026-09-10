@@ -130,7 +130,12 @@ def apply_finetune_regularization(model: GPTLanguageModel, fcfg: dict) -> dict:
     return summary
 
 
-def finetune(lang: str, repo_root: str = ".", config_name: str = "reasoning_finetune_config.yaml") -> dict:
+def finetune(
+    lang: str,
+    repo_root: str = ".",
+    config_name: str = "reasoning_finetune_config.yaml",
+    max_steps_override: int | None = None,
+) -> dict:
     root = Path(repo_root).resolve()
     cfg = load_config(root, lang, config_name)
     fcfg = cfg["finetune"]
@@ -170,7 +175,9 @@ def finetune(lang: str, repo_root: str = ".", config_name: str = "reasoning_fine
 
     optimizer = build_optimizer(model, fcfg["lr"], fcfg["weight_decay"], tuple(fcfg["betas"]))
     steps_per_epoch = len(train_loader)
-    max_steps = steps_per_epoch * fcfg["epochs"]
+    max_steps = max_steps_override or steps_per_epoch * fcfg["epochs"]
+    print(f"[{lang}] steps_per_epoch={steps_per_epoch:,}, max_steps={max_steps:,}"
+          f"{' (overridden)' if max_steps_override else ''}", flush=True)
 
     ckpt_dir = root / fcfg["ckpt_dir"]
     ckpt_dir.mkdir(parents=True, exist_ok=True)
@@ -226,6 +233,8 @@ def finetune(lang: str, repo_root: str = ".", config_name: str = "reasoning_fine
                             },
                         )
                 step += 1
+                if step >= max_steps:
+                    break
 
             save_checkpoint(
                 ckpt_dir / f"epoch_{epoch}.pt", model, optimizer, scheduler_state, step,
@@ -237,6 +246,8 @@ def finetune(lang: str, repo_root: str = ".", config_name: str = "reasoning_fine
                 {"model": base_ckpt["config"]["model"], "finetune": fcfg},
                 extra={"base_checkpoint": fcfg["base_checkpoint"], "base_checkpoint_step": base_ckpt.get("step")},
             )
+            if step >= max_steps:
+                break
 
     return pcount
 
@@ -246,8 +257,9 @@ def main() -> int:
     ap.add_argument("--lang", required=True, choices=["hindi", "nepali"])
     ap.add_argument("--repo-root", default=".")
     ap.add_argument("--config", default="reasoning_finetune_config.yaml")
+    ap.add_argument("--max-steps", type=int, default=None, help="cap total steps (overrides epochs*steps_per_epoch)")
     args = ap.parse_args()
-    finetune(args.lang, args.repo_root, args.config)
+    finetune(args.lang, args.repo_root, args.config, args.max_steps)
     return 0
 
 
