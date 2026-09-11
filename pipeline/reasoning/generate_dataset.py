@@ -5,7 +5,7 @@ exactly known at generation time.
     python -m pipeline.reasoning.generate_dataset --lang hindi --repo-root .
     python -m pipeline.reasoning.generate_dataset --lang nepali --repo-root .
 
-Leakage avoidance (two independent mechanisms, both applied every time):
+Leakage avoidance (three independent mechanisms, all applied every time):
   1. Entity names: the name pool for each language is split into disjoint
      train / val / test subsets (see `split_names`). An entity name that
      appears in a test example was NEVER used to generate a train or val
@@ -15,6 +15,15 @@ Leakage avoidance (two independent mechanisms, both applied every time):
      split; train/val only ever sample from the remaining phrasings. So
      some exact sentence structures in the test set were never seen during
      training either.
+  3. Numeric values: each attribute's integer range (e.g. height 140-195)
+     is ALSO split into disjoint train/val/test value pools (`split_values`),
+     the same way entity names are. Without this, a test example like
+     "172 vs 165" could reuse the exact value pair from some train example
+     under different entity names -- not literal memorization of the
+     prompt, but still lets the model recall a specific comparison rather
+     than generalize the comparison operation. With disjoint value pools,
+     a numeric comparison the model needs to answer at test time was never
+     seen, under any names, during training.
 
 Output schema (one JSON object per line):
     {
@@ -66,6 +75,27 @@ def split_names(names: list[str], seed: int, train_frac: float = 0.70, val_frac:
     }
 
 
+def split_values(low: int, high: int, seed: int, train_frac: float = 0.70, val_frac: float = 0.15) -> dict[str, list[int]]:
+    """Disjoint train/val/test partition of an attribute's integer value
+    range [low, high]. Same mechanism as split_names, applied to numeric
+    values instead of entity names: without this, a test example could
+    reuse the exact same value PAIR as some train example (just under
+    different entity names) -- not prompt-level leakage, but it lets the
+    model recall a specific comparison instead of generalizing the
+    comparison operation. See the module docstring, mechanism 3."""
+    rng = random.Random(seed)
+    pool = list(range(low, high + 1))
+    rng.shuffle(pool)
+    n = len(pool)
+    n_train = int(n * train_frac)
+    n_val = int(n * val_frac)
+    return {
+        "train": pool[:n_train],
+        "val": pool[n_train : n_train + n_val],
+        "test": pool[n_train + n_val :],
+    }
+
+
 def templates_for_split(lex: Lexicon, family: str, split: str) -> list[str]:
     all_templates = lex.templates[family]
     if len(all_templates) < 2:
@@ -79,16 +109,19 @@ def _fmt(template: str, attr, **kw) -> str:
     )
 
 
-def gen_two_entity(rng: random.Random, lex: Lexicon, split: str, names: list[str], family: str, ex_id: str) -> dict:
+def gen_two_entity(
+    rng: random.Random, lex: Lexicon, split: str, names: list[str], value_pools: dict[str, list[int]], family: str, ex_id: str
+) -> dict:
     attr_key = rng.choice(list(lex.attributes))
     attr = lex.attributes[attr_key]
     pool = lex.people_names if attr.domain == "people" else lex.object_names
     pool = [n for n in pool if n in names] or names  # fall back if domain pool doesn't intersect this split's names
     a, b = rng.sample(pool, 2) if len(pool) >= 2 else rng.sample(names, 2)
-    va = rng.randint(attr.low, attr.high)
-    vb = rng.randint(attr.low, attr.high)
+    vpool = value_pools[attr_key]
+    va = rng.choice(vpool)
+    vb = rng.choice(vpool)
     while vb == va:
-        vb = rng.randint(attr.low, attr.high)
+        vb = rng.choice(vpool)
 
     template = rng.choice(templates_for_split(lex, family, split))
     prompt = _fmt(template, attr, A=a, B=b, va=va, vb=vb)
@@ -103,18 +136,21 @@ def gen_two_entity(rng: random.Random, lex: Lexicon, split: str, names: list[str
     }
 
 
-def gen_equality(rng: random.Random, lex: Lexicon, split: str, names: list[str], ex_id: str) -> dict:
+def gen_equality(
+    rng: random.Random, lex: Lexicon, split: str, names: list[str], value_pools: dict[str, list[int]], ex_id: str
+) -> dict:
     attr_key = rng.choice(list(lex.attributes))
     attr = lex.attributes[attr_key]
     pool = lex.people_names if attr.domain == "people" else lex.object_names
     pool = [n for n in pool if n in names] or names
     a, b = rng.sample(pool, 2) if len(pool) >= 2 else rng.sample(names, 2)
-    va = rng.randint(attr.low, attr.high)
+    vpool = value_pools[attr_key]
+    va = rng.choice(vpool)
     equal = rng.random() < 0.5
-    vb = va if equal else rng.randint(attr.low, attr.high)
+    vb = va if equal else rng.choice(vpool)
     if not equal:
         while vb == va:
-            vb = rng.randint(attr.low, attr.high)
+            vb = rng.choice(vpool)
 
     template = rng.choice(templates_for_split(lex, FAMILY_EQ, split))
     prompt = _fmt(template, attr, A=a, B=b, va=va, vb=vb)
@@ -126,15 +162,18 @@ def gen_equality(rng: random.Random, lex: Lexicon, split: str, names: list[str],
     }
 
 
-def gen_three_entity_numeric(rng: random.Random, lex: Lexicon, split: str, names: list[str], family: str, ex_id: str) -> dict:
+def gen_three_entity_numeric(
+    rng: random.Random, lex: Lexicon, split: str, names: list[str], value_pools: dict[str, list[int]], family: str, ex_id: str
+) -> dict:
     attr_key = rng.choice(list(lex.attributes))
     attr = lex.attributes[attr_key]
     pool = lex.people_names if attr.domain == "people" else lex.object_names
     pool = [n for n in pool if n in names] or names
     a, b, c = rng.sample(pool, 3) if len(pool) >= 3 else rng.sample(names, 3)
+    vpool = value_pools[attr_key]
     vals = set()
     while len(vals) < 3:
-        vals.add(rng.randint(attr.low, attr.high))
+        vals.add(rng.choice(vpool))
     va, vb, vc = list(vals)
 
     template = rng.choice(templates_for_split(lex, family, split))
@@ -196,7 +235,9 @@ FAMILY_WEIGHTS = {
 }
 
 
-def generate_split(lex: Lexicon, split: str, names: list[str], n: int, seed: int) -> list[dict]:
+def generate_split(
+    lex: Lexicon, split: str, names: list[str], value_pools: dict[str, list[int]], n: int, seed: int
+) -> list[dict]:
     rng = random.Random(seed)
     families = list(FAMILY_WEIGHTS)
     weights = [FAMILY_WEIGHTS[f] for f in families]
@@ -208,11 +249,11 @@ def generate_split(lex: Lexicon, split: str, names: list[str], n: int, seed: int
         family = rng.choices(families, weights=weights, k=1)[0]
         ex_id = f"{lex.lang}_{split}_{len(out):06d}"
         if family in FAMILIES_2E:
-            ex = gen_two_entity(rng, lex, split, names, family, ex_id)
+            ex = gen_two_entity(rng, lex, split, names, value_pools, family, ex_id)
         elif family == FAMILY_EQ:
-            ex = gen_equality(rng, lex, split, names, ex_id)
+            ex = gen_equality(rng, lex, split, names, value_pools, ex_id)
         elif family in FAMILIES_3E_NUM:
-            ex = gen_three_entity_numeric(rng, lex, split, names, family, ex_id)
+            ex = gen_three_entity_numeric(rng, lex, split, names, value_pools, family, ex_id)
         else:
             ex = gen_transitive_chain(rng, lex, split, names, family, ex_id)
 
@@ -247,6 +288,16 @@ def write_jsonl(path: Path, examples: list[dict]) -> None:
             f.write(json.dumps(ex, ensure_ascii=False) + "\n")
 
 
+# Fixed (not hash()-based) per-split seed offsets -- Python's str hash() is
+# randomized per-process by default (PYTHONHASHSEED), so `hash(split)` would
+# silently make each generation run non-reproducible even with the same
+# --seed, contradicting the "fully and exactly reproducible from a fixed
+# seed" claim this dataset's documentation makes elsewhere (README.md,
+# .gitignore). Verified: two fresh `python -c "print(hash('train'))"`
+# invocations returned different values.
+_SPLIT_SEED_OFFSET = {"train": 0, "val": 1, "test": 2}
+
+
 def generate_all(lang: str, repo_root: Path, n_train: int, n_val: int, n_test: int, seed: int) -> dict:
     lex = LEXICONS[lang]
     people_split = split_names(lex.people_names, seed=seed)
@@ -254,15 +305,24 @@ def generate_all(lang: str, repo_root: Path, n_train: int, n_val: int, n_test: i
     name_split = {
         s: people_split[s] + object_split[s] for s in ("train", "val", "test")
     }
+    value_split = {
+        s: {attr_key: split_values(attr.low, attr.high, seed=seed + 2 + i)[s]
+            for i, (attr_key, attr) in enumerate(lex.attributes.items())}
+        for s in ("train", "val", "test")
+    }
 
     out_dir = repo_root / lang / "data" / "reasoning"
     sizes = {"train": n_train, "val": n_val, "test": n_test}
     stats = {"lang": lang, "seed": seed, "splits": {}}
     for split, n in sizes.items():
-        examples = generate_split(lex, split, name_split[split], n, seed=seed + hash(split) % 10_000)
+        examples = generate_split(
+            lex, split, name_split[split], value_split[split], n,
+            seed=seed + 1000 + _SPLIT_SEED_OFFSET[split],
+        )
         write_jsonl(out_dir / f"{split}.jsonl", examples)
         stats["splits"][split] = dataset_stats(examples)
         stats["splits"][split]["names_used"] = sorted(set(name_split[split]))
+        stats["splits"][split]["value_pool_sizes"] = {k: len(v) for k, v in value_split[split].items()}
 
     stats["name_pool_sizes"] = {s: len(name_split[s]) for s in name_split}
     stats["leakage_avoidance"] = (
@@ -272,7 +332,10 @@ def generate_all(lang: str, repo_root: Path, n_train: int, n_val: int, n_test: i
         "example. Additionally, for every template family with more than "
         "one phrasing, the last phrasing is reserved exclusively for the "
         "test split (templates_for_split) -- some test sentence structures "
-        "were never seen during training either."
+        "were never seen during training either. Each attribute's numeric "
+        "range is ALSO partitioned into disjoint train/val/test value pools "
+        "(split_values) -- a numeric comparison a test example asks about "
+        "was never seen, under any entity names, during training."
     ).format(seed=seed)
 
     (out_dir / "dataset_stats.json").write_text(
