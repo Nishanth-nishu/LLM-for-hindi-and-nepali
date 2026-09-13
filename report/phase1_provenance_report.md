@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| Generated (UTC) | 2026-08-25 09:38:50 |
-| Git commit | `987ad30458abfbc6b83154a7717d846e4bc85abc` |
-| Branch | `phase-1` |
+| Generated (UTC) | 2026-09-13 12:24:37 |
+| Git commit | `c2a82c02fa66e6395fd229e237a102fc4cb385f5` |
+| Branch | `phase-1-fix` |
 | Working tree | **dirty** — uncommitted changes present |
 
 > Values marked **ESTIMATE** are character-based proxies computed before a tokenizer existed. Final token counts are measured by encoding the final corpus with the final tokenizer (`count_corpus_tokens.py`).
@@ -64,7 +64,6 @@ Every record carries `provenance_class`, `source`, `collection_method` and `coll
 |---|---|---|---|
 | `gs://lma-01-hi-ne-corpus/raw/hi/wikipedia/data.jsonl` | `hindi/data/raw/downloaded_wikipedia.jsonl` | `hindi/data/splits/*.jsonl` | `downloaded` |
 | `gs://lma-01-hi-ne-corpus/raw/hi/sangraha/verified/data.jsonl` | `hindi/data/raw/downloaded_sangraha_verified.jsonl` | `hindi/data/splits/*.jsonl` | `downloaded` |
-| seed_domains.txt → sitemaps → article URLs | `hindi/data/raw/manual_scrape.jsonl` | `hindi/data/splits/*.jsonl` | `manual` |
 
 ### Nepali
 
@@ -72,8 +71,6 @@ Every record carries `provenance_class`, `source`, `collection_method` and `coll
 |---|---|---|---|
 | `gs://lma-01-hi-ne-corpus/raw/ne/wikipedia/data.jsonl` | `nepali/data/raw/downloaded_wikipedia.jsonl` | `nepali/data/splits/*.jsonl` | `downloaded` |
 | `gs://lma-01-hi-ne-corpus/raw/ne/sangraha/verified/data.jsonl` | `nepali/data/raw/downloaded_sangraha_verified.jsonl` | `nepali/data/splits/*.jsonl` | `downloaded` |
-| pdf_sources.txt → pdf_harvest → PDFs | `nepali/data/raw/manual_ocr.jsonl` | `nepali/data/splits/*.jsonl` | `manual` |
-| seed_domains.txt → sitemaps → article URLs | `nepali/data/raw/manual_scrape.jsonl` | `nepali/data/splits/*.jsonl` | `manual` |
 
 ## Dataset / licence information
 
@@ -88,28 +85,25 @@ Every record carries `provenance_class`, `source`, `collection_method` and `coll
 
 ## Version
 
-- Commit: `987ad30458abfbc6b83154a7717d846e4bc85abc`
-- Branch: `phase-1`
-- Generated: 2026-08-25 09:38:50 UTC
+- Commit: `c2a82c02fa66e6395fd229e237a102fc4cb385f5`
+- Branch: `phase-1-fix`
+- Generated: 2026-09-13 12:24:37 UTC
 - Working tree: dirty
 
 
 ```
-UU README.md
-A  pipeline/stats/dataset_stats.py
-M  run_phase1.py
-A  tools/make_figures.py
-M  tools/make_reports.py
-?? hindi/data/stats/dataset_statistics.json
-?? nepali/data/stats/dataset_statistics.json
-?? report/figures/cleaning_hindi.png
-?? report/figures/cleaning_hindi.svg
-?? report/figures/corpus_composition.png
-?? report/figures/corpus_composition.svg
-?? report/figures/doc_length.png
-?? report/figures/doc_length.svg
-?? report/figures/vocab_tradeoff.png
-?? report/figures/vocab_tradeoff.svg
-?? report/figures/zipf.png
-?? report/figures/zipf.svg
+M hindi/data/stats/dataset_statistics.json
+ M hindi/data/stats/token_accounting.json
+ M nepali/data/stats/dataset_statistics.json
+ M nepali/data/stats/token_accounting.json
+ M report/phase1_cleaning_report.md
+ M report/phase1_data_collection_report.md
+ M report/phase1_final_statistics.md
+ M report/phase1_manual_data_report.md
+ M report/phase1_provenance_report.md
+ M report/phase1_summary.md
+ M report/phase1_tokenizer_report.md
+ M report/phase1_validation_report.md
+ M report/verification.json
+ M tools/make_reports.py
 ```

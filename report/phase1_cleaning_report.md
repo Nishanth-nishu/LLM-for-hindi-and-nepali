@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| Generated (UTC) | 2026-08-25 09:38:50 |
-| Git commit | `987ad30458abfbc6b83154a7717d846e4bc85abc` |
-| Branch | `phase-1` |
+| Generated (UTC) | 2026-09-13 12:24:37 |
+| Git commit | `c2a82c02fa66e6395fd229e237a102fc4cb385f5` |
+| Branch | `phase-1-fix` |
 | Working tree | **dirty** — uncommitted changes present |
 
 > Values marked **ESTIMATE** are character-based proxies computed before a tokenizer existed. Final token counts are measured by encoding the final corpus with the final tokenizer (`count_corpus_tokens.py`).
@@ -81,6 +81,22 @@ Boilerplate lines removed in place: **58,551**
 MinHash Jaccard threshold: **0.8**, word 5-grams.
 
 ## Nepali
+
+> **⚠ Known-stale section, not fixed by this refresh.** Everything below this
+> note (document counts, character-by-split table, budget trim) is read
+> from `nepali/data/stats/corpus_stats.json`, the output of the
+> cleaning/dedup/budget-trim pipeline stage (`pipeline/process/build_corpus.py`).
+> That file still describes an earlier, incomplete state of the Nepali
+> corpus (~36M tokens / 73,969 train documents) from before the full
+> download/scrape volume was assembled — the same stale snapshot that
+> produced the incorrect "~36M Nepali tokens" figure this refresh set out
+> to fix. Regenerating it correctly requires re-running the full cleaning
+> pipeline against the raw, pre-cleaning collection files, which are not
+> part of this checkout (too large for git, and the original collection
+> environment is no longer available). The corrected, currently-accurate
+> Nepali corpus size (480,275,183 tokens / 900,737 total documents) is in
+> `report/phase1_validation_report.md`, `report/phase1_final_statistics.md`,
+> and `report/phase1_summary.md` — trust those over the numbers below.
 
 _Nepali — documents removed, by filter_
 

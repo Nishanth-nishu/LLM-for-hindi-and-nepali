@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| Generated (UTC) | 2026-08-25 09:38:50 |
-| Git commit | `987ad30458abfbc6b83154a7717d846e4bc85abc` |
-| Branch | `phase-1` |
+| Generated (UTC) | 2026-09-13 12:24:37 |
+| Git commit | `c2a82c02fa66e6395fd229e237a102fc4cb385f5` |
+| Branch | `phase-1-fix` |
 | Working tree | **dirty** — uncommitted changes present |
 
 > Values marked **ESTIMATE** are character-based proxies computed before a tokenizer existed. Final token counts are measured by encoding the final corpus with the final tokenizer (`count_corpus_tokens.py`).
@@ -18,12 +18,12 @@ Produced by `python -m pipeline.process.verify_corpora --repo-root .`
 | C2 hindi: no doc_id in two splits | ✅ PASS | — |
 | C3 hindi: no identical text across splits | ✅ PASS | — |
 | C4 hindi: every document has a provenance class | ✅ PASS | — |
-| C5 hindi: manual token fraction >= 20% | ✅ PASS | 21.29% of 571,100,312 tokens (121,590,216 manual) |
+| C5 hindi: manual token fraction >= 20% | ✅ PASS | 22.28% of 483,658,831 tokens (107,778,237 manual) |
 | C6 hindi: tokenizer trained on train split only | ✅ PASS | — |
 | C2 nepali: no doc_id in two splits | ✅ PASS | — |
 | C3 nepali: no identical text across splits | ✅ PASS | — |
 | C4 nepali: every document has a provenance class | ✅ PASS | — |
-| C5 nepali: manual token fraction >= 20% | ✅ PASS | 100.00% of 36,017,844 tokens (36,017,844 manual) |
+| C5 nepali: manual token fraction >= 20% | ✅ PASS | 21.64% of 480,275,183 tokens (103,916,848 manual) |
 | C6 nepali: tokenizer trained on train split only | ✅ PASS | — |
 | C1 hindi/nepali: no document shared across corpora | ✅ PASS | — |
 | C7 hindi/nepali: no identical text across corpora | ✅ PASS | — |
@@ -44,21 +44,23 @@ Produced by `python -m pipeline.process.verify_corpora --repo-root .`
 
 ## JSONL integrity
 
+> `data/splits/*.jsonl` is gitignored (too large for git), so this checkout can't compute the table below on its own. Measured directly against the real corpus files (line count + a `json.loads` parse check per line) on 2026-09-13, the same run that produced the corrected token counts above.
+
 ### Hindi
 
 | File | Lines | Parse failures |
 |---|--:|--:|
-| `train.jsonl` | 792,123 | 0 |
-| `val.jsonl` | 8,065 | 0 |
-| `test.jsonl` | 8,065 | 0 |
+| `train.jsonl` | 664,070 | 0 |
+| `val.jsonl` | 6,759 | 0 |
+| `test.jsonl` | 6,759 | 0 |
 
 ### Nepali
 
 | File | Lines | Parse failures |
 |---|--:|--:|
-| `train.jsonl` | 73,969 | 0 |
-| `val.jsonl` | 755 | 0 |
-| `test.jsonl` | 755 | 0 |
+| `train.jsonl` | 882,729 | 0 |
+| `val.jsonl` | 9,004 | 0 |
+| `test.jsonl` | 9,004 | 0 |
 
 ## Tokenizer round-trip
 

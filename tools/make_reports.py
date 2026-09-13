@@ -459,7 +459,7 @@ def r_manual(c: Ctx) -> str:
             if p.exists():
                 doms = [l.strip() for l in p.read_text(encoding="utf-8").splitlines()
                         if l.strip() and not l.startswith("#")]
-                L += [f"**{label}:** {len(doms)} (`{p.relative_to(c.root)}`)", ""]
+                L += [f"**{label}:** {len(doms)} (`{p.relative_to(c.root).as_posix()}`)", ""]
 
         urlf = c.root / lang / "data" / "raw" / "article_urls.txt"
         if urlf.exists():
@@ -803,7 +803,7 @@ def r_final_stats(c: Ctx) -> str:
           "> Token counts are valid **only** for the tokenizer named in each "
           "language's `token_accounting.json`. The same corpus measured with a "
           "different vocabulary yields a different number — at vocab 32,000 "
-          "this Nepali corpus measures roughly 345M tokens rather than 511M, "
+          "this Nepali corpus measures roughly 345M tokens rather than 480M, "
           "because chars-per-token rises from 3.63 to 5.06. A token count "
           "without its tokenizer is not a checkable claim.", ""]
     L += ["## Summary", "",
@@ -876,7 +876,7 @@ def r_repro(c: Ctx) -> str:
     for lang in LANGS:
         for f in sorted((c.root / lang / "configs").glob("*")):
             if f.is_file():
-                L.append(f"- `{f.relative_to(c.root)}`")
+                L.append(f"- `{f.relative_to(c.root).as_posix()}`")
     L += ["", "## GCS bucket structure", "", "```",
           "gs://lma-01-hi-ne-corpus/",
           "└── raw/",
@@ -991,7 +991,7 @@ def r_validation(c: Ctx) -> str:
           "`<lang>/tokenizer/analysis/examples.md`.", ""]
     for lang in LANGS:
         ex = c.root / lang / "tokenizer" / "analysis" / "examples.md"
-        L.append(f"- {lang}: {'`' + str(ex.relative_to(c.root)) + '`' if ex.exists() else MISSING}")
+        L.append(f"- {lang}: {'`' + ex.relative_to(c.root).as_posix() + '`' if ex.exists() else MISSING}")
     L += ["", "## Phase 2 consumability", "",
           "The final corpus is newline-delimited JSON with one document per "
           "line and a stable schema (`doc_id`, `text`, `language`, "

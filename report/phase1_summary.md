@@ -1,6 +1,6 @@
 # Phase 1 — Hindi and Nepali corpora and tokenizers
 
-_Generated 2026-08-25 09:38 UTC from commit `987ad30458ab`._
+_Generated 2026-09-13 12:24 UTC from commit `c2a82c02fa66`._
 
 ## Executive summary
 
@@ -12,10 +12,10 @@ The downloaded side streams from Cloud Storage with **windowed byte-range sampli
 
 | | Hindi | Nepali |
 |---|--:|--:|
-| Corpus tokens (MEASURED) | 571,100,312 | 36,017,844 |
-| Training tokens | 559,913,515 | 35,314,141 |
-| Manual tokens | 121,590,216 | 36,017,844 |
-| Downloaded tokens | 449,510,096 | 0 |
+| Corpus tokens (MEASURED) | 483,658,831 | 480,275,183 |
+| Training tokens | 474,087,588 | 470,739,561 |
+| Manual tokens | 107,778,237 | 103,916,848 |
+| Downloaded tokens | 375,880,594 | 376,358,335 |
 | Vocabulary size | 4,000 | 4,000 |
 | Fertility (test) | 1.6522 | 1.8457 |
 

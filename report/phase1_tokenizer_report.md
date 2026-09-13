@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| Generated (UTC) | 2026-08-25 09:38:50 |
-| Git commit | `987ad30458abfbc6b83154a7717d846e4bc85abc` |
-| Branch | `phase-1` |
+| Generated (UTC) | 2026-09-13 12:24:37 |
+| Git commit | `c2a82c02fa66e6395fd229e237a102fc4cb385f5` |
+| Branch | `phase-1-fix` |
 | Working tree | **dirty** — uncommitted changes present |
 
 > Values marked **ESTIMATE** are character-based proxies computed before a tokenizer existed. Final token counts are measured by encoding the final corpus with the final tokenizer (`count_corpus_tokens.py`).
@@ -77,8 +77,8 @@ _If manual fertility is materially worse than downloaded, the tokenizer is under
 
 ### Training corpus size
 
-- Training tokens: **559,913,515** (MEASURED)
-- Measured chars/token: **3.125** — by provenance: {'manual': 3.101, 'downloaded': 3.132}
+- Training tokens: **474,087,588** (MEASURED)
+- Measured chars/token: **3.12** — by provenance: {'manual': 3.101, 'downloaded': 3.126}
 
 ### Example tokenizations
 
@@ -246,8 +246,8 @@ _If manual fertility is materially worse than downloaded, the tokenizer is under
 
 ### Training corpus size
 
-- Training tokens: **35,314,141** (MEASURED)
-- Measured chars/token: **3.671** — by provenance: {'manual': 3.671}
+- Training tokens: **470,739,561** (MEASURED)
+- Measured chars/token: **3.633** — by provenance: {'manual': 3.743, 'downloaded': 3.603}
 
 ### Example tokenizations
 

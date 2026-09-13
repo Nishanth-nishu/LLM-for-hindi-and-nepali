@@ -18,7 +18,7 @@
     {
       "name": "C5 hindi: manual token fraction >= 20%",
       "passed": true,
-      "detail": "21.29% of 571,100,312 tokens (121,590,216 manual)"
+      "detail": "22.28% of 483,658,831 tokens (107,778,237 manual)"
     },
     {
       "name": "C6 hindi: tokenizer trained on train split only",
@@ -43,7 +43,7 @@
     {
       "name": "C5 nepali: manual token fraction >= 20%",
       "passed": true,
-      "detail": "100.00% of 36,017,844 tokens (36,017,844 manual)"
+      "detail": "21.64% of 480,275,183 tokens (103,916,848 manual)"
     },
     {
       "name": "C6 nepali: tokenizer trained on train split only",

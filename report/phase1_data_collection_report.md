@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| Generated (UTC) | 2026-08-25 09:38:50 |
-| Git commit | `987ad30458abfbc6b83154a7717d846e4bc85abc` |
-| Branch | `phase-1` |
+| Generated (UTC) | 2026-09-13 12:24:37 |
+| Git commit | `c2a82c02fa66e6395fd229e237a102fc4cb385f5` |
+| Branch | `phase-1-fix` |
 | Working tree | **dirty** — uncommitted changes present |
 
 > Values marked **ESTIMATE** are character-based proxies computed before a tokenizer existed. Final token counts are measured by encoding the final corpus with the final tokenizer (`count_corpus_tokens.py`).
@@ -45,17 +45,17 @@ Sources present in the bucket and deliberately excluded:
 
 ### Raw data size
 
-- `hindi/data/raw/` — **7.59 GB**
-- `hindi/data/splits/` — **4.83 GB**
+- `hindi/data/raw/` — not verified in this refresh (pre-cleaning collection files are not part of this checkout; see `report/phase1_manual_data_report.md` for why)
+- `hindi/data/splits/` — **5.0 GB** (measured directly, 2026-09-13, same run as the corrected token counts above)
 
 ### Token counts
 
 | Metric | Value | Status |
 |---|--:|---|
-| Corpus tokens (all splits) | 571,100,312 | **MEASURED** |
-| Training tokens | 559,913,515 | **MEASURED** |
+| Corpus tokens (all splits) | 483,658,831 | **MEASURED** |
+| Training tokens | 474,087,588 | **MEASURED** |
 | Target | 500,000,000 | — |
-| % of target | 114.22% | **MEASURED** |
+| % of target | 96.73% | **MEASURED** |
 
 Measured with `hindi_tokenizer.model` (vocab 4,000). Counts are valid only for this tokenizer.
 
@@ -96,16 +96,16 @@ Sources present in the bucket and deliberately excluded:
 
 ### Raw data size
 
-- `nepali/data/raw/` — **7.82 GB**
-- `nepali/data/splits/` — **0.38 GB**
+- `nepali/data/raw/` — not verified in this refresh (pre-cleaning collection files are not part of this checkout; see `report/phase1_manual_data_report.md` for why)
+- `nepali/data/splits/` — **6.1 GB** (measured directly, 2026-09-13, same run as the corrected token counts above — this is markedly larger than the previously-reported 0.38 GB, consistent with the previous number describing an earlier, incomplete state of this corpus before the full download/scrape volume was assembled; see `report/phase1_final_statistics.md`)
 
 ### Token counts
 
 | Metric | Value | Status |
 |---|--:|---|
-| Corpus tokens (all splits) | 36,017,844 | **MEASURED** |
-| Training tokens | 35,314,141 | **MEASURED** |
+| Corpus tokens (all splits) | 480,275,183 | **MEASURED** |
+| Training tokens | 470,739,561 | **MEASURED** |
 | Target | 500,000,000 | — |
-| % of target | 7.2% | **MEASURED** |
+| % of target | 96.06% | **MEASURED** |
 
 Measured with `nepali_tokenizer.model` (vocab 4,000). Counts are valid only for this tokenizer.
