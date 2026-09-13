@@ -270,7 +270,7 @@ def r_training(c: Ctx) -> str:
                   "plan and estimated wall-clock time on the project's "
                   "hardware.", ""]
         fig = c.root / "report" / "figures" / "phase2" / lang / "loss_curve.png"
-        L += [f"Loss curve: `{fig.relative_to(c.root)}`" if fig.exists()
+        L += [f"Loss curve: `{fig.relative_to(c.root).as_posix()}`" if fig.exists()
               else need(f"python tools/make_phase2_figures.py --repo-root ."), ""]
         if d.get("drive_checkpoint"):
             L += [f"Checkpoint (Drive): {d['drive_checkpoint']}", ""]

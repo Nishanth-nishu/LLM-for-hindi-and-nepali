@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| Generated (UTC) | 2026-09-08 17:22:48 |
-| Git commit | `95d64d64b9b122cea18c7162e68cd1e26c02c648` |
-| Branch | `phase-2` |
+| Generated (UTC) | 2026-09-13 11:21:26 |
+| Git commit | `21e27548771512fdaa9b753388a69f26b8a7f564` |
+| Branch | `phase-3` |
 
 > Following the Phase 1 convention: every number below is read from a JSON file a script actually produced. A field with no source file renders as `⚠ **NOT YET MEASURED**` and names the command that fills it.
 
@@ -13,10 +13,10 @@
 | | Model H (Hindi) | Model L (Nepali) |
 |---|--:|--:|
 | Checkpoint step | 6500 | 6799 |
-| Test cross-entropy (nats) | 2.7803 | 3.2246 |
-| Test perplexity | 16.12 | 25.14 |
-| Test bits-per-byte | 0.3088 | 0.4796 |
-| Val perplexity | 14.62 | 25.49 |
+| Test cross-entropy (nats) | 2.7803 | 3.2219 |
+| Test perplexity | 16.12 | 25.07 |
+| Test bits-per-byte | 0.3088 | 0.4792 |
+| Val perplexity | 14.62 | 25.41 |
 
 
 
@@ -26,4 +26,4 @@ Perplexity is computed per *token*, and the two languages use separate tokenizer
 
 ## Discussing the H vs L gap
 
-Model L (Nepali) has higher test perplexity than Model H (25.14 vs 16.12, +55.9%). Plausible contributors: fewer training tokens (471.6M L vs 474.8M H, ~0.7% less — the corpus actually tokenized for this run, not the Phase 1 handoff's claimed final-corpus figures; see `report/phase2_resource_comparison.md`), higher tokenizer fertility (1.8338 L vs 1.6522 H tokens/word — the same text costs more, harder-to-predict tokens in Nepali), and a lower manual-token share (20.83% L vs 21.29% H, both Phase 1 measurements). On bits-per-byte, which removes the tokenizer effect, the gap persists in the same direction (0.4796 vs 0.3088 bits/byte) — Model L remains behind on the byte-normalized metric too, suggesting the corpus-size gap dominates over the tokenizer-fertility effect. Byte-fallback rate (0.73% H vs 0.28% L, from `report/phase1_tokenizer_report.md`) is small for both and an unlikely major driver. With only two languages and one run each, this is a plausible attribution, not a controlled ablation.
+Model L (Nepali) has higher test perplexity than Model H (25.07 vs 16.12, +55.5%). Plausible contributors: fewer training tokens (471.6M L vs 474.8M H, ~0.7% less — the corpus actually tokenized for this run, not the Phase 1 handoff's claimed final-corpus figures; see `report/phase2_resource_comparison.md`), higher tokenizer fertility (1.8338 L vs 1.6522 H tokens/word — the same text costs more, harder-to-predict tokens in Nepali), and a lower manual-token share (20.83% L vs 21.29% H, both Phase 1 measurements). On bits-per-byte, which removes the tokenizer effect, the gap persists in the same direction (0.4792 vs 0.3088 bits/byte) — Model L remains behind on the byte-normalized metric too, suggesting the corpus-size gap dominates over the tokenizer-fertility effect. Byte-fallback rate (0.73% H vs 0.28% L, from `report/phase1_tokenizer_report.md`) is small for both and an unlikely major driver. With only two languages and one run each, this is a plausible attribution, not a controlled ablation.
