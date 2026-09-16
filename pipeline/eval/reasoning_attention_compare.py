@@ -56,6 +56,7 @@ def _pick_examples(examples: list[dict], n: int) -> list[dict]:
 def _analyze_checkpoint(
     model: GPTLanguageModel, mcfg: GPTConfig, sp: spm.SentencePieceProcessor,
     examples: list[dict], delimiter: str, device: str, fig_dir: Path, tag: str,
+    root: Path,
 ) -> dict:
     per_layer_entropy, per_layer_distance, causal_checks = [], [], []
     heatmap_paths: list[str] = []
@@ -71,11 +72,10 @@ def _analyze_checkpoint(
 
         if si == 0:
             tokens = [sp.id_to_piece(i) for i in ids]
-            early_path = fig_dir / f"{tag}_heatmap_layer_early.png"
-            late_path = fig_dir / f"{tag}_heatmap_layer_late.png"
-            plot_heatmap(attn[0], tokens, f"{tag} · layer 0 (early)", early_path)
-            plot_heatmap(attn[-1], tokens, f"{tag} · layer {len(attn) - 1} (late)", late_path)
-            heatmap_paths = [str(early_path), str(late_path)]
+            for li, layer_attn in enumerate(attn):
+                out_p = fig_dir / f"{tag}_heatmap_layer_{li:02d}.png"
+                plot_heatmap(layer_attn, tokens, f"{tag} · layer {li}", out_p)
+                heatmap_paths.append(out_p.relative_to(root).as_posix())
 
         ent = torch.stack([attention_entropy(a) for a in attn])       # (n_layer, h)
         dist = torch.stack([mean_attention_distance(a) for a in attn])  # (n_layer, h)
@@ -125,13 +125,13 @@ def run_comparison(
     fig_dir = root / "report" / "figures" / "phase3" / lang / "attention_pretrained_vs_finetuned"
 
     pre_model, pre_cfg, pre_step = _load_model(root / pretrained_checkpoint, device)
-    pre_result = _analyze_checkpoint(pre_model, pre_cfg, sp, examples, delimiter, device, fig_dir, "pretrained")
+    pre_result = _analyze_checkpoint(pre_model, pre_cfg, sp, examples, delimiter, device, fig_dir, "pretrained", root)
     pre_result["checkpoint"] = str(pretrained_checkpoint)
     pre_result["checkpoint_step"] = pre_step
     del pre_model
 
     ft_model, ft_cfg, ft_step = _load_model(root / finetuned_checkpoint, device)
-    ft_result = _analyze_checkpoint(ft_model, ft_cfg, sp, examples, delimiter, device, fig_dir, "finetuned")
+    ft_result = _analyze_checkpoint(ft_model, ft_cfg, sp, examples, delimiter, device, fig_dir, "finetuned", root)
     ft_result["checkpoint"] = str(finetuned_checkpoint)
     ft_result["checkpoint_step"] = ft_step
     del ft_model

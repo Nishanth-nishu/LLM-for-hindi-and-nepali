@@ -169,7 +169,12 @@
     84.87652587890625
   ],
   "heatmaps": [
-    "report\\figures\\phase2\\hindi\\heatmap_layer_early.png",
-    "report\\figures\\phase2\\hindi\\heatmap_layer_late.png"
+    "report/figures/phase2/hindi/heatmap_layer_00.png",
+    "report/figures/phase2/hindi/heatmap_layer_01.png",
+    "report/figures/phase2/hindi/heatmap_layer_02.png",
+    "report/figures/phase2/hindi/heatmap_layer_03.png",
+    "report/figures/phase2/hindi/heatmap_layer_04.png",
+    "report/figures/phase2/hindi/heatmap_layer_05.png",
+    "report/figures/phase2/hindi/heatmap_layer_06.png"
   ]
 }

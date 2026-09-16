@@ -6,71 +6,76 @@
   "prompts_analyzed": [
     {
       "family": "C_endpoints_less",
-      "prompt": "मोबाइल को तौल, साइकल भन्दा बढी छ। साइकल को तौल, जुत्ता भन्दा बढी छ। मोबाइल र जुत्ता मध्ये कसको तौल कम छ?",
-      "answer": "जुत्ता"
-    },
-    {
-      "family": "C_endpoints_more",
-      "prompt": "गोपाल, उमेर मा राजु भन्दा अगाडि छ। राजु, उमेर मा शिव भन्दा अगाडि छ। गोपाल र शिव मध्ये कसको उमेर बढी छ?",
-      "answer": "गोपाल"
-    },
-    {
-      "family": "C_most",
-      "prompt": "राजु को उमेर, शिव भन्दा बढी छ। शिव को उमेर, कमला भन्दा बढी छ। तीनैमध्ये सबैभन्दा बढी उमेर कसको छ?",
-      "answer": "राजु"
-    },
-    {
-      "family": "C_endpoints_more",
-      "prompt": "साइकल, मूल्य मा जुत्ता भन्दा अगाडि छ। जुत्ता, मूल्य मा मोबाइल भन्दा अगाडि छ। साइकल र मोबाइल मध्ये कसको मूल्य बढी छ?",
-      "answer": "साइकल"
+      "prompt": "घडी को मूल्य, बल भन्दा बढी छ। बल को मूल्य, चश्मा भन्दा बढी छ। घडी र चश्मा मध्ये कसको मूल्य कम छ?",
+      "answer": "चश्मा"
     },
     {
       "family": "C_endpoints_less",
-      "prompt": "गोपाल को उचाइ, सुनिता भन्दा बढी छ। सुनिता को उचाइ, प्रकाश भन्दा बढी छ। गोपाल र प्रकाश मध्ये कसको उचाइ कम छ?",
-      "answer": "प्रकाश"
+      "prompt": "विश्वरूप को उचाइ, शारदा भन्दा बढी छ। शारदा को उचाइ, सुशीला भन्दा बढी छ। विश्वरूप र सुशीला मध्ये कसको उचाइ कम छ?",
+      "answer": "सुशीला"
+    },
+    {
+      "family": "C_endpoints_less",
+      "prompt": "कलम को तौल, बल भन्दा बढी छ। बल को तौल, सिलेंडर भन्दा बढी छ। कलम र सिलेंडर मध्ये कसको तौल कम छ?",
+      "answer": "सिलेंडर"
+    },
+    {
+      "family": "C_endpoints_less",
+      "prompt": "चश्मा को तौल, बटन भन्दा बढी छ। बटन को तौल, कलम भन्दा बढी छ। चश्मा र कलम मध्ये कसको तौल कम छ?",
+      "answer": "कलम"
+    },
+    {
+      "family": "C_endpoints_less",
+      "prompt": "सरिता को उमेर, प्रियंका भन्दा बढी छ। प्रियंका को उमेर, वीरेन्द्र भन्दा बढी छ। सरिता र वीरेन्द्र मध्ये कसको उमेर कम छ?",
+      "answer": "वीरेन्द्र"
+    },
+    {
+      "family": "C_endpoints_less",
+      "prompt": "राजु को उमेर, विकास भन्दा बढी छ। विकास को उमेर, वीरेन्द्र भन्दा बढी छ। राजु र वीरेन्द्र मध्ये कसको उमेर कम छ?",
+      "answer": "वीरेन्द्र"
     },
     {
       "family": "C_most",
-      "prompt": "साइकल को तौल, मोबाइल भन्दा बढी छ। मोबाइल को तौल, जुत्ता भन्दा बढी छ। तीनैमध्ये सबैभन्दा बढी तौल कसको छ?",
-      "answer": "साइकल"
+      "prompt": "सरिता को उचाइ, वीरेन्द्र भन्दा बढी छ। वीरेन्द्र को उचाइ, हरि भन्दा बढी छ। तीनैमध्ये सबैभन्दा बढी उचाइ कसको छ?",
+      "answer": "सरिता"
     },
     {
-      "family": "C_least",
-      "prompt": "प्रकाश को उमेर, राजु भन्दा बढी छ। राजु को उमेर, गोपाल भन्दा बढी छ। तीनैमध्ये सबैभन्दा कम उमेर कसको छ?",
-      "answer": "गोपाल"
-    },
-    {
-      "family": "C_least",
-      "prompt": "साइकल को तौल, जुत्ता भन्दा बढी छ। जुत्ता को तौल, मोबाइल भन्दा बढी छ। तीनैमध्ये सबैभन्दा कम तौल कसको छ?",
-      "answer": "मोबाइल"
+      "family": "C_endpoints_less",
+      "prompt": "घडी को मूल्य, चश्मा भन्दा बढी छ। चश्मा को मूल्य, बल भन्दा बढी छ। घडी र बल मध्ये कसको मूल्य कम छ?",
+      "answer": "बल"
     }
   ],
   "pretrained": {
     "n_sentences_analyzed": 8,
     "causal_mask_verified_all_sentences": true,
     "entropy_mean_per_layer": [
-      2.3908166885375977,
-      2.3473706245422363,
-      2.328794002532959,
-      1.8700377941131592,
-      1.7689770460128784,
-      1.6630593538284302,
-      1.531639575958252
+      2.489527940750122,
+      2.425750494003296,
+      2.393500804901123,
+      1.8926384449005127,
+      1.7921222448349,
+      1.7283638715744019,
+      1.5664047002792358
     ],
     "distance_mean_per_layer": [
-      7.808629512786865,
-      8.754528045654297,
-      7.095365524291992,
-      3.5009350776672363,
-      3.9558234214782715,
-      6.291085720062256,
-      10.599451065063477
+      8.596597671508789,
+      9.667095184326172,
+      7.770360946655273,
+      3.659287452697754,
+      4.248854637145996,
+      6.792165756225586,
+      11.690739631652832
     ],
-    "entropy_overall_mean": 1.9858137369155884,
-    "distance_overall_mean": 6.857974052429199,
+    "entropy_overall_mean": 2.041187047958374,
+    "distance_overall_mean": 7.489299774169922,
     "heatmaps": [
-      "/scratch/nishanth.r/LMA/repo_phase3/report/figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_early.png",
-      "/scratch/nishanth.r/LMA/repo_phase3/report/figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_late.png"
+      "report/figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_00.png",
+      "report/figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_01.png",
+      "report/figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_02.png",
+      "report/figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_03.png",
+      "report/figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_04.png",
+      "report/figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_05.png",
+      "report/figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_06.png"
     ],
     "checkpoint": "nepali/checkpoints/latest.pt",
     "checkpoint_step": 6799
@@ -79,50 +84,55 @@
     "n_sentences_analyzed": 8,
     "causal_mask_verified_all_sentences": true,
     "entropy_mean_per_layer": [
-      2.3774209022521973,
-      2.371537208557129,
-      2.29750394821167,
-      1.7189161777496338,
-      1.6305593252182007,
-      1.3703275918960571,
-      1.504126787185669
+      2.4788057804107666,
+      2.4622275829315186,
+      2.3645808696746826,
+      1.749507188796997,
+      1.6713060140609741,
+      1.4270471334457397,
+      1.4973535537719727
     ],
     "distance_mean_per_layer": [
-      7.874785900115967,
-      8.472225189208984,
-      6.322497367858887,
-      3.3146369457244873,
-      3.654735565185547,
-      7.188474178314209,
-      10.314661026000977
+      8.649560928344727,
+      9.319128036499023,
+      6.853911399841309,
+      3.565319299697876,
+      4.036252021789551,
+      7.70702600479126,
+      11.147109031677246
     ],
-    "entropy_overall_mean": 1.8957703113555908,
-    "distance_overall_mean": 6.734573841094971,
+    "entropy_overall_mean": 1.9501183032989502,
+    "distance_overall_mean": 7.3254714012146,
     "heatmaps": [
-      "/scratch/nishanth.r/LMA/repo_phase3/report/figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_early.png",
-      "/scratch/nishanth.r/LMA/repo_phase3/report/figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_late.png"
+      "report/figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_00.png",
+      "report/figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_01.png",
+      "report/figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_02.png",
+      "report/figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_03.png",
+      "report/figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_04.png",
+      "report/figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_05.png",
+      "report/figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_06.png"
     ],
-    "checkpoint": "nepali/checkpoints_reasoning/best.pt",
+    "checkpoint": "nepali/checkpoints_reasoning/latest.pt",
     "checkpoint_step": 75
   },
   "delta_entropy_per_layer_finetuned_minus_pretrained": [
-    -0.01339578628540039,
-    0.024166584014892578,
-    -0.03129005432128906,
-    -0.1511216163635254,
-    -0.13841772079467773,
-    -0.29273176193237305,
-    -0.027512788772583008
+    -0.010722160339355469,
+    0.036477088928222656,
+    -0.02891993522644043,
+    -0.14313125610351562,
+    -0.12081623077392578,
+    -0.3013167381286621,
+    -0.06905114650726318
   ],
   "delta_distance_per_layer_finetuned_minus_pretrained": [
-    0.06615638732910156,
-    -0.2823028564453125,
-    -0.7728681564331055,
-    -0.18629813194274902,
-    -0.3010878562927246,
-    0.8973884582519531,
-    -0.2847900390625
+    0.0529632568359375,
+    -0.34796714782714844,
+    -0.9164495468139648,
+    -0.09396815299987793,
+    -0.2126026153564453,
+    0.9148602485656738,
+    -0.5436305999755859
   ],
-  "delta_entropy_overall": -0.09004342555999756,
-  "delta_distance_overall": -0.12340021133422852
+  "delta_entropy_overall": -0.09106874465942383,
+  "delta_distance_overall": -0.16382837295532227
 }

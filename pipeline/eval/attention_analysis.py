@@ -144,12 +144,16 @@ def run_attention_analysis(lang: str, checkpoint_path: str | Path, repo_root: st
             # looked all but blank. Take a short prefix of the same
             # document instead, with its own small forward pass.
             heatmap_ids = ids[:20]
+            heatmap_paths: list[Path] = []
             if len(heatmap_ids) >= 4:
                 heatmap_idx = torch.tensor([heatmap_ids], dtype=torch.long, device=device)
                 heatmap_attn = get_attention(model, heatmap_idx)
                 tokens = [sp.id_to_piece(i) for i in heatmap_ids]
-                plot_heatmap(heatmap_attn[0], tokens, "layer_0_early", fig_dir / "heatmap_layer_early.png")
-                plot_heatmap(heatmap_attn[-1], tokens, f"layer_{len(heatmap_attn) - 1}_late", fig_dir / "heatmap_layer_late.png")
+                n_layer_total = len(heatmap_attn)
+                for li, layer_attn in enumerate(heatmap_attn):
+                    out_p = fig_dir / f"heatmap_layer_{li:02d}.png"
+                    plot_heatmap(layer_attn, tokens, f"layer_{li}", out_p)
+                    heatmap_paths.append(out_p)
 
         ent = torch.stack([attention_entropy(a) for a in attn])  # (n_layer, h)
         dist = torch.stack([mean_attention_distance(a) for a in attn])  # (n_layer, h)
@@ -171,10 +175,7 @@ def run_attention_analysis(lang: str, checkpoint_path: str | Path, repo_root: st
         "mean_attention_distance_by_layer_head": distance.tolist(),
         "entropy_mean_per_layer": entropy.mean(dim=1).tolist(),
         "distance_mean_per_layer": distance.mean(dim=1).tolist(),
-        "heatmaps": [
-            str((fig_dir / "heatmap_layer_early.png").relative_to(root)),
-            str((fig_dir / "heatmap_layer_late.png").relative_to(root)),
-        ],
+        "heatmaps": [p.relative_to(root).as_posix() for p in heatmap_paths],
     }
     return result
 

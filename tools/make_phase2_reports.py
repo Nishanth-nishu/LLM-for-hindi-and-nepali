@@ -447,8 +447,7 @@ def r_attention(c: Ctx) -> str:
               f"(changing a future token left every earlier position's "
               f"logits bit-for-bit identical).", "",
               "### Heatmaps", "",
-              f"- Early layer: `{a['heatmaps'][0]}`",
-              f"- Late layer: `{a['heatmaps'][1]}`", "",
+              *[f"- Layer {i}: `{hp}`" for i, hp in enumerate(a["heatmaps"])], "",
               "### Entropy (nats) and mean attention distance, by layer", "",
               "| Layer | Mean entropy | Mean attention distance |",
               "|--:|--:|--:|"]

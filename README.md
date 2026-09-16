@@ -50,6 +50,8 @@ report/phase2_*.md               Phase 2: architecture, training, LM eval,
                                   generation eval, attention, ablation (bonus)
 report/phase3_*.md               Phase 3: reasoning finetuning, attention
                                   comparison, final consolidated report
+report/INDEX.md                  index of every report above, grouped by phase
+report/final_report.tex          consolidated <=10-page submission report (LaTeX)
 report/figures/                  loss curves, attention heatmaps, dataset figures
 report/phase2_checkpoint_links.json   Google Drive links for every checkpoint
 tests/                           unit tests (model correctness, reasoning

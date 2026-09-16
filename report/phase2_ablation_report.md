@@ -111,10 +111,21 @@ gap in §2.1, corroborated by the attention analysis below.
 
 Full per-head breakdown: [`phase2_attention_analysis_ablation_baseline.json`](../hindi/data/stats/phase2_attention_analysis_ablation_baseline.json),
 [`phase2_attention_analysis_ablation_nopos.json`](../hindi/data/stats/phase2_attention_analysis_ablation_nopos.json).
-Heatmaps: [baseline early layer](../report/figures/phase2/hindi__model_config_ablation_baseline/heatmap_layer_early.png) /
-[late layer](../report/figures/phase2/hindi__model_config_ablation_baseline/heatmap_layer_late.png),
-[no-pos early layer](../report/figures/phase2/hindi__model_config_ablation_nopos/heatmap_layer_early.png) /
-[late layer](../report/figures/phase2/hindi__model_config_ablation_nopos/heatmap_layer_late.png).
+Heatmaps, all 7 layers:
+Baseline — [0](../report/figures/phase2/hindi__model_config_ablation_baseline/heatmap_layer_00.png) ·
+[1](../report/figures/phase2/hindi__model_config_ablation_baseline/heatmap_layer_01.png) ·
+[2](../report/figures/phase2/hindi__model_config_ablation_baseline/heatmap_layer_02.png) ·
+[3](../report/figures/phase2/hindi__model_config_ablation_baseline/heatmap_layer_03.png) ·
+[4](../report/figures/phase2/hindi__model_config_ablation_baseline/heatmap_layer_04.png) ·
+[5](../report/figures/phase2/hindi__model_config_ablation_baseline/heatmap_layer_05.png) ·
+[6](../report/figures/phase2/hindi__model_config_ablation_baseline/heatmap_layer_06.png).
+No-pos — [0](../report/figures/phase2/hindi__model_config_ablation_nopos/heatmap_layer_00.png) ·
+[1](../report/figures/phase2/hindi__model_config_ablation_nopos/heatmap_layer_01.png) ·
+[2](../report/figures/phase2/hindi__model_config_ablation_nopos/heatmap_layer_02.png) ·
+[3](../report/figures/phase2/hindi__model_config_ablation_nopos/heatmap_layer_03.png) ·
+[4](../report/figures/phase2/hindi__model_config_ablation_nopos/heatmap_layer_04.png) ·
+[5](../report/figures/phase2/hindi__model_config_ablation_nopos/heatmap_layer_05.png) ·
+[6](../report/figures/phase2/hindi__model_config_ablation_nopos/heatmap_layer_06.png).
 
 The causal mask is empirically verified intact for both models (perturbing
 the last token never changes logits at earlier positions) — the ablation

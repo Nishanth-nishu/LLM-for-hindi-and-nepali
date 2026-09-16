@@ -93,15 +93,49 @@ attention *entropy* (which drops in the same direction and a comparable
 relative amount across both checkpoint-selection attempts) is the more
 robust of the two signals.
 
-## 4. Heatmaps: early vs. late layer, pretrained vs. finetuned
+## 4. Heatmaps: all 7 layers, pretrained vs. finetuned
 
-Four heatmaps per language (early layer × {pretrained, finetuned}, late
-layer × {pretrained, finetuned}), each showing all analyzed attention
-heads for one representative transitive-chain prompt including its answer
-position:
+28 heatmaps per language (7 layers × {pretrained, finetuned}), each
+showing all analyzed attention heads for one representative
+transitive-chain prompt including its answer position:
 
-- Hindi: [pretrained early](figures/phase3/hindi/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_early.png) · [pretrained late](figures/phase3/hindi/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_late.png) · [finetuned early](figures/phase3/hindi/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_early.png) · [finetuned late](figures/phase3/hindi/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_late.png)
-- Nepali: [pretrained early](figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_early.png) · [pretrained late](figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_late.png) · [finetuned early](figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_early.png) · [finetuned late](figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_late.png)
+**Hindi** — pretrained:
+[0](figures/phase3/hindi/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_00.png) ·
+[1](figures/phase3/hindi/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_01.png) ·
+[2](figures/phase3/hindi/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_02.png) ·
+[3](figures/phase3/hindi/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_03.png) ·
+[4](figures/phase3/hindi/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_04.png) ·
+[5](figures/phase3/hindi/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_05.png) ·
+[6](figures/phase3/hindi/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_06.png)
+— finetuned:
+[0](figures/phase3/hindi/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_00.png) ·
+[1](figures/phase3/hindi/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_01.png) ·
+[2](figures/phase3/hindi/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_02.png) ·
+[3](figures/phase3/hindi/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_03.png) ·
+[4](figures/phase3/hindi/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_04.png) ·
+[5](figures/phase3/hindi/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_05.png) ·
+[6](figures/phase3/hindi/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_06.png)
+
+**Nepali** — pretrained:
+[0](figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_00.png) ·
+[1](figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_01.png) ·
+[2](figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_02.png) ·
+[3](figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_03.png) ·
+[4](figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_04.png) ·
+[5](figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_05.png) ·
+[6](figures/phase3/nepali/attention_pretrained_vs_finetuned/pretrained_heatmap_layer_06.png)
+— finetuned:
+[0](figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_00.png) ·
+[1](figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_01.png) ·
+[2](figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_02.png) ·
+[3](figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_03.png) ·
+[4](figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_04.png) ·
+[5](figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_05.png) ·
+[6](figures/phase3/nepali/attention_pretrained_vs_finetuned/finetuned_heatmap_layer_06.png)
+
+(Layer 0 = earliest, layer 6 = final/late layer — matches the "early vs.
+late" pair discussed in the rest of this report, now with every layer in
+between included too.)
 
 The late-layer heatmaps show a strong "attention sink" at position 0
 across most heads in both the pretrained and finetuned checkpoints (a
